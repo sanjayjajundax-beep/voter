@@ -2223,44 +2223,44 @@
         async function shareSlipImageDirect() {
             const btn = event.target;
             const oldText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> तैयार हो रहा है...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> इमेज तैयार हो रही है...';
 
             const canvas = await generateSlipCanvas();
             if (canvas) {
                 canvas.toBlob(async function(blob) {
-                    const file = new File([blob], `voter_slip_${currentActiveVoter ? currentActiveVoter.name : 'voter'}.png`, { type: 'image/png' });
+                    const fileName = `voter_slip_${currentActiveVoter ? currentActiveVoter.name.replace(/\s+/g, '_') : 'voter'}.png`;
+                    const file = new File([blob], fileName, { type: 'image/png' });
                     
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         try {
-                            await navigator.canShare({
+                            await navigator.share({
                                 files: [file],
                                 title: 'मतदाता सूचना पर्ची',
-                                text: `${campaign.name} (${campaign.symbolName}) - मतदाता पर्ची`
+                                text: `मतदाता पर्ची: ${currentActiveVoter ? currentActiveVoter.name : ''} | ${campaign.name} (${campaign.symbolName})`
                             });
                         } catch(err) {
-                            console.warn(err);
+                            if (err.name !== 'AbortError') {
+                                downloadCanvasFallback(canvas, fileName);
+                            }
                         }
-                    } else if (navigator.share) {
-                        try {
-                            await navigator.share({
-                                title: 'मतदाता सूचना पर्ची',
-                                text: `${campaign.name} (${campaign.symbolName}) - मतदाता पर्ची: ${currentActiveVoter ? currentActiveVoter.name : ''}`
-                            });
-                        } catch(e) {}
                     } else {
-                        // Fallback: download the image directly
-                        const link = document.createElement('a');
-                        link.download = `voter_slip.png`;
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                        alert('इमेज डाउनलोड हो गई है! अब आप इसे व्हाट्सएप पर भेज सकते हैं।');
+                        downloadCanvasFallback(canvas, fileName);
+                        alert('✅ पर्ची PNG इमेज डाउनलोड हो गई है! अब आप इसे सीधे व्हाट्सएप पर भेज सकते हैं।');
                     }
+                    btn.innerHTML = oldText;
                 }, 'image/png');
+            } else {
+                btn.innerHTML = oldText;
             }
-            btn.innerHTML = oldText;
         }
 
-    
+        function downloadCanvasFallback(canvas, fileName) {
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
         // ================= ADMIN PASSWORD CHANGE LOGIC =================
         let currentAdminPassword = localStorage.getItem('custom_admin_password') || 'admin123';
 
