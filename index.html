@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- html2canvas for PNG slip export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- SheetJS for 5400+ Excel Parsing -->
+    <!-- SheetJS for डेटा Excel Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <!-- Firebase SDK (Compat mode for seamless single-page GitHub Pages hosting) -->
@@ -516,7 +516,7 @@
             color: #475569;
         }
 
-        /* Progress Bar for 5400+ Upload */
+        /* Progress Bar for डेटा Upload */
         .progress-box {
             width: 100%;
             height: 14px;
@@ -885,7 +885,7 @@
             <div class="admin-top-bar">
                 <div>
                     <h2 style="font-size: 1.25rem; font-weight: 700;"><i class="fa-solid fa-user-shield"></i> मुख्य एडमिन डैशबोर्ड</h2>
-                    <p style="font-size: 0.82rem; opacity: 0.85;">फायरबेस क्लाउड डेटाबेस एवं 5400+ एक्सेल अपलोड</p>
+                    <p style="font-size: 0.82rem; opacity: 0.85;">फायरबेस क्लाउड डेटाबेस एवं डेटा एक्सेल अपलोड</p>
                 </div>
                 <button class="btn-main" style="width: auto; padding: 8px 14px; background: #dc2626;" onclick="exitAdmin()">
                     <i class="fa-solid fa-xmark"></i> बाहर निकलें
@@ -894,7 +894,7 @@
 
             <div class="admin-nav-tabs">
                 <button class="nav-tab-btn active" onclick="switchAdminTab('tabExcelUpload', this)">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> 1. एक्सेल से फायरबेस पर अपलोड (5400+)
+                    <i class="fa-solid fa-cloud-arrow-up"></i> 1. एक्सेल से फायरबेस पर अपलोड (डेटा)
                 </button>
                 <button class="nav-tab-btn" onclick="switchAdminTab('tabClientsManage', this)">
                     <i class="fa-solid fa-users-gear"></i> 2. क्लाइंट्स & वार्ड एक्सेस
@@ -907,10 +907,10 @@
                 </button>
             </div>
 
-            <!-- TAB 1: EXCEL TO FIREBASE BATCH UPLOAD (5400+ VOTERS) -->
+            <!-- TAB 1: EXCEL TO FIREBASE BATCH UPLOAD (डेटा VOTERS) -->
             <div id="tabExcelUpload" class="admin-tab-pane">
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-file-excel"></i> 1 से 17 वार्ड की 5405+ एक्सेल शीट को फायरबेस में अपलोड करें</h3>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-file-excel"></i> 1 से 17 वार्ड की  एक्सेल शीट को फायरबेस में अपलोड करें</h3>
                     <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 14px;">
                         यहाँ अपनी पूरी 17 वार्डों की एक्सेल फाइल चुनें। यह सिस्टम इसे ऑटोमैटिकली 450-450 के बैच में फायरबेस क्लाउड में अपलोड कर देगा।
                     </p>
@@ -1196,7 +1196,7 @@
             }
         }
 
-        // In-memory & Local DB Cache of Voters (5400+)
+        // In-memory & Local DB Cache of Voters (डेटा)
         let votersList = [];
         if (localStorage.getItem('election_all_voters_db')) {
             try {
@@ -2027,7 +2027,7 @@
             document.getElementById('wardStatsCount').innerHTML = summaryStr;
         }
 
-        // ================= EXCEL PARSER & FIREBASE BATCH UPLOAD (5405+ VOTERS) =================
+        // ================= EXCEL PARSER & FIREBASE BATCH UPLOAD ( VOTERS) =================
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -2036,7 +2036,7 @@
             const progressBox = document.getElementById('uploadProgressBox');
             const progressBar = document.getElementById('uploadProgressBar');
 
-            msgDiv.innerHTML = '<span style="color:#2563eb;"><i class="fa-solid fa-spinner fa-spin"></i> 5400+ एक्सेल शीट पढ़ी जा रही है, कृपया प्रतीक्षा करें...</span>';
+            msgDiv.innerHTML = '<span style="color:#2563eb;"><i class="fa-solid fa-spinner fa-spin"></i> मतदाता एक्सेल शीट पढ़ी जा रही है, कृपया प्रतीक्षा करें...</span>';
             progressBox.style.display = 'block';
             progressBar.style.width = '10%';
 
@@ -2109,7 +2109,7 @@
 
                     // ================= FIREBASE CLOUD BATCH UPLOAD =================
                     if (isFirebaseActive && db) {
-                        msgDiv.innerHTML = `<span style="color:#2563eb;"><i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> फायरबेस क्लाउड पर 5400+ मतदाता अपलोड हो रहे हैं...</span>`;
+                        msgDiv.innerHTML = `<span style="color:#2563eb;"><i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> फायरबेस क्लाउड पर डेटा मतदाता अपलोड हो रहे हैं...</span>`;
                         
                         const batchSize = 450; // Firestore limit is 500 writes per batch
                         const totalRecords = votersList.length;
