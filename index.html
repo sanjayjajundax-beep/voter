@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- html2canvas for PNG slip export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- SheetJS for डेटा Excel Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -905,6 +903,9 @@
                 <button class="nav-tab-btn" onclick="switchAdminTab('tabFirebaseConfig', this)">
                     <i class="fa-solid fa-gear"></i> 4. फायरबेस सेटिंग्स (API Keys)
                 </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('tabAdminPassword', this)">
+                    <i class="fa-solid fa-key"></i> 5. एडमिन पासवर्ड बदलें
+                </button>
             </div>
 
             <!-- TAB 1: EXCEL TO FIREBASE BATCH UPLOAD (डेटा VOTERS) -->
@@ -1083,6 +1084,31 @@
                     </div>
                     <button class="btn-main" onclick="saveFirebaseCredentials()">
                         <i class="fa-solid fa-cloud-bolt"></i> फायरबेस सेटिंग्स सेव करें & कनेक्ट करें
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 5: ADMIN PASSWORD CHANGE -->
+            <div id="tabAdminPassword" class="admin-tab-pane" style="display: none;">
+                <div class="admin-card">
+                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-key"></i> मुख्य एडमिन पासवर्ड बदलें</h3>
+                    <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 14px;">
+                        सुरक्षा के लिए आप अपना एडमिन पासवर्ड बदल सकते हैं। (डिफ़ॉल्ट पासवर्ड: <code>admin123</code>)
+                    </p>
+                    <div class="form-group">
+                        <label>वर्तमान एडमिन पासवर्ड:</label>
+                        <input type="password" id="currentAdminPass" class="form-control" placeholder="पुराना पासवर्ड दर्ज करें...">
+                    </div>
+                    <div class="form-group">
+                        <label>नया एडमिन पासवर्ड:</label>
+                        <input type="password" id="newAdminPass" class="form-control" placeholder="नया पासवर्ड दर्ज करें...">
+                    </div>
+                    <div class="form-group">
+                        <label>नया पासवर्ड दोबारा लिखें (कन्फर्म):</label>
+                        <input type="password" id="confirmAdminPass" class="form-control" placeholder="नया पासवर्ड दोबारा लिखें...">
+                    </div>
+                    <button class="btn-main" onclick="updateAdminPassword()" style="margin-top: 10px;">
+                        <i class="fa-solid fa-shield-halved"></i> एडमिन पासवर्ड सुरक्षित करें
                     </button>
                 </div>
             </div>
@@ -1293,7 +1319,7 @@
 
         function submitAdminModalPass() {
             const p = document.getElementById('modalAdminPass').value.trim();
-            if (p === 'admin123') {
+            if (p === currentAdminPassword) {
                 closeAdminModal();
                 showView('viewAdminDashboard');
             } else {
@@ -1320,7 +1346,7 @@
             }
 
             // Direct Admin Login
-            if (u.toLowerCase() === 'admin' && p === 'admin123') {
+            if (u.toLowerCase() === 'admin' && p === currentAdminPassword) {
                 showView('viewAdminDashboard');
                 return;
             }
@@ -2090,9 +2116,6 @@
                             rel_name: getVal(row, ['संबंधी का नाम (Relative Name)', 'संबंधी का नाम', 'Relative Name', 'पिता का नाम', 'पति का नाम'], ''),
                             house: getVal(row, ['मकान संख्या (House No.)', 'मकान नंबर', 'मकान संख्या', 'House No', 'House'], ''),
                             age: getVal(row, ['आयु (Age)', 'आयु', 'उम्र', 'Age'], ''),
-                            gender: getVal(row, ['लिंग (Gender)', 'लिंग', 'Gender'], ''),
-                            area: getVal(row, ['मोहल्ला / क्षेत्र (Area/Locality)', 'मोहल्ला', 'क्षेत्र', 'Area', 'Locality', 'एरिया'], 'सुवाणा'),
-                            booth: getVal(row, ['मतदान केंद्र', 'बूथ', 'मतदान का बूथ', 'Polling Station', 'Booth'], 'रा. उ. मा. वि. सुवाणा')
                         };
                     });
 
@@ -2225,6 +2248,44 @@
                 }, 'image/png');
             }
             btn.innerHTML = oldText;
+        }
+
+    
+        // ================= ADMIN PASSWORD CHANGE LOGIC =================
+        let currentAdminPassword = localStorage.getItem('custom_admin_password') || 'admin123';
+
+        function updateAdminPassword() {
+            const oldP = document.getElementById('currentAdminPass').value.trim();
+            const newP = document.getElementById('newAdminPass').value.trim();
+            const confP = document.getElementById('confirmAdminPass').value.trim();
+
+            if (!oldP || !newP || !confP) {
+                alert('कृपया सभी फ़ील्ड भरें!');
+                return;
+            }
+
+            if (oldP !== currentAdminPassword) {
+                alert('वर्तमान (पुराना) पासवर्ड गलत है!');
+                return;
+            }
+
+            if (newP.length < 4) {
+                alert('नया पासवर्ड कम से कम 4 अंकों/अक्षरों का होना होना चाहिए!');
+                return;
+            }
+
+            if (newP !== confP) {
+                alert('नया पासवर्ड और कन्फर्म पासवर्ड मेल नहीं खा रहे हैं!');
+                return;
+            }
+
+            currentAdminPassword = newP;
+            localStorage.setItem('custom_admin_password', newP);
+
+            alert('✅ एडमिन पासवर्ड सफलतापूर्वक बदल दिया गया है! अब नए पासवर्ड से लॉगिन करें।');
+            document.getElementById('currentAdminPass').value = '';
+            document.getElementById('newAdminPass').value = '';
+            document.getElementById('confirmAdminPass').value = '';
         }
 
     </script>
