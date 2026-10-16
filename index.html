@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- html2canvas for PNG slip export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- SheetJS for डेटा Excel Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -797,6 +799,12 @@
                         <i class="fa-solid fa-unlock"></i> डिवाइस लॉक रीसेट करें
                     </a>
                 </div>
+                
+                <div style="margin-top: 16px; padding-top: 10px; border-top: 1px dashed var(--border); font-size: 0.78rem; color: var(--text-muted); text-align: center;">
+                    <div>विकसितकर्ता: <b>संजय जाजुन्दा</b></div>
+                    <div>हेल्पलाइन / तकनीकी सहायता: <a href="tel:9829970310" style="color: var(--primary-light); font-weight: 700;">9829970310</a></div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -1084,31 +1092,6 @@
                     </div>
                     <button class="btn-main" onclick="saveFirebaseCredentials()">
                         <i class="fa-solid fa-cloud-bolt"></i> फायरबेस सेटिंग्स सेव करें & कनेक्ट करें
-                    </button>
-                </div>
-            </div>
-
-            <!-- TAB 5: ADMIN PASSWORD CHANGE -->
-            <div id="tabAdminPassword" class="admin-tab-pane" style="display: none;">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-key"></i> मुख्य एडमिन पासवर्ड बदलें</h3>
-                    <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 14px;">
-                        सुरक्षा के लिए आप अपना एडमिन पासवर्ड बदल सकते हैं। (डिफ़ॉल्ट पासवर्ड: <code>admin123</code>)
-                    </p>
-                    <div class="form-group">
-                        <label>वर्तमान एडमिन पासवर्ड:</label>
-                        <input type="password" id="currentAdminPass" class="form-control" placeholder="पुराना पासवर्ड दर्ज करें...">
-                    </div>
-                    <div class="form-group">
-                        <label>नया एडमिन पासवर्ड:</label>
-                        <input type="password" id="newAdminPass" class="form-control" placeholder="नया पासवर्ड दर्ज करें...">
-                    </div>
-                    <div class="form-group">
-                        <label>नया पासवर्ड दोबारा लिखें (कन्फर्म):</label>
-                        <input type="password" id="confirmAdminPass" class="form-control" placeholder="नया पासवर्ड दोबारा लिखें...">
-                    </div>
-                    <button class="btn-main" onclick="updateAdminPassword()" style="margin-top: 10px;">
-                        <i class="fa-solid fa-shield-halved"></i> एडमिन पासवर्ड सुरक्षित करें
                     </button>
                 </div>
             </div>
@@ -1983,19 +1966,42 @@
                     <td>
                         ${c.boundDevice ? 
                             `<span style="color:#b91c1c; font-weight:700;"><i class="fa-solid fa-lock"></i> लॉक्ड</span><br><small style="color:#64748b;">(${c.boundDevice.substr(0,10)}...)</small>` : 
-                            '<span style="color:#15803d; font-weight:700;"><i class="fa-solid fa-lock-open"></i> खुला (नया फोन लिंक होगा)</span>'}
+                            '<span style="color:#15803d; font-weight:700;"><i class="fa-solid fa-lock-open"></i> खुला</span>'}
                     </td>
                     <td>
-                        <button class="btn-main" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#3b82f6; display:inline-block; margin-bottom:4px;" onclick="unlockClientDevice(${idx})">
-                            <i class="fa-solid fa-arrows-rotate"></i> अनलॉक
-                        </button>
-                        <button class="btn-main" style="width:auto; padding:4px 8px; font-size:0.75rem; background:#ef4444; display:inline-block;" onclick="deleteClient(${idx})">
-                            हटाएं
-                        </button>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#3b82f6;" onclick="unlockClientDevice(${idx})">
+                                <i class="fa-solid fa-arrows-rotate"></i> अनलॉक
+                            </button>
+                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#d97706;" onclick="editClient(${idx})">
+                                <i class="fa-solid fa-pen-to-square"></i> एडिट
+                            </button>
+                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#ef4444;" onclick="deleteClient(${idx})">
+                                <i class="fa-solid fa-trash"></i> हटाएं
+                            </button>
+                        </div>
                     </td>
                 `;
                 tb.appendChild(tr);
             });
+        }
+
+        function editClient(idx) {
+            const c = clientUsers[idx];
+            const newName = prompt("कार्यकर्ता / व्यक्ति का नाम:", c.name);
+            if (newName === null) return;
+            const newPass = prompt("नया पासवर्ड:", c.pass);
+            if (newPass === null) return;
+            const newWard = prompt("वार्ड नंबर (1 से 17 या ALL लिखें):", c.ward);
+            if (newWard === null) return;
+
+            c.name = newName.trim() || c.name;
+            c.pass = newPass.trim() || c.pass;
+            c.ward = newWard.trim().toUpperCase() || c.ward;
+
+            saveClientsState();
+            renderClientsAdminTable();
+            alert('✅ क्लाइंट विवरण सफलतापूर्वक अपडेट हो गया!');
         }
 
         function addClientAccount() {
@@ -2116,6 +2122,9 @@
                             rel_name: getVal(row, ['संबंधी का नाम (Relative Name)', 'संबंधी का नाम', 'Relative Name', 'पिता का नाम', 'पति का नाम'], ''),
                             house: getVal(row, ['मकान संख्या (House No.)', 'मकान नंबर', 'मकान संख्या', 'House No', 'House'], ''),
                             age: getVal(row, ['आयु (Age)', 'आयु', 'उम्र', 'Age'], ''),
+                            gender: getVal(row, ['लिंग (Gender)', 'लिंग', 'Gender'], ''),
+                            area: getVal(row, ['मोहल्ला / क्षेत्र (Area/Locality)', 'मोहल्ला', 'क्षेत्र', 'Area', 'Locality', 'एरिया'], 'सुवाणा'),
+                            booth: getVal(row, ['मतदान केंद्र', 'बूथ', 'मतदान का बूथ', 'Polling Station', 'Booth'], 'रा. उ. मा. वि. सुवाणा')
                         };
                     });
 
@@ -2144,7 +2153,8 @@
 
                             chunk.forEach(voter => {
                                 // Unique Doc ID based on Ward and Serial Number or EPIC
-                                const docId = `w${voter.ward}_s${voter.sno}_${voter.epic || Math.random().toString(36).substr(2,5)}`;
+                                const cleanEpic = (voter.epic || '').replace(/\//g, '_').replace(/\s+/g, '');
+                                const docId = `w${voter.ward}_s${voter.sno}_${cleanEpic || Math.random().toString(36).substr(2,5)}`;
                                 const docRef = db.collection("voters").doc(docId);
                                 batch.set(docRef, voter);
                             });
@@ -2270,7 +2280,7 @@
             }
 
             if (newP.length < 4) {
-                alert('नया पासवर्ड कम से कम 4 अंकों/अक्षरों का होना होना चाहिए!');
+                alert('नया पासवर्ड कम से कम 4 अंकों/अक्षरों का होना चाहिए!');
                 return;
             }
 
