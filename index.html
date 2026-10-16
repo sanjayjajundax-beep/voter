@@ -1930,13 +1930,14 @@
         });
 
         // Clients Management Table
-        function renderClientsAdminTable() {
+                function renderClientsAdminTable() {
             const tb = document.getElementById('clientsTableBody');
+            if (!tb) return;
             tb.innerHTML = '';
 
             clientUsers.forEach((c, idx) => {
                 const tr = document.createElement('tr');
-                const wardDisplay = c.ward === 'ALL' ? '<span style="color:#d97706; font-weight:700;"><i class="fa-solid fa-crown"></i> सभी वार्ड (1-17)</span>' : `<b>वार्ड ${c.ward}</b>`;
+                const wardDisplay = c.ward === 'ALL' ? '<span style="color:#d97706; font-weight:700;">सभी वार्ड (1-17)</span>' : `<b>वार्ड ${c.ward}</b>`;
                 tr.innerHTML = `
                     <td><strong>${c.id}</strong></td>
                     <td>${c.name}</td>
@@ -1944,18 +1945,18 @@
                     <td><code>${c.pass}</code></td>
                     <td>
                         ${c.boundDevice ? 
-                            `<span style="color:#b91c1c; font-weight:700;"><i class="fa-solid fa-lock"></i> लॉक्ड</span><br><small style="color:#64748b;">(${c.boundDevice.substr(0,10)}...)</small>` : 
+                            `<span style="color:#b91c1c; font-weight:700;"><i class="fa-solid fa-lock"></i> लॉक्ड</span>` : 
                             '<span style="color:#15803d; font-weight:700;"><i class="fa-solid fa-lock-open"></i> खुला</span>'}
                     </td>
                     <td>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#3b82f6;" onclick="unlockClientDevice(${idx})">
+                        <div style="display: flex; flex-direction: column; gap: 6px; width: 100%;">
+                            <button class="btn-main" style="width:100%; padding:6px 10px; font-size:0.78rem; background:#3b82f6;" onclick="unlockClientDevice(${idx})">
                                 <i class="fa-solid fa-arrows-rotate"></i> अनलॉक
                             </button>
-                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#d97706;" onclick="editClient(${idx})">
+                            <button class="btn-main" style="width:100%; padding:6px 10px; font-size:0.78rem; background:#d97706;" onclick="editClient(${idx})">
                                 <i class="fa-solid fa-pen-to-square"></i> एडिट
                             </button>
-                            <button class="btn-main" style="width:100%; padding:5px 8px; font-size:0.75rem; background:#ef4444;" onclick="deleteClient(${idx})">
+                            <button class="btn-main" style="width:100%; padding:6px 10px; font-size:0.78rem; background:#ef4444;" onclick="deleteClient(${idx})">
                                 <i class="fa-solid fa-trash"></i> हटाएं
                             </button>
                         </div>
@@ -1963,6 +1964,7 @@
                 `;
                 tb.appendChild(tr);
             });
+        });
         }
 
         function editClient(idx) {
