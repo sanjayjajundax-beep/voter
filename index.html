@@ -1086,20 +1086,24 @@
                 </div>
             </div>
 
-                        <div class="slip-footer-tools">
-                <button class="btn-main" style="background: #16a34a; padding: 12px; font-size: 0.95rem;" onclick="downloadSlipAsImage()">
-                    <i class="fa-solid fa-download"></i> 🖼️ पर्ची इमेज (PNG) डाउनलोड करें
+                                    <div class="slip-footer-tools">
+                <button class="btn-main" style="background: #16a34a; padding: 12px; font-size: 0.95rem;" onclick="sendSlipWhatsAppModal()">
+                    <i class="fa-brands fa-whatsapp"></i> व्हाट्सएप पर टेक्स्ट भेजें
                 </button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                    <button class="btn-main" style="background: #2563eb; padding: 9px;" onclick="shareSlipImageDirect()">
-                        <i class="fa-solid fa-share-nodes"></i> शेयर करें
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn-main" style="background: #2563eb; padding: 10px;" onclick="downloadSlipAsImage()">
+                        <i class="fa-solid fa-download"></i> 🖼️ पर्ची सेव (PNG)
                     </button>
-                    <button class="btn-main" style="background: #e2e8f0; color: #0f172a; padding: 9px;" onclick="closeSlipModal()">
-                        <i class="fa-solid fa-xmark"></i> बंद करें
+                    <button class="btn-main" style="background: #d97706; padding: 10px;" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> प्रिंट / PDF
                     </button>
                 </div>
+                <button class="btn-main" style="background: #e2e8f0; color: #0f172a; padding: 9px;" onclick="closeSlipModal()">
+                    <i class="fa-solid fa-xmark"></i> बंद करें
+                </button>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Application JavaScript -->
@@ -2271,6 +2275,15 @@
             document.getElementById('currentAdminPass').value = '';
             document.getElementById('newAdminPass').value = '';
             document.getElementById('confirmAdminPass').value = '';
+        }
+
+    
+        function sendSlipWhatsAppModal() {
+            if (!currentActiveVoter) return;
+            const num = prompt("मतदाता " + currentActiveVoter.name + " की पर्ची भेजने के लिए मोबाइल नंबर दर्ज करें:");
+            if (num && num.trim().length >= 10) {
+                dispatchWhatsApp(num.trim(), currentActiveVoter);
+            }
         }
 
     </script>
