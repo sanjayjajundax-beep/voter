@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>पंचायती राज चुनाव • मतदाता पर्ची पोर्टल</title>
+    <title>स्मार्ट मतदाता पर्ची एवं चुनाव प्रबंधन पोर्टल (वार्ड 1-17)</title>
     
     <!-- Google Fonts & Font Awesome -->
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -508,6 +508,7 @@
             max-height: 94vh;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
         }
 
         .slip-scroll-content {
@@ -574,6 +575,7 @@
             gap: 8px;
         }
 
+        /* Admin Modal Dialog */
         #adminLoginModal {
             position: fixed;
             top: 0;
@@ -599,6 +601,7 @@
             border-radius: 16px;
             padding: 22px;
             text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
         @media print {
@@ -894,7 +897,7 @@
                     <button class="btn-main" style="background: #2563eb; padding: 10px;" onclick="downloadSlipAsImage()">
                         <i class="fa-solid fa-download"></i> 🖼️ पर्ची सेव (PNG)
                     </button>
-                    <button class="btn-main" style="background: #d97706; padding: 10px;" onclick="window.print()">
+                    <button class="btn-main" style="background: #d97706; padding: 10px;" onclick="printSingleVoterSlip()">
                         <i class="fa-solid fa-print"></i> प्रिंट / PDF
                     </button>
                 </div>
@@ -1105,6 +1108,13 @@
             }
         }
 
+        let currentSearchMode = 'name';
+        const nameSearchInput = document.getElementById('nameSearchInput');
+        const houseSearchInput = document.getElementById('houseSearchInput');
+        const voterResultsContainer = document.getElementById('voterResultsContainer');
+        const voterResultCount = document.getElementById('voterResultCount');
+        const searchHintText = document.getElementById('searchHintText');
+
         function setSearchMode(mode) {
             currentSearchMode = mode;
             const btnName = document.getElementById('tabBtnNameMode');
@@ -1129,7 +1139,23 @@
 
         function showInitialSearchPrompt() {
             voterResultCount.innerText = '0';
-            voterResultsContainer.innerHTML = `<div style="text-align: center; padding: 40px; background: white; border-radius: 14px; color: #64748b;">खोजने के लिए ऊपर टाइप करें</div>`;
+            if (currentSearchMode === 'name') {
+                voterResultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 45px 16px; background: white; border-radius: 16px; border: 1.5px dashed #cbd5e1; margin-top: 10px;">
+                        <i class="fa-solid fa-user-tag" style="font-size: 2.6rem; color: #3b82f6; margin-bottom: 10px;"></i>
+                        <h3 style="font-size: 1.1rem; color: #1e3a8a; font-weight: 700; margin-bottom: 4px;">मतदाता या पिता का नाम लिखें</h3>
+                        <p style="font-size: 0.85rem; color: #64748b;">नाम के कुछ अक्षर लिखते ही परिणाम सामने आ जाएंगे।</p>
+                    </div>
+                `;
+            } else {
+                voterResultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 45px 16px; background: white; border-radius: 16px; border: 1.5px dashed #f59e0b; margin-top: 10px;">
+                        <i class="fa-solid fa-people-roof" style="font-size: 2.6rem; color: #d97706; margin-bottom: 10px;"></i>
+                        <h3 style="font-size: 1.1rem; color: #92400e; font-weight: 700; margin-bottom: 4px;">मकान नंबर दर्ज करें (पारिवारिक खोज)</h3>
+                        <p style="font-size: 0.85rem; color: #78350f;">मकान नंबर लिखते ही उस घर के सभी सदस्यों की पर्चियां आ जाएंगी।</p>
+                    </div>
+                `;
+            }
         }
 
         function getActiveWardFilter() {
@@ -1261,7 +1287,7 @@
             membersList.forEach(voter => {
                 slipsHtml += `
                     <div style="border: 2.5px solid #1e3a8a; border-radius: 12px; padding: 12px; page-break-inside: avoid; background: #fff;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 6px; margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 8px;">
                             <img src="${campaign.photo}" style="width: 70px; height: 70px; border-radius: 50%; border: 2.5px solid #d97706; object-fit: cover;" alt="प्रत्याशी">
                             <div style="text-align: center; flex: 1; padding: 0 4px;">
                                 <span style="font-size: 0.72rem; background: #d97706; color: white; padding: 1px 6px; border-radius: 8px;">${campaign.postType} प्रत्याशी</span>
@@ -1346,7 +1372,7 @@
         function dispatchWhatsApp(phone, voter) {
             let cleanPhone = phone.replace(/[^0-9]/g, '');
             if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-            const msg = `🗳️ *मतदाता सूचना पर्ची*\nवार्ड: ${voter.ward || '-'}\nनाम: ${voter.name}\nक्र०: #${voter.sno}\nमकान: ${voter.house || '-'}\nबूथ: ${voter.booth || '-'}\nप्रत्याशी: ${campaign.name} (${campaign.symbolName})\nकृपया वोट दें।`;
+            const msg = `🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️\n━━━━━━━━━━━━━━━━━━\n🚩 *वार्ड संख्या:* *वार्ड नं० ${voter.ward || '1'}*\n👤 *मतदाता का नाम:* ${voter.name || '-'}\n🔢 *क्रमांक संख्या (S.No.):* #${voter.sno}\n🆔 *वोटर आईडी (EPIC):* ${voter.epic || 'उपलब्ध नहीं'}\n👨‍👩‍👦 *${voter.relation || 'संबंधी'} का नाम:* ${voter.rel_name || '-'}\n🏠 *मकान संख्या:* ${voter.house || '-'}\n📍 *मोहल्ला / क्षेत्र:* ${voter.area || 'सुवाणा'}\n━━━━━━━━━━━━━━━━━━\n🏫 *मतदान केंद्र (वोटर सेंटर):*\n📍 *${voter.booth || 'सुवाणा'}*\n━━━━━━━━━━━━━━━━━━\n🚩 *${campaign.postType} पद हेतु योग्य एवं संघर्षशील प्रत्याशी:*\n⭐ *${campaign.name}*\n🗳️ *चुनाव चिन्ह:* *${campaign.symbolName}*\n💬 *संदेश:* ${campaign.slogan}\n📞 *संपर्क:* ${campaign.contact}\n━━━━━━━━━━━━━━━━━━\n_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_`;
             window.open('https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg), '_blank');
         }
 
@@ -1473,7 +1499,7 @@
                 }));
                 localStorage.setItem('election_all_voters_db', JSON.stringify(votersList));
                 updateAdminExcelStats();
-                alert(`✅ कुल ${votersList.length} मतदाता सफलताಪूर्वक लोड हो गए!`);
+                alert(`✅ कुल ${votersList.length} मतदाता सफलतापूर्वक लोड हो गए!`);
             };
             r.readAsArrayBuffer(file);
         });
@@ -1492,6 +1518,53 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             }
+        }
+
+        function printSingleVoterSlip() {
+            if (!currentActiveVoter) return;
+            const voter = currentActiveVoter;
+            let printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>मतदाता सूचना पर्ची - ${voter.name}</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; background: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                        .slip-box { border: 2.5px solid #1e3a8a; border-radius: 14px; padding: 16px; width: 420px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+                        @media print { body { padding: 0; } .slip-box { border: 2.5px solid #1e3a8a; width: 100%; box-shadow: none; } }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="slip-box">
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 10px; background: #1e3a8a; color: white; padding: 10px; border-radius: 8px;">
+                            <img src="${campaign.photo}" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #facc15; object-fit: cover; background: white;" alt="प्रत्याशी">
+                            <div style="text-align: center; flex: 1; padding: 0 6px;">
+                                <span style="font-size: 0.74rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;">${campaign.postType} प्रत्याशी</span>
+                                <h3 style="margin:2px 0 0 0; font-size:1.15rem; color:#facc15; font-weight:800;">${campaign.name}</h3>
+                                <p style="margin:0; font-size:0.78rem; opacity:0.9;">${campaign.panchayat}</p>
+                            </div>
+                            <img src="${campaign.symbol}" style="width: 54px; height: 54px; background: white; border-radius: 8px; border: 2px solid #facc15; object-fit: contain; padding: 2px;" alt="चिन्ह">
+                        </div>
+                        <div style="text-align: center; border-bottom: 2px dashed #94a3b8; padding-bottom: 6px; margin-bottom: 8px;">
+                            <h4 style="color: #1e3a8a; font-size: 1.05rem; margin:0;">मतदाता सूचना पर्ची (Voter Slip)</h4>
+                            <span style="font-size: 0.78rem; color: #64748b;">वार्ड क्रमांक: ${voter.ward || '-'} | सुवाणा</span>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem;">
+                            <tr><td style="padding: 5px 6px; color:#64748b; width:38%;">मतदाता का नाम:</td><td style="font-weight:bold; font-size:1.1rem; color:#1e3a8a;">${voter.name}</td></tr>
+                            <tr><td style="padding: 5px 6px; color:#64748b;">वोटर आईडी (EPIC):</td><td style="font-weight:bold; color:#16a34a; font-size:1rem;">${voter.epic || '-'}</td></tr>
+                            <tr><td style="padding: 5px 6px; color:#64748b;">${voter.relation || 'संबंधी'} का नाम:</td><td style="font-weight:bold;">${voter.rel_name || '-'}</td></tr>
+                            <tr><td style="padding: 5px 6px; color:#64748b;">मकान संख्या:</td><td style="font-weight:bold;">${voter.house || '-'}</td></tr>
+                            <tr><td style="padding: 5px 6px; color:#64748b;">आयु एवं लिंग:</td><td style="font-weight:bold;">${voter.age} वर्ष / ${voter.gender}</td></tr>
+                            <tr><td style="padding: 5px 6px; color:#64748b;">वोटर सेंटर:</td><td style="font-weight:bold; color:#1e40af;">📍 ${voter.booth || 'सुवाणा'}</td></tr>
+                        </table>
+                        <div style="margin-top: 12px; text-align: center; background: #fffbeb; border: 1.5px solid #fde68a; color: #92400e; padding: 6px; border-radius: 6px; font-size: 0.88rem; font-weight: bold;">
+                            अपना अमूल्य मत '${campaign.symbolName}' के सामने वाला बटन दबाकर विजयी बनाएं।
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
     </script>
 </body>
