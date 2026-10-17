@@ -650,7 +650,7 @@
 
                 <div class="form-group">
                     <label><i class="fa-solid fa-user"></i> यूजर आईडी (Client ID):</label>
-                    <input type="text" id="inpClientId" class="form-control" placeholder="उदा० sarpanch या ward1" value="sarpanch">
+                    <input type="text" id="inpClientId" class="form-control" placeholder="उदा० sarpanch या ward9_cand1" value="sarpanch">
                 </div>
 
                 <div class="form-group">
@@ -693,7 +693,7 @@
             <div class="cand-profile">
                 <img id="candDisplayPhoto" class="cand-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" alt="प्रत्याशी फोटो">
                 <div class="cand-meta">
-                    <span class="post-tag" id="candDisplayPostTag">सरपंच प्रत्याशी</span>
+                    <span class="post-tag" id="candDisplayPostTag">प्रत्याशी</span>
                     <h3 id="candDisplayName">श्रीमती रेखा देवी जाट</h3>
                     <p id="candDisplayPanchayat">ग्राम पंचायत: सुवाणा (भीलवाड़ा)</p>
                 </div>
@@ -830,17 +830,17 @@
             <!-- TAB 3: CLIENTS & WARD -->
             <div id="tabClientsManage" class="admin-tab-pane" style="display: none;">
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया सरपंच / वार्ड पंच / कार्यकर्ता जोड़ें</h3>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया प्रत्याशी / वार्ड पंच / कार्यकर्ता जोड़ें</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="form-group"><label>यूजर आईडी:</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० ward1_suwana"></div>
+                        <div class="form-group"><label>यूजर आईडी (Login ID):</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० ward9_cand1"></div>
                         <div class="form-group"><label>पासवर्ड:</label><input type="text" id="addClientPass" class="form-control" placeholder="पासवर्ड..."></div>
-                        <div class="form-group"><label>नाम:</label><input type="text" id="addClientName" class="form-control" placeholder="नाम..."></div>
+                        <div class="form-group"><label>यूजर/लॉगिन नाम:</label><input type="text" id="addClientName" class="form-control" placeholder="उदा० रमेश कुमार"></div>
                         <div class="form-group">
                             <label>ग्राम पंचायत निर्धारित करें:</label>
                             <select id="addClientGp" class="form-control" style="font-weight:600; color:var(--primary);"></select>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
-                            <label>वार्ड एक्सेस:</label>
+                            <label>वार्ड एक्सेस (जैसे वार्ड 9 के लिए 9 चुनें):</label>
                             <select id="addClientWard" class="form-control">
                                 <option value="ALL">⭐ सभी वार्ड (सरपंच हेतु)</option>
                                 <option value="1">वार्ड 1</option><option value="2">वार्ड 2</option><option value="3">वार्ड 3</option>
@@ -852,14 +852,14 @@
                             </select>
                         </div>
                     </div>
-                    <button class="btn-main" onclick="addClientAccount()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> क्लाइंट जोड़ें</button>
+                    <button class="btn-main" onclick="addClientAccount()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> नया उम्मीदवार/क्लाइंट जोड़ें</button>
                 </div>
 
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 6px; color: #1e3a8a;"><i class="fa-solid fa-mobile-screen-button"></i> पंजीकृत क्लाइंट्स सूची</h3>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 6px; color: #1e3a8a;"><i class="fa-solid fa-mobile-screen-button"></i> पंजीकृत क्लाइंट्स सूची (हर वार्ड के अलग उम्मीदवार)</h3>
                     <div style="overflow-x: auto;">
                         <table class="table-custom">
-                            <thead><tr><th>आईडी</th><th>नाम</th><th>पंचायत</th><th>वार्ड</th><th>पासवर्ड</th><th>लॉक</th><th>कार्रवाई</th></tr></thead>
+                            <thead><tr><th>आईडी</th><th>नाम / प्रत्याशी</th><th>पंचायत</th><th>वार्ड</th><th>पासवर्ड</th><th>लॉक</th><th>कार्रवाई (Edit/Delete)</th></tr></thead>
                             <tbody id="clientsTableBody"></tbody>
                         </table>
                     </div>
@@ -869,7 +869,7 @@
             <!-- TAB 4: CANDIDATE BRANDING -->
             <div id="tabCandidateManage" class="admin-tab-pane" style="display: none;">
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 14px; color: #1e3a8a;"><i class="fa-solid fa-address-card"></i> प्रत्याशी ब्रांडिंग</h3>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 14px; color: #1e3a8a;"><i class="fa-solid fa-address-card"></i> मुख्य सरपंच प्रत्याशी ब्रांडिंग</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="form-group"><label>पद:</label><select id="cfgPostType" class="form-control"><option value="सरपंच (Sarpanch)">सरपंच</option><option value="वार्ड पंच (Ward Panch)">वार्ड पंच</option></select></div>
                         <div class="form-group"><label>नाम:</label><input type="text" id="cfgName" class="form-control" value="श्रीमती रेखा देवी जाट"></div>
@@ -907,9 +907,9 @@
                     <div class="slip-header-campaign">
                         <img id="slCandImg" class="slip-cand-img" src="" alt="प्रत्याशी">
                         <div class="slip-cand-info">
-                            <span style="font-size: 0.74rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;" id="slPostTag">सरपंच प्रत्याशी</span>
-                            <h2 id="slCandName">श्रीमती रेखा देवी जाट</h2>
-                            <p style="font-size: 0.78rem; opacity: 0.9;" id="slPanchayat">ग्राम पंचायत सुवाणा</p>
+                            <span style="font-size: 0.74rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;" id="slPostTag">प्रत्याशी</span>
+                            <h2 id="slCandName">नाम</h2>
+                            <p style="font-size: 0.78rem; opacity: 0.9;" id="slPanchayat">ग्राम पंचायत</p>
                         </div>
                         <img id="slSymbolImg" class="slip-symbol-img" src="" alt="चिन्ह">
                     </div>
@@ -931,11 +931,11 @@
 
                     <div class="slip-center-box">
                         <strong style="color: #1e40af;"><i class="fa-solid fa-school"></i> मतदान केंद्र:</strong>
-                        <div style="font-weight: 700; color: #0f172a; margin-top: 2px;" id="slVoterBooth">रा. उ. मा. वि. सुवाणा</div>
+                        <div style="font-weight: 700; color: #0f172a; margin-top: 2px;" id="slVoterBooth">-</div>
                     </div>
 
                     <div class="slip-vote-appeal">
-                        <i class="fa-solid fa-stamp"></i> अपना अमूल्य मत <span id="slSymbolFooter" style="color: #b45309; font-size: 1rem;">'चाबी'</span> के सामने वाला बटन दबाकर विजयी बनाएं।
+                        <i class="fa-solid fa-stamp"></i> अपना अमूल्य मत <span id="slSymbolFooter" style="color: #b45309; font-size: 1rem;">''</span> के सामने वाला बटन दबाकर विजयी बनाएं।
                     </div>
                 </div>
             </div>
@@ -1003,8 +1003,8 @@
         }));
 
         let clientUsers = JSON.parse(localStorage.getItem('election_client_users') || JSON.stringify([
-            { id: "sarpanch", pass: "1234", name: "सरपंच प्रत्याशी / मुख्य एजेंट", gp: "suwana", ward: "ALL", boundDevice: null, status: "Active" },
-            { id: "ward1", pass: "1234", name: "वार्ड 1 कार्यकर्ता", gp: "suwana", ward: "1", boundDevice: null, status: "Active", candidateName: "रमेश जाट", postType: "वार्ड पंच (Ward Panch) - वार्ड 1", symbolName: "चाबी" }
+            { id: "sarpanch", pass: "1234", name: "सरपंच प्रत्याशी / मुख्य एजेंट", gp: "suwana", ward: "ALL", boundDevice: null, status: "Active", candidateName: "श्रीमती रेखा देवी जाट", postType: "सरपंच (Sarpanch)", symbolName: "चाबी", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png" },
+            { id: "ward9_cand1", pass: "1234", name: "वार्ड 9 - उम्मीदवार 1", gp: "suwana", ward: "9", boundDevice: null, status: "Active", candidateName: "प्रत्याशी नाम 1", postType: "वार्ड पंच (Ward Panch) - वार्ड 9", symbolName: "बल्ला", photo: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/2954/2954848.png" }
         ]));
 
         let loggedInClient = null;
@@ -1539,17 +1539,18 @@
             printWindow.document.close();
         }
 
+        // 🌟 डायनेमिक प्रत्याशी मैपिंग फंक्शन (हर वार्ड के अलग उम्मीदवार की पहचान हेतु)
         function getActiveCampaign() {
             if (loggedInClient && loggedInClient.id.toLowerCase() !== 'sarpanch' && loggedInClient.ward !== 'ALL') {
                 return {
                     postType: loggedInClient.postType || ("वार्ड पंच (Ward Panch) - वार्ड " + loggedInClient.ward),
                     name: loggedInClient.candidateName || loggedInClient.name,
                     panchayat: loggedIdClientGPName(),
-                    symbolName: loggedInClient.symbolName || campaign.symbolName,
-                    slogan: campaign.slogan,
+                    symbolName: loggedInClient.symbolName || "चाबी",
+                    slogan: loggedInClient.slogan || campaign.slogan,
                     contact: loggedInClient.contact || campaign.contact,
-                    photo: loggedInClient.photo || campaign.photo,
-                    symbol: loggedInClient.symbol || campaign.symbol
+                    photo: loggedInClient.photo || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+                    symbol: loggedInClient.symbol || "https://cdn-icons-png.flaticon.com/512/1995/1995574.png"
                 };
             }
             return campaign;
@@ -1557,7 +1558,7 @@
 
         function updateCampaignHeaderUI() {
             const camp = getActiveCampaign();
-            document.getElementById('candDisplayPostTag').innerText = camp.postType + " पद प्रत्याशी";
+            document.getElementById('candDisplayPostTag').innerText = camp.postType + " प्रत्याशी";
             document.getElementById('candDisplayName').innerText = camp.name;
             document.getElementById('candDisplayPanchayat').innerText = loggedIdClientGPName();
             document.getElementById('candDisplaySymbolName').innerText = "चिन्ह: " + camp.symbolName;
@@ -1568,7 +1569,7 @@
         function openVoterSlip(voter) {
             currentActiveVoter = voter;
             const camp = getActiveCampaign();
-            document.getElementById('slPostTag').innerText = camp.postType + " पद प्रत्याशी";
+            document.getElementById('slPostTag').innerText = camp.postType + " प्रत्याशी";
             document.getElementById('slCandName').innerText = camp.name;
             document.getElementById('slPanchayat').innerText = loggedIdClientGPName();
             document.getElementById('slCandImg').src = camp.photo;
@@ -1604,33 +1605,43 @@
         }
 
         function sendWA(phone, voter) {
-            let cleanPhone = phone.replace(/[^0-9]/g, '');
-            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-            const camp = getActiveCampaign();
-            const lines = [
-                '🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *वार्ड संख्या:* *वार्ड नं० ' + (voter.ward || '1') + '*',
-                '👤 *मतदाता का नाम:* ' + (voter.name || '-'),
-                '🔢 *क्रमांक संख्या (S.No.):* #' + voter.sno,
-                '🆔 *वोटर आईडी (EPIC):* ' + (voter.epic || 'उपलब्ध नहीं'),
-                '👨‍👩‍👦 *' + (voter.relation || 'संबंधी') + ' का नाम:* ' + (voter.rel_name || '-'),
-                '🏠 *मकान संख्या:* ' + (voter.house || '-'),
-                '📍 *क्षेत्र:* ' + (voter.area || loggedIdClientGPName()),
-                '━━━━━━━━━━━━━━━━━━',
-                '🏫 *मतदान केंद्र (वोटर सेंटर):*',
-                '📍 *' + (voter.booth || loggedIdClientGPName()) + '*',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *' + camp.postType + ' पद हेतु योग्य एवं संघर्षशील प्रत्याशी:*',
-                '⭐ *' + camp.name + '*',
-                '🗳️ *चुनाव चिन्ह:* *' + camp.symbolName + '*',
-                '💬 *संदेश:* ' + camp.slogan,
-                '📞 *संपर्क:* ' + camp.contact,
-                '━━━━━━━━━━━━━━━━━━',
-                '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
-            ];
-            const msg = lines.join('\n');
-            window.open(`https://wa.me/?text=${text}`, '_blank');
+    // मोबाइल नंबर को साफ करें और देश का कोड (91) जोड़ें
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
+
+    // प्रत्याशी और मतदाता की जानकारी प्राप्त करें
+    const camp = getActiveCampaign();
+    
+    // व्हाट्सएप पर भेजने के लिए मैसेज का टेक्स्ट तैयार करें
+    const lines = [
+        '🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️',
+        '━━━━━━━━━━━━━━━━━━',
+        '🚩 *वार्ड संख्या:* *वार्ड नं० ' + (voter.ward || '1') + '*',
+        '👤 *मतदाता का नाम:* ' + (voter.name || '-'),
+        '🔢 *क्रमांक संख्या (S.No.):* #' + voter.sno,
+        '🆔 *वोटर आईडी (EPIC):* ' + (voter.epic || 'उपलब्ध नहीं'),
+        '👨‍👩‍👦 *' + (voter.relation || 'संबंधी') + ' का नाम:* ' + (voter.rel_name || '-'),
+        '🏠 *मकान संख्या:* ' + (voter.house || '-'),
+        '📍 *क्षेत्र:* ' + (voter.area || loggedIdClientGPName()),
+        '━━━━━━━━━━━━━━━━━━',
+        '🏫 *मतदान केंद्र (वोटर सेंटर):*',
+        '📍 *' + (voter.booth || loggedIdClientGPName()) + '*',
+        '━━━━━━━━━━━━━━━━━━',
+        '🚩 *' + camp.postType + ' हेतु योग्य एवं संघर्षशील प्रत्याशी:*',
+        '⭐ *' + camp.name + '*',
+        '🗳️ *चुनाव चिन्ह:* *' + camp.symbolName + '*',
+        '💬 *संदेश:* ' + camp.slogan,
+        '📞 *संपर्क:* ' + camp.contact,
+        '━━━━━━━━━━━━━━━━━━',
+        '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
+    ];
+    
+    const textData = lines.join('\n');
+
+    // इमेज में दिखाए गए फॉर्मेट के अनुसार window.open का उपयोग
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textData)}`, '_blank');
+}
+
         }
 
         function switchAdminTab(tabId, btn) {
@@ -1659,7 +1670,7 @@
             campaign.slogan = document.getElementById('cfgSlogan').value.trim();
             campaign.contact = document.getElementById('cfgContact').value.trim();
             localStorage.setItem('election_campaign_data', JSON.stringify(campaign));
-            alert('✅ प्रत्याशी विवरण सुरक्षित हो गया!');
+            alert('✅ मुख्य प्रत्याशी विवरण सुरक्षित हो गया!');
         }
 
         document.getElementById('filePhotoInput').addEventListener('change', function(e) {
@@ -1688,9 +1699,9 @@
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${c.id}</strong></td>
-                    <td>${c.name}</td>
+                    <td>${c.candidateName || c.name} <br><small style="color:#64748b;">(${c.postType || 'वार्ड पंच'})</small></td>
                     <td><span style="background:#eff6ff; color:#1e3a8a; padding:2px 6px; border-radius:6px; font-weight:600; font-size:0.8rem;">${gpNameStr}</span></td>
-                    <td>${c.ward}</td>
+                    <td><b>वार्ड ${c.ward}</b></td>
                     <td><code>${c.pass}</code></td>
                     <td>${c.boundDevice ? '🔒 लॉक्ड' : '🟢 खुला'}</td>
                     <td>
@@ -1705,30 +1716,45 @@
             });
         }
 
+        // 🌟 हर वार्ड के उम्मीदवार की पूरी जानकारी (नाम, फोटो, चिन्ह) एडिट करने का नया रूप
         function editClient(idx) {
             const c = clientUsers[idx];
-            const newName = prompt("कार्यकर्ता / व्यक्ति का नाम:", c.name); if (newName === null) return;
+            const newName = prompt("यूजर/लॉगिन नाम:", c.name); if (newName === null) return;
             const newPass = prompt("नया पासवर्ड:", c.pass); if (newPass === null) return;
-            const newGp = prompt("ग्राम पंचायत आईडी (उदा० suwana):", c.gp || panchayatsList[0]?.id || 'suwana'); if (newGp === null) return;
-            const newWard = prompt("वार्ड नंबर (1 से 17 या ALL लिखें):", c.ward); if (newWard === null) return;
-            const candName = prompt("प्रत्याशी का नाम (इस वार्ड के लिए):", c.candidateName || c.name); if (candName === null) return;
-            const postType = prompt("पद (जैसे 'सरपंच (Sarpanch)' या 'वार्ड पंच (Ward Panch)'):", c.postType || "वार्ड पंच (Ward Panch)"); if (postType === null) return;
-            const symbolName = prompt("चुनाव चिन्ह नाम (जैसे 'चाबी'):", c.symbolName || "चाबी"); if (symbolName === null) return;
+            const newGp = prompt("ग्राम पंचायत आईडी (उदा० suwana):", c.gp || 'suwana'); if (newGp === null) return;
+            const newWard = prompt("वार्ड नंबर (जैसे 9 या ALL):", c.ward); if (newWard === null) return;
+            
+            // प्रत्याशी विशेष ब्रांडिंग फील्ड्स
+            const candName = prompt("प्रत्याशी का वास्तविक नाम (पर्ची पर छपने के लिए):", c.candidateName || c.name); if (candName === null) return;
+            const postType = prompt("पद (जैसे 'वार्ड पंच (Ward Panch) - वार्ड 9'):", c.postType || ("वार्ड पंच (Ward Panch) - वार्ड " + newWard)); if (postType === null) return;
+            const symbolName = prompt("चुनाव चिन्ह का नाम (जैसे 'बल्ला', 'कमल', 'हाथ'):", c.symbolName || "चाबी"); if (symbolName === null) return;
+            const symbolImgUrl = prompt("चुनाव चिन्ह की इमेज का URL (Image URL):", c.symbol || ""); if (symbolImgUrl === null) return;
+            const candPhotoUrl = prompt("प्रत्याशी की फोटो का URL (Photo URL):", c.photo || ""); if (candPhotoUrl === null) return;
 
-            c.name = newName.trim(); c.pass = newPass.trim(); c.gp = newGp.trim().toLowerCase(); c.ward = newWard.trim().toUpperCase();
-            c.candidateName = candName.trim(); c.postType = postType.trim(); c.symbolName = symbolName.trim();
+            c.name = newName.trim(); 
+            c.pass = newPass.trim(); 
+            c.gp = newGp.trim().toLowerCase(); 
+            c.ward = newWard.trim().toUpperCase();
+            c.candidateName = candName.trim(); 
+            c.postType = postType.trim(); 
+            c.symbolName = symbolName.trim();
+            if(symbolImgUrl.trim()) c.symbol = symbolImgUrl.trim();
+            if(candPhotoUrl.trim()) c.photo = candPhotoUrl.trim();
 
-            saveClientsState(); renderClientsAdminTable(); alert('✅ क्लाइंट और प्रत्याशी विवरण अपडेट हो गया!');
+            saveClientsState(); 
+            renderClientsAdminTable(); 
+            alert('✅ इस प्रत्याशी का विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
         }
 
         function addClientAccount() {
             const id = document.getElementById('addClientId').value.trim();
             const pass = document.getElementById('addClientPass').value.trim();
-            const name = document.getElementById('addClientName').value.trim() || 'कार्यकर्ता';
+            const name = document.getElementById('addClientName').value.trim() || 'प्रत्याशी';
             const gp = document.getElementById('addClientGp').value;
             const ward = document.getElementById('addClientWard').value;
 
-            if (!id || !pass) { alert('आईडी और पासवर्ड भरें!'); return; }
+            if (!id || !pass) { alert('यूजर आईडी और पासवर्ड भरें!'); return; }
+            
             clientUsers.push({ 
                 id, 
                 pass, 
@@ -1739,11 +1765,13 @@
                 status: "Active", 
                 candidateName: name, 
                 postType: ward === 'ALL' ? 'सरपंच (Sarpanch)' : 'वार्ड पंच (Ward Panch) - वार्ड ' + ward, 
-                symbolName: 'चाबी' 
+                symbolName: 'चाबी',
+                photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
+                symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png"
             });
             saveClientsState(); 
             renderClientsAdminTable(); 
-            alert('✅ नया क्लाइंट (सरपंच/वार्ड पंच) सफलतापूर्वक जोड़ दिया गया!');
+            alert('✅ नया प्रत्याशी/क्लाइंट सफलतापूर्वक जोड़ दिया गया! अब ' + id + ' की विशिष्ट फोटो व चिन्ह सेट करने के लिए सूची में "एडिट" बटन पर क्लिक करें।');
             document.getElementById('addClientId').value = ''; 
             document.getElementById('addClientPass').value = '';
             document.getElementById('addClientName').value = '';
@@ -1754,7 +1782,7 @@
         }
 
         function deleteClient(idx) {
-            if (confirm('हटाना चाहते हैं?')) { clientUsers.splice(idx, 1); saveClientsState(); renderClientsAdminTable(); }
+            if (confirm('क्या आप इस क्लाइंट को हटाना चाहते हैं?')) { clientUsers.splice(idx, 1); saveClientsState(); renderClientsAdminTable(); }
         }
 
         function updateAdminExcelStats() {
