@@ -1473,41 +1473,40 @@
             if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), currentActiveVoter);
         }
 
-        // // वन-क्लिक व्हाट्सएप सीधा ऐप में ओपन करने का सही फंक्शन
-function dispatchWhatsApp(phone, voter) {
-    let cleanPhone = phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length === 10) {
-        cleanPhone = '91' + cleanPhone;
-    }
-    
-    const camp = getActiveCampaign();
-    const message = `🗳️ मतदाता सूचना पर्ची (Voter Slip)\n` +
-                    `━━━━━━━━━━━━━━━━━━\n` +
-                    `🚩 ग्राम पंचायत: ${loggedInClient ? loggedInClient.panchayat : 'सुवाणा'}\n` +
-                    `🚩 वार्ड संख्या: वार्ड नं० ${voter.ward || '1'}\n` +
-                    `👤 मतदाता का नाम: ${voter.name || '-'}\n` +
-                    `🔢 क्रमांक संख्या: #${voter.sno}\n` +
-                    `🆔 वोटर आईडी (EPIC): ${voter.epic || 'उपलब्ध नहीं'}\n` +
-                    `👨‍👩‍👦 ${voter.relation || 'संबंधी'} का नाम: ${voter.rel_name || '-'}\n` +
-                    `🏠 मकान संख्या: ${voter.house || '-'}\n` +
-                    `📍 मोहल्ला / क्षेत्र: ${voter.area || '-'}\n` +
-                    `━━━━━━━━━━━━━━━━━━\n` +
-                    `🏫 मतदान केंद्र:\n` +
-                    `📍 ${voter.booth || 'सुवाणा'}\n` +
-                    `━━━━━━━━━━━━━━━━━━\n` +
-                    `🚩 ${camp.postType} पद हेतु प्रत्याशी:\n` +
-                    `⭐ ${camp.name}\n` +
-                    `🗳️ चुनाव चिन्ह: ${camp.symbolName}\n` +
-                    `💬 संदेश: ${camp.slogan}\n` +
-                    `📞 संपर्क: ${camp.contact}\n` +
-                    `━━━━━━━━━━━━━━━━━━\n` +
-                    `कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।`;
+        // वन-क्लिक व्हाट्सएप सीधा ऐप में ओपन करने का सही फंक्शन
+        function dispatchWhatsApp(phone, voter) {
+            let cleanPhone = phone.replace(/[^0-9]/g, '');
+            if (cleanPhone.length === 10) {
+                cleanPhone = '91' + cleanPhone;
+            }
+            
+            const camp = getActiveCampaign();
+            const message = `🗳️ मतदाता सूचना पर्ची (Voter Slip)\n` +
+                            `━━━━━━━━━━━━━━━━━━\n` +
+                            `🚩 ग्राम पंचायत: ${loggedInClient ? loggedInClient.panchayat : 'सुवाणा'}\n` +
+                            `🚩 वार्ड संख्या: वार्ड नं० ${voter.ward || '1'}\n` +
+                            `👤 मतदाता का नाम: ${voter.name || '-'}\n` +
+                            `🔢 क्रमांक संख्या: #${voter.sno}\n` +
+                            `🆔 वोटर आईडी (EPIC): ${voter.epic || 'उपलब्ध नहीं'}\n` +
+                            `👨‍👩‍👦 ${voter.relation || 'संबंधी'} का नाम: ${voter.rel_name || '-'}\n` +
+                            `🏠 मकान संख्या: ${voter.house || '-'}\n` +
+                            `📍 मोहल्ला / क्षेत्र: ${voter.area || '-'}\n` +
+                            `━━━━━━━━━━━━━━━━━━\n` +
+                            `🏫 मतदान केंद्र:\n` +
+                            `📍 ${voter.booth || 'सुवाणा'}\n` +
+                            `━━━━━━━━━━━━━━━━━━\n` +
+                            `🚩 ${camp.postType} पद हेतु प्रत्याशी:\n` +
+                            `⭐ ${camp.name}\n` +
+                            `🗳️ चुनाव चिन्ह: ${camp.symbolName}\n` +
+                            `💬 संदेश: ${camp.slogan}\n` +
+                            `📞 संपर्क: ${camp.contact}\n` +
+                            `━━━━━━━━━━━━━━━━━━\n` +
+                            `कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।`;
 
-    // सीधा wa.me लिंक जो बिना किसी डाउनलोड या परमिशन के सीधा WhatsApp ऐप खोलेगा
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-}
-
+            // सीधा wa.me लिंक जो बिना किसी डाउनलोड या परमिशन के सीधा WhatsApp ऐप खोलेगा
+            const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
 
         function switchAdminTab(tabId, btn) {
             document.querySelectorAll('.admin-tab-pane').forEach(p => p.style.display = 'none');
@@ -1516,22 +1515,49 @@ function dispatchWhatsApp(phone, voter) {
             btn.classList.add('active');
         }
 
-        // Helper to parse wards from manual input or fallback to sheet detection
+        // Universal Excel Row Mapping to ensure 100% data compatibility with any header names
+        function processExcelRows(rows, pName) {
+            return rows.map((r, i) => {
+                let wardVal = r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || r['वार्ड'] || r['WardNo'] || '1';
+                let snoVal = r['क्र० सं० (S.No.)'] || r['S.No.'] || r['SNo'] || r['क्र.सं.'] || (i + 1);
+                let epicVal = r['ईपिक सं० (EPIC No.)'] || r['EPIC No.'] || r['EPIC'] || r['VoterID'] || r['वोटर आईडी'] || '';
+                let nameVal = r['नाम (Name)'] || r['Name'] || r['Voter Name'] || r['मतदाता का नाम'] || r['नाम'] || '';
+                let relType = r['संबंध का प्रकार (Relation)'] || r['Relation'] || r['संबंध'] || 'पिता/पति';
+                let relName = r['संबंधी का नाम (Relative Name)'] || r['Relative Name'] || r['Father Name'] || r['Husband Name'] || r['पिता/पति का नाम'] || '';
+                let houseVal = r['मकान संख्या (House No.)'] || r['House No.'] || r['House'] || r['मकान नंबर'] || '';
+                let ageVal = r['आयु (Age)'] || r['Age'] || r['आयु'] || '';
+                let genderVal = r['लिंग (Gender)'] || r['Gender'] || r['लिंग'] || '';
+                let areaVal = r['मोहल्ला / क्षेत्र (Area/Locality)'] || r['Area'] || r['मोहल्ला'] || pName;
+                let boothVal = r['मतदान बूथ सं० व पता'] || r['Booth'] || r['बूथ'] || pName;
+
+                return {
+                    ward: String(wardVal).trim(),
+                    sno: snoVal,
+                    epic: String(epicVal).trim(),
+                    name: String(nameVal).trim(),
+                    relation: String(relType).trim(),
+                    rel_name: String(relName).trim(),
+                    house: String(houseVal).trim(),
+                    age: String(ageVal).trim(),
+                    gender: String(genderVal).trim(),
+                    area: String(areaVal).trim(),
+                    booth: String(boothVal).trim()
+                };
+            });
+        }
+
         function parseWardsInput(inputStr, votersList) {
             if (inputStr && inputStr.trim() !== "") {
                 let clean = inputStr.trim();
-                // If admin entered a single number like "11", generate ["1", "2", ..., "11"]
                 if (!isNaN(clean) && Number(clean) > 0 && !clean.includes(',')) {
                     let total = Number(clean);
                     let arr = [];
                     for (let i = 1; i <= total; i++) arr.push(String(i));
                     return arr;
                 }
-                // If admin entered comma separated or range like "1,2,3"
                 return clean.split(',').map(s => s.trim()).filter(Boolean);
             }
             
-            // Fallback: auto-detect from sheet if input is empty
             let wardsSet = new Set();
             votersList.forEach(v => {
                 if (v.ward !== undefined && v.ward !== null && String(v.ward).trim() !== "") {
@@ -1558,21 +1584,8 @@ function dispatchWhatsApp(phone, voter) {
                 const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
                 let rows = [];
                 wb.SheetNames.forEach(s => rows = rows.concat(XLSX.utils.sheet_to_json(wb.Sheets[s])));
-                const votersList = rows.map((r, i) => ({
-                    ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || r['वार्ड'] || '1'),
-                    sno: r['क्र० सं० (S.No.)'] || (i + 1),
-                    epic: String(r['ईपिक सं० (EPIC No.)'] || ''),
-                    name: String(r['नाम (Name)'] || ''),
-                    relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                    rel_name: String(r['संबंधी का नाम (Relative Name)'] || ''),
-                    house: String(r['मकान संख्या (House No.)'] || ''),
-                    age: String(r['आयु (Age)'] || ''),
-                    gender: String(r['लिंग (Gender)'] || ''),
-                    area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
-                    booth: String(r['मतदान बूथ सं० व पता'] || pName)
-                }));
-
-                // Get wards based on admin manual entry or auto-detection
+                
+                const votersList = processExcelRows(rows, pName);
                 const finalWards = parseWardsInput(wardsInputStr, votersList);
 
                 panchayatsDB[pName] = {
@@ -1812,20 +1825,10 @@ function dispatchWhatsApp(phone, voter) {
                 const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
                 let rows = [];
                 wb.SheetNames.forEach(s => rows = rows.concat(XLSX.utils.sheet_to_json(wb.Sheets[s])));
-                const votersList = rows.map((r, i) => ({
-                    ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || r['वार्ड'] || '1'),
-                    sno: r['क्र० सं० (S.No.)'] || (i + 1),
-                    epic: String(r['ईपिक सं० (EPIC No.)'] || ''),
-                    name: String(r['नाम (Name)'] || ''),
-                    relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                    rel_name: String(r['संबंधी का नाम (Relative Name)'] || ''),
-                    house: String(r['मकान संख्या (House No.)'] || ''),
-                    age: String(r['आयु (Age)'] || ''),
-                    gender: String(r['लिंग (Gender)'] || ''),
-                    area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
-                    booth: String(r['मतदान बूथ सं० व पता'] || pName)
-                }));
+                
+                const votersList = processExcelRows(rows, pName);
                 const detectedWards = parseWardsInput("", votersList);
+                
                 panchayatsDB[pName].voters = votersList;
                 panchayatsDB[pName].wards = detectedWards;
                 saveStateToStorage();
