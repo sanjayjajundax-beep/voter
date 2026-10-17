@@ -1603,7 +1603,7 @@
             if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), currentActiveVoter);
         }
 
-        function dispatchWhatsApp(phone, voter) {
+        function sendWA(phone, voter) {
             let cleanPhone = phone.replace(/[^0-9]/g, '');
             if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
             const camp = getActiveCampaign();
@@ -1630,7 +1630,7 @@
                 '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
             ];
             const msg = lines.join('\n');
-            window.open('https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg), '_blank');
+            window.open(`https://wa.me/?text=${text}`, '_blank');
         }
 
         function switchAdminTab(tabId, btn) {
