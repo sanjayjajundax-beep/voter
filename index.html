@@ -657,13 +657,6 @@
                     <i class="fa-solid fa-arrow-right-to-bracket"></i> लॉगिन करें
                 </button>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 0.78rem;">
-                    <span style="color: #64748b;">मोबाइल लॉक समस्या?</span>
-                    <a href="javascript:void(0)" onclick="resetAllDeviceLocks()" style="color: #dc2626; font-weight: 700; text-decoration: underline;">
-                        <i class="fa-solid fa-unlock"></i> डिवाइस लॉक रीसेट करें
-                    </a>
-                </div>
-
                 <div style="margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 0.82rem; color: var(--text-muted); text-align: center; line-height: 1.6;">
                     <div>विकसितकर्ता: <b>संजय जाजुन्दा</b></div>
                     <div>हेल्पलाइन / तकनीकी सहायता: <a href="tel:9829970310" style="color: var(--primary-light); font-weight: 700; text-decoration: none;">9829970310</a></div>
@@ -868,7 +861,7 @@
                     <h3 style="font-size: 1.05rem; margin-bottom: 6px; color: #1e3a8a;"><i class="fa-solid fa-users"></i> पंजीकृत प्रत्याशी एवं क्लाइंट्स सूची</h3>
                     <div style="overflow-x: auto;">
                         <table class="table-custom">
-                            <thead><tr><th>आईडी</th><th>प्रत्याशी नाम</th><th>पद</th><th>पंचायत</th><th>वार्ड</th><th>पासवर्ड</th><th>लॉक</th><th>कार्रवाई</th></tr></thead>
+                            <thead><tr><th>आईडी</th><th>प्रत्याशी नाम</th><th>पद</th><th>पंचायत</th><th>वार्ड</th><th>पासवर्ड</th><th>लॉगिन डिवाइस स्टेटस</th><th>कार्रवाई</th></tr></thead>
                             <tbody id="clientsTableBody"></tbody>
                         </table>
                     </div>
@@ -1051,16 +1044,13 @@
                 return;
             }
 
+            // Secure Device Binding Check
             if (!client.boundDevice) {
                 client.boundDevice = currentPhoneToken;
                 saveClientsState();
             } else if (client.boundDevice !== currentPhoneToken) {
-                if (confirm("⚠️ यह आईडी दूसरे डिवाइस में खुली थी। क्या इसे इस मोबाइल पर रजिस्टर करना चाहते हैं?")) {
-                    client.boundDevice = currentPhoneToken;
-                    saveClientsState();
-                } else {
-                    return;
-                }
+                alert('⚠️ सुरक्षा चेतावनी: यह आईडी पहले से किसी अन्य डिवाइस पर लॉगिन है। इसे दूसरे डिवाइस पर चलाने के लिए कृपया एडमिन से संपर्क करके "अनलॉक" करवाएं।');
+                return;
             }
 
             loggedInClient = client;
@@ -1108,10 +1098,11 @@
             }
         }
 
-        function resetAllDeviceLocks() {
-            clientUsers.forEach(c => c.boundDevice = null);
-            saveClientsState();
-            alert('✅ सभी डिवाइस लॉक रीसेट कर दिए गए हैं!');
+        function unlockClientDevice(idx) {
+            clientUsers[idx].boundDevice = null; 
+            saveClientsState(); 
+            renderClientsAdminTable(); 
+            alert('✅ इस प्रत्याशी की आईडी का डिवाइस लॉक अनलॉक (रीसेट) कर दिया गया है!');
         }
 
         function logoutClient() {
@@ -1619,6 +1610,7 @@
             clientUsers.forEach((c, idx) => {
                 const gpObj = panchayatsList.find(g => g.id === c.gp);
                 const gpNameStr = gpObj ? gpObj.name : (c.gp || '-');
+                const lockStatus = c.boundDevice ? '<span style="color:#d97706; font-weight:600;">🔒 लॉक्ड</span>' : '<span style="color:#16a34a; font-weight:600;">🟢 खुला</span>';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${c.id}</strong></td>
@@ -1627,7 +1619,7 @@
                     <td><span style="background:#eff6ff; color:#1e3a8a; padding:2px 6px; border-radius:6px; font-weight:600; font-size:0.8rem;">${gpNameStr}</span></td>
                     <td>${c.ward}</td>
                     <td><code>${c.pass}</code></td>
-                    <td>${c.boundDevice ? '🔒 लॉक्ड' : '🟢 खुला'}</td>
+                    <td>${lockStatus}</td>
                     <td>
                         <div style="display: flex; flex-direction: column; gap: 4px;">
                             <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#3b82f6;" onclick="unlockClientDevice(${idx})">अनलॉक</button>
@@ -1720,19 +1712,40 @@
             }
         }
 
-        function unlockClientDevice(idx) {
-            clientUsers[idx].boundDevice = null; 
-            saveClientsState(); 
-            renderClientsAdminTable(); 
-            alert('✅ डिवाइस अनलॉक कर दिया गया है!');
-        }
-
         function deleteClient(idx) {
             if (confirm('क्या आप इस प्रत्याशी/क्लाइंट को हटाना चाहते हैं?')) {
                 clientUsers.splice(idx, 1); 
                 saveClientsState(); 
                 renderClientsAdminTable();
             }
+        }
+
+        function updateAdminPassword() {
+            const currentPass = document.getElementById('currentAdminPass').value.trim();
+            const newPass = document.getElementById('newAdminPass').value.trim();
+            const confirmPass = document.getElementById('confirmAdminPass').value.trim();
+
+            if (!currentPass || !newPass || !confirmPass) {
+                alert('कृपया सभी पासवर्ड फील्ड भरें!');
+                return;
+            }
+
+            if (currentPass !== currentAdminPassword) {
+                alert('पुराना पासवर्ड गलत है!');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                alert('नया पासवर्ड और कन्फर्म पासवर्ड मेल नहीं खा रहे हैं!');
+                return;
+            }
+
+            currentAdminPassword = newPass;
+            localStorage.setItem('custom_admin_password', newPass);
+            alert('✅ एडमिन पासवर्ड सफलतापूर्वक बदल दिया गया है!');
+            document.getElementById('currentAdminPass').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmAdminPass').value = '';
         }
 
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
