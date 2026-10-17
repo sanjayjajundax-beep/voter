@@ -39,7 +39,7 @@
         <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
 
             <!-- 1. LOGIN SECTION -->
-            <section id="login-section" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 border border-gray-100 mt-10">
+            <section id="login-section" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 border border-gray-100 mt-6">
                 <div class="text-center mb-6">
                     <div class="bg-indigo-100 text-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
                         <i class="fa-solid fa-lock"></i>
@@ -84,6 +84,12 @@
                         लॉगिन करें
                     </button>
                 </form>
+
+                <!-- Developer Branding on Login Dashboard -->
+                <div class="mt-8 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-400">Developed with ❤️ by</p>
+                    <p class="text-sm font-bold text-indigo-600 mt-0.5">संजय कुमार जाजुन्दा</p>
+                </div>
             </section>
 
             <!-- 2. ADMIN DASHBOARD -->
@@ -91,12 +97,13 @@
                 <div class="bg-white rounded-xl shadow p-6 border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800">एडमिन नियंत्रण कक्ष</h2>
-                        <p class="text-sm text-gray-500">नई ग्राम पंचायत जोड़ें, एक्सेल डेटा प्रबंधित करें और पासवर्ड सेट करें</p>
+                        <p class="text-sm text-gray-500">ग्राम पंचायत, एक्सेल डेटा, प्रत्याशी प्रबंधन और पासवर्ड नियंत्रण</p>
                     </div>
                 </div>
 
-                <!-- Add Panchayat & Excel Upload Card -->
+                <!-- Admin Grid Controls -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Add Panchayat & Excel Upload Card -->
                     <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
                             <i class="fa-solid fa-plus-circle text-indigo-600 mr-2"></i> नई ग्राम पंचायत और एक्सेल जोड़ें
@@ -109,7 +116,6 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">पंचायत की मतदाता सूची (Excel File)</label>
                                 <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" required class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                                <p class="text-xs text-gray-500 mt-1">एक्सेल में कॉलम: Ward, Name, Relative, Mobile, VoterID आदि होने चाहिए।</p>
                             </div>
                             <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition shadow">
                                 पंचायत जोड़ें व डेटा आयात करें
@@ -117,20 +123,80 @@
                         </form>
                     </div>
 
-                    <!-- Existing Panchayats List -->
-                    <div class="bg-white rounded-xl shadow p-6 border border-gray-100 flex flex-col">
+                    <!-- Manage Candidates Card -->
+                    <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                            <i class="fa-solid fa-list-check text-indigo-600 mr-2"></i> पंजीकृत ग्राम पंचायतें
+                            <i class="fa-solid fa-user-tie text-indigo-600 mr-2"></i> प्रत्याशी प्रबंधन (Sarpanch/Ward Panch)
                         </h3>
-                        <div class="flex-grow overflow-y-auto max-h-64 border rounded-lg p-2 divide-y" id="admin-panchayat-list">
-                            <!-- JS will populate this -->
-                        </div>
+                        <form id="candidate-form" onsubmit="handleSaveCandidate(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">पंचायत चुनें</label>
+                                <select id="admin-cand-panchayat" required class="w-full border rounded-lg p-2 text-sm">
+                                    <option value="">-- पंचायत चुनें --</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">पद</label>
+                                    <select id="admin-cand-role" class="w-full border rounded-lg p-2 text-sm">
+                                        <option value="sarpanch">सरपंच उम्मीदवार</option>
+                                        <option value="ward">वार्ड पंच उम्मीदवार</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">वार्ड नं (यदि वार्ड पंच हो)</label>
+                                    <input type="text" id="admin-cand-ward" placeholder="उदा. 3" class="w-full border rounded-lg p-2 text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 mb-1">प्रत्याशी का नाम</label>
+                                <input type="text" id="admin-cand-name" required placeholder="नाम दर्ज करें" class="w-full border rounded-lg p-2 text-sm">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">चुनाव चिह्न (Symbol/Icon)</label>
+                                    <input type="text" id="admin-cand-symbol" placeholder="उदा. कमल / हाथ" class="w-full border rounded-lg p-2 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-700 mb-1">पासवर्ड</label>
+                                    <input type="text" id="admin-cand-pass" required placeholder="लॉगिन पासवर्ड" class="w-full border rounded-lg p-2 text-sm">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm transition shadow">
+                                प्रत्याशी सेव करें
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Existing Panchayats & Candidates List -->
+                <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-list-check text-indigo-600 mr-2"></i> पंजीकृत पंचायतें एवं प्रत्याशी सूची
+                    </h3>
+                    <div id="admin-panchayat-list" class="space-y-4">
+                        <!-- JS will populate -->
                     </div>
                 </div>
             </section>
 
             <!-- 3. USER DASHBOARD (Sarpanch & Ward Panch View) -->
             <section id="user-dashboard" class="hidden space-y-6">
+                <!-- Candidate Info Banner -->
+                <div id="candidate-banner" class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl shadow p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white/20 p-3 rounded-full text-2xl"><i class="fa-solid fa-user-shield"></i></div>
+                        <div>
+                            <h3 id="banner-cand-name" class="text-xl font-bold">प्रत्याशी नाम</h3>
+                            <p id="banner-cand-details" class="text-xs text-indigo-100">पद और वार्ड विवरण</p>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 px-4 py-2 rounded-lg text-center border border-white/20">
+                        <span class="text-xs text-indigo-200 block">चुनाव चिह्न</span>
+                        <span id="banner-cand-symbol" class="font-bold text-lg">--</span>
+                    </div>
+                </div>
+
                 <!-- Filters and Search Bar -->
                 <div class="bg-white rounded-xl shadow p-6 border border-gray-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
@@ -226,17 +292,14 @@
     <!-- JavaScript Application Logic -->
     <script>
         // LocalStorage Structure Initialization
-        let db = JSON.parse(localStorage.getItem('gp_voter_db')) || {
+        let db = JSON.parse(localStorage.getItem('gp_voter_db_v2')) || {
             panchayats: {}, // { "Suwana": { voters: [...], wards: [...] } }
-            passwords: {
-                admin: "admin123",
-                sarpanch: {}, 
-                ward: {}      
-            },
-            votedStatus: {}   
+            candidates: {}, // { "Suwana_sarpanch": { name, symbol, pass }, "Suwana_W1": { name, symbol, pass } }
+            votedStatus: {}, // { "Suwana_voterId_index": true }
+            passwords: { admin: "admin123" }
         };
 
-        let currentSession = JSON.parse(localStorage.getItem('gp_current_session')) || null;
+        let currentSession = JSON.parse(localStorage.getItem('gp_current_session_v2')) || null;
 
         // Initialize App on load
         window.onload = function() {
@@ -248,7 +311,6 @@
             }
         };
 
-        // Helper to switch views
         function showSection(sectionId) {
             document.getElementById('login-section').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
@@ -263,7 +325,6 @@
             }
         }
 
-        // Toggle Login fields depending on role
         function toggleLoginFields() {
             const role = document.getElementById('login-role').value;
             const panchayatGroup = document.getElementById('login-panchayat-group');
@@ -283,19 +344,24 @@
 
         function updateLoginPanchayatDropdowns() {
             const select = document.getElementById('login-panchayat-select');
+            const adminSelect = document.getElementById('admin-cand-panchayat');
+            
             select.innerHTML = '<option value="">-- पंचायत चुनें --</option>';
+            adminSelect.innerHTML = '<option value="">-- पंचायत चुनें --</option>';
             
             Object.keys(db.panchayats).forEach(pName => {
-                let opt = document.createElement('option');
-                opt.value = pName;
-                opt.textContent = pName;
-                select.appendChild(opt);
+                let opt1 = document.createElement('option');
+                opt1.value = pName; opt1.textContent = pName;
+                select.appendChild(opt1);
+
+                let opt2 = document.createElement('option');
+                opt2.value = pName; opt2.textContent = pName;
+                adminSelect.appendChild(opt2);
             });
 
-            renderAdminPanchayatList();
+            renderAdminDashboardLists();
         }
 
-        // When Panchayat changes in login, update Ward dropdown
         document.getElementById('login-panchayat-select').addEventListener('change', function() {
             const pName = this.value;
             const wardSelect = document.getElementById('login-ward-select');
@@ -328,7 +394,10 @@
                 }
             } else if (role === 'sarpanch') {
                 if (!panchayat) { alert('कृपया ग्राम पंचायत चुनें!'); return; }
-                let correctPass = db.passwords.sarpanch[panchayat] || "1234";
+                let candKey = `${panchayat}_sarpanch`;
+                let candData = db.candidates[candKey];
+                let correctPass = candData ? candData.pass : "1234";
+
                 if (password === correctPass) {
                     currentSession = { role: 'sarpanch', panchayat: panchayat };
                     saveAndLoadDashboard();
@@ -337,8 +406,10 @@
                 }
             } else if (role === 'ward') {
                 if (!panchayat || !ward) { alert('कृपया पंचायत और वार्ड दोनों चुनें!'); return; }
-                let key = `${panchayat}_W${ward}`;
-                let correctPass = db.passwords.ward[key] || "1234";
+                let candKey = `${panchayat}_W${ward}`;
+                let candData = db.candidates[candKey];
+                let correctPass = candData ? candData.pass : "1234";
+
                 if (password === correctPass) {
                     currentSession = { role: 'ward', panchayat: panchayat, ward: ward };
                     saveAndLoadDashboard();
@@ -349,7 +420,7 @@
         }
 
         function saveAndLoadDashboard() {
-            localStorage.setItem('gp_current_session', JSON.stringify(currentSession));
+            localStorage.setItem('gp_current_session_v2', JSON.stringify(currentSession));
             restoreSession();
         }
 
@@ -362,13 +433,25 @@
                 showSection('admin-dashboard');
                 updateLoginPanchayatDropdowns();
             } else if (currentSession.role === 'sarpanch') {
-                document.getElementById('current-panchayat-title').textContent = `ग्राम पंचायत: ${currentSession.panchayat} (सरपंच व्यू)`;
-                document.getElementById('logged-user-display').textContent = `सरपंच उम्मीदवार`;
+                let cand = db.candidates[`${currentSession.panchayat}_sarpanch`] || { name: 'सरपंच उम्मीदवार', symbol: 'निर्दिष्ट नहीं' };
+                document.getElementById('current-panchayat-title').textContent = `ग्राम पंचायत: ${currentSession.panchayat}`;
+                document.getElementById('logged-user-display').textContent = cand.name;
+                
+                document.getElementById('banner-cand-name').textContent = cand.name;
+                document.getElementById('banner-cand-details',).textContent = `ग्राम पंचायत ${currentSession.panchayat} - सरपंच उम्मीदवार`;
+                document.getElementById('banner-cand-symbol').textContent = cand.symbol || '--';
+
                 showSection('user-dashboard');
                 setupUserDashboardFilters();
             } else if (currentSession.role === 'ward') {
+                let cand = db.candidates[`${currentSession.panchayat}_W${currentSession.ward}`] || { name: `वार्ड ${currentSession.ward} पंच`, symbol: 'निर्दिष्ट नहीं' };
                 document.getElementById('current-panchayat-title').textContent = `ग्राम पंचायत: ${currentSession.panchayat} | वार्ड ${currentSession.ward}`;
-                document.getElementById('logged-user-display').textContent = `वार्ड ${currentSession.ward} पंच उम्मीदवार`;
+                document.getElementById('logged-user-display').textContent = cand.name;
+
+                document.getElementById('banner-cand-name').textContent = cand.name;
+                document.getElementById('banner-cand-details').textContent = `ग्राम पंचायत ${currentSession.panchayat} - वार्ड ${currentSession.ward} पंच उम्मीदवार`;
+                document.getElementById('banner-cand-symbol').textContent = cand.symbol || '--';
+
                 showSection('user-dashboard');
                 setupUserDashboardFilters();
             }
@@ -376,12 +459,12 @@
 
         function logout() {
             currentSession = null;
-            localStorage.removeItem('gp_current_session');
+            localStorage.removeItem('gp_current_session_v2');
             document.getElementById('login-form').reset();
             showSection('login-section');
         }
 
-        // Admin: Add New Panchayat and parse Excel
+        // Admin: Add Panchayat & Excel
         function handleAddNewPanchayat(event) {
             event.preventDefault();
             const pName = document.getElementById('new-panchayat-name').value.trim();
@@ -434,23 +517,43 @@
                         wards: Array.from(wardsSet).sort((a,b) => Number(a)-Number(b))
                     };
 
-                    if(!db.passwords.sarpanch[pName]) db.passwords.sarpanch[pName] = "1234";
-
-                    localStorage.setItem('gp_voter_db', JSON.stringify(db));
+                    localStorage.setItem('gp_voter_db_v2', JSON.stringify(db));
                     alert(`सफलतापूर्वक "${pName}" पंचायत जोड़ दी गई है!\nकुल मतदाता: ${voters.length}`);
                     document.getElementById('add-panchayat-form').reset();
                     updateLoginPanchayatDropdowns();
 
                 } catch (err) {
                     console.error(err);
-                    alert('एक्सेल फाइल पढ़ने में त्रुटि हुई। कृपया सही फॉर्मेट की फाइल अपलोड करें।');
+                    alert('एक्सेल फाइल पढ़ने में त्रुटि हुई।');
                 }
             };
-
             reader.readAsArrayBuffer(file);
         }
 
-        function renderAdminPanchayatList() {
+        // Admin: Save/Update Candidate
+        function handleSaveCandidate(event) {
+            event.preventDefault();
+            const pName = document.getElementById('admin-cand-panchayat').value;
+            const role = document.getElementById('admin-cand-role').value;
+            const wardNo = document.getElementById('admin-cand-ward').value.trim();
+            const name = document.getElementById('admin-cand-name').value.trim();
+            const symbol = document.getElementById('admin-cand-symbol').value.trim();
+            const pass = document.getElementById('admin-cand-pass').value.trim();
+
+            if (!pName) { alert('कृपया पंचायत चुनें!'); return; }
+            if (role === 'ward' && !wardNo) { alert('वार्ड पंच के लिए वार्ड नंबर अनिवार्य है!'); return; }
+
+            let key = role === 'sarpanch' ? `${pName}_sarpanch` : `${pName}_W${wardNo}`;
+
+            db.candidates[key] = { name, symbol, pass, role, ward: wardNo };
+            localStorage.setItem('gp_voter_db_v2', JSON.stringify(db));
+
+            alert(`प्रत्याशी "${name}" सफलतापूर्वक सेव कर दिए गए हैं!`);
+            document.getElementById('candidate-form').reset();
+            renderAdminDashboardLists();
+        }
+
+        function renderAdminDashboardLists() {
             const container = document.getElementById('admin-panchayat-list');
             container.innerHTML = '';
 
@@ -461,17 +564,45 @@
             }
 
             panchayats.forEach(pName => {
-                let count = db.panchayats[pName].voters.length;
-                let wardsCount = db.panchayats[pName].wards.length;
-                
+                let pData = db.panchayats[pName];
                 let div = document.createElement('div');
-                div.className = "flex justify-between items-center p-3 bg-gray-50 rounded-lg border mb-2";
+                div.className = "p-4 bg-gray-50 rounded-lg border mb-3";
+
+                let candidatesHtml = '';
+                // Sarpanch check
+                let sKey = `${pName}_sarpanch`;
+                if(db.candidates[sKey]) {
+                    let s = db.candidates[sKey];
+                    candidatesHtml += `<div class="text-xs bg-indigo-50 text-indigo-700 p-2 rounded mt-1 flex justify-between items-center">
+                        <span><strong>सरपंच:</strong> ${s.name} (${s.symbol}) | पास: ${s.pass}</span>
+                        <button onclick="deleteCandidate('${sKey}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                }
+
+                // Ward Panch check
+                pData.wards.forEach(w => {
+                    let wKey = `${pName}_W${w}`;
+                    if(db.candidates[wKey]) {
+                        let wCand = db.candidates[wKey];
+                        candidatesHtml += `<div class="text-xs bg-blue-50 text-blue-700 p-2 rounded mt-1 flex justify-between items-center">
+                            <span><strong>वार्ड ${w} पंच:</strong> ${wCand.name} (${wCand.symbol}) | पास: ${wCand.pass}</span>
+                            <button onclick="deleteCandidate('${wKey}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </div>`;
+                    }
+                });
+
                 div.innerHTML = `
-                    <div>
-                        <h4 class="font-bold text-gray-800">${pName}</h4>
-                        <p class="text-xs text-gray-500">वार्ड्स: ${wardsCount} | मतदाता: ${count}</p>
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-base">${pName}</h4>
+                            <p class="text-xs text-gray-500">कुल वार्ड्स: ${pData.wards.length} | कुल मतदाता: ${pData.voters.length}</p>
+                        </div>
+                        <button onclick="deletePanchayat('${pName}')" class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded text-xs font-bold"><i class="fa-solid fa-trash mr-1"></i> पंचायत हटाएं</button>
                     </div>
-                    <button onclick="deletePanchayat('${pName}')" class="text-red-500 hover:text-red-700 text-sm px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                    <div class="mt-3">
+                        <p class="text-xs font-bold text-gray-600 uppercase">पंजीकृत प्रत्याशी:</p>
+                        ${candidatesHtml || '<p class="text-xs text-gray-400 mt-1">कोई प्रत्याशी नहीं जोड़ा गया।</p>'}
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -480,9 +611,16 @@
         function deletePanchayat(pName) {
             if(confirm(`क्या आप वाकई "${pName}" पंचायत को हटाना चाहते हैं?`)) {
                 delete db.panchayats[pName];
-                delete db.passwords.sarpanch[pName];
-                localStorage.setItem('gp_voter_db', JSON.stringify(db));
+                localStorage.setItem('gp_voter_db_v2', JSON.stringify(db));
                 updateLoginPanchayatDropdowns();
+            }
+        }
+
+        function deleteCandidate(key) {
+            if(confirm('क्या आप इस प्रत्याशी को हटाना चाहते हैं?')) {
+                delete db.candidates[key];
+                localStorage.setItem('gp_voter_db_v2', JSON.stringify(db));
+                renderAdminDashboardLists();
             }
         }
 
@@ -601,7 +739,7 @@
             } else {
                 db.votedStatus[voterId] = true;
             }
-            localStorage.setItem('gp_voter_db', JSON.stringify(db));
+            localStorage.setItem('gp_voter_db_v2', JSON.stringify(db));
             filterVoters();
         }
 
