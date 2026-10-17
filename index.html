@@ -1,969 +1,526 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>पंचायती राज चुनाव • मतदाता पर्ची पोर्टल</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पंचायती राज चुनाव - मतदाता पर्ची एवं प्रबंधन पोर्टल</title>
     
-    <!-- Google Fonts & Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:ital@0;1&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        hindi: ['Tiro Devanagari Hindi', 'serif'],
+                    },
+                    colors: {
+                        saffron: {
+                            50: '#fff9ed',
+                            100: '#fef2d6',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Firebase Compat SDKs (v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- SheetJS (xlsx) & html2canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-dark: #0f172a;
-            --primary-light: #2563eb;
-            --accent: #d97706;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Poppins', 'Tiro Devanagari Hindi', sans-serif;
         }
-
-        /* Top Corner Hidden Admin Button */
-        .admin-corner-btn {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 999;
-            background: #ffffff;
-            color: #64748b;
-            border: 1.5px solid #cbd5e1;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.15rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        .hindi-font {
+            font-family: 'Tiro Devanagari Hindi', serif;
         }
-
-        .app-view {
-            display: none;
-        }
-
-        .app-view.active {
-            display: block;
-        }
-
-        /* 1. LOGIN SCREEN */
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: white;
-            width: 100%;
-            max-width: 420px;
-            border-radius: 20px;
-            padding: 30px 24px;
-            box-shadow: 0 20px 40px -15px rgba(30, 58, 138, 0.15);
-            border: 1px solid var(--border);
-            text-align: center;
-        }
-
-        .login-icon-badge {
-            width: 72px;
-            height: 72px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2.2rem;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.88rem;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-main);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            outline: none;
-            background: #fafafa;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-light);
-            background: #fff;
-        }
-
-        .btn-main {
-            width: 100%;
-            padding: 13px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .cloud-status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            margin-bottom: 14px;
-        }
-        .cloud-online { background: #dcfce7; color: #15803d; }
-        .cloud-offline { background: #fee2e2; color: #b91c1c; }
-
-        /* 2. CLIENT VOTER SEARCH SCREEN */
-        .client-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 40;
-        }
-
-        .campaign-strip {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            border-bottom: 2px solid #f59e0b;
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .cand-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .cand-avatar {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            border: 2px solid #d97706;
-            object-fit: cover;
-            background: white;
-        }
-
-        .symbol-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            border: 1.5px solid #d97706;
-            object-fit: contain;
-            background: white;
-            padding: 2px;
-        }
-
-        .post-tag {
-            background: #d97706;
-            color: white;
-            font-size: 0.72rem;
-            padding: 2px 7px;
-            border-radius: 10px;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .content-wrap {
-            max-width: 860px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 14px 14px 60px 14px;
-        }
-
-        .search-card-main {
-            background: white;
-            border-radius: 16px;
-            padding: 14px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-            margin-bottom: 12px;
-        }
-
-        .ward-filter-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed var(--border);
-        }
-
-        .ward-select-control {
-            flex: 1;
-            padding: 9px 12px;
-            border: 1.5px solid #93c5fd;
-            border-radius: 10px;
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: var(--primary);
-            background: #eff6ff;
-            outline: none;
-        }
-
-        .single-search-input {
-            width: 100%;
-            padding: 14px 14px 14px 44px;
-            border: 2px solid #bfdbfe;
-            border-radius: 12px;
-            font-size: 1rem;
-            outline: none;
-            background: #fafafa;
-        }
-
-        .search-field-wrap {
-            position: relative;
-        }
-
-        .search-field-wrap i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--primary);
-            font-size: 1.15rem;
-        }
-
-        .quick-hint-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.84rem;
-            color: var(--text-muted);
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .voter-card {
-            background: white;
-            border-radius: 14px;
-            border: 1px solid var(--border);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .voter-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-        }
-
-        .ward-badge-pill {
-            background: #fef3c7;
-            color: #92400e;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .epic-chip {
-            background: #f0fdf4;
-            color: #166534;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
-
-        .voter-name-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .voter-meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px 10px;
-            font-size: 0.9rem;
-            margin-top: 6px;
-            color: #334155;
-        }
-
-        .voter-booth-box {
-            background: #eff6ff;
-            border-left: 3px solid var(--primary-light);
-            border-radius: 0 6px 6px 0;
-            padding: 7px 10px;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            color: #1e3a8a;
-        }
-
-        .voter-action-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid #f1f5f9;
-        }
-
-        .btn-view-slip {
-            background: #f1f5f9;
-            color: #1e293b;
-            border: 1px solid #cbd5e1;
-            padding: 9px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-wa-slip {
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 9px;
-            border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        /* 3. DEDICATED ADMIN DASHBOARD */
-        .admin-wrap {
-            max-width: 920px;
-            margin: 0 auto;
-            width: 100%;
-            padding: 16px 14px 60px 14px;
-        }
-
-        .admin-top-bar {
-            background: #0f172a;
-            color: white;
-            padding: 16px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .admin-nav-tabs {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 14px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .nav-tab-btn {
-            padding: 9px 16px;
-            background: #e2e8f0;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .nav-tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .admin-card {
-            background: white;
-            border-radius: 16px;
-            padding: 18px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            margin-bottom: 14px;
-        }
-
-        .table-custom {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.88rem;
-        }
-
-        .table-custom th, .table-custom td {
-            padding: 10px;
-            border-bottom: 1px solid var(--border);
-            text-align: left;
-        }
-
-        .table-custom th {
-            background: #f8fafc;
-            color: #475569;
-        }
-
-        .progress-box {
-            width: 100%;
-            height: 14px;
-            background: #e2e8f0;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2563eb, #16a34a);
-            width: 0%;
-        }
-
-        /* 4. VOTER SLIP MODAL */
-        .slip-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.75);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 12px;
-        }
-
-        .slip-overlay.active {
-            display: flex;
-        }
-
-        .slip-dialog {
-            background: white;
-            width: 100%;
-            max-width: 460px;
-            border-radius: 16px;
-            overflow: hidden;
-            max-height: 94vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-        }
-
-        .slip-scroll-content {
-            overflow-y: auto;
-            padding: 14px;
-        }
-
-        #printableSlipCard {
-            background: white;
-            border: 2px solid #1e3a8a;
-            border-radius: 12px;
-            padding: 12px;
-            position: relative;
-        }
-
-        .slip-header-campaign {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .slip-cand-img {
-            width: 58px;
-            height: 58px;
-            border-radius: 50%;
-            border: 2px solid #facc15;
-            object-fit: cover;
-            background: white;
-        }
-
-        .slip-symbol-img {
-            width: 54px;
-            height: 54px;
-            background: white;
-            border-radius: 8px;
-            border: 2px solid #facc15;
-            object-fit: contain;
-            padding: 2px;
-        }
-
-        .slip-table-details {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.92rem;
-            margin-top: 8px;
-        }
-
-        .slip-table-details td {
-            padding: 5px 6px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .slip-footer-tools {
-            padding: 12px 14px;
-            background: #f8fafc;
-            border-top: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        /* Admin Modal Dialog */
-        #adminLoginModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.75);
-            z-index: 1001;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        #adminLoginModal.active {
-            display: flex;
-        }
-
-        .admin-modal-box {
-            background: white;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 16px;
-            padding: 22px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
         @media print {
             body * { visibility: hidden; }
-            #printableSlipCard, #printableSlipCard * { visibility: visible; }
-            #printableSlipCard { position: fixed; left: 5%; top: 5%; width: 90%; }
-            .slip-overlay, .slip-footer-tools, .admin-corner-btn, #adminLoginModal { display: none !important; }
+            #printableSlipArea, #printableSlipArea * { visibility: visible; }
+            #printableSlipArea { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
-<body>
+<body class="h-full flex flex-col text-slate-800">
 
-    <!-- 🌟 TOP-RIGHT HIDDEN ADMIN ACCESS BUTTON 🌟 -->
-    <button class="admin-corner-btn" title="एडमिन पोर्टल" onclick="openAdminModal()">
-        <i class="fa-solid fa-lock"></i>
-    </button>
-
-    <!-- ADMIN MODAL DIALOG -->
-    <div id="adminLoginModal">
-        <div class="admin-modal-box">
-            <div style="width: 52px; height: 52px; background: #0f172a; color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px;">
-                <i class="fa-solid fa-user-shield"></i>
-            </div>
-            <h3 style="font-size: 1.15rem; color: #0f172a; margin-bottom: 4px;">एडमिन कंट्रोल रूम</h3>
-            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">कृपया मुख्य एडमिन पासवर्ड दर्ज करें:</p>
-            <input type="password" id="modalAdminPass" class="form-control" placeholder="एडमिन पासवर्ड..." style="text-align: center; font-size: 1.1rem; letter-spacing: 2px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
-                <button class="btn-main" onclick="submitAdminModalPass()">लॉगिन</button>
-                <button class="btn-main" style="background: #e2e8f0; color: #334155;" onclick="closeAdminModal()">रद्द करें</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- VIEW 1: CLIENT LOGIN SCREEN -->
-    <section class="app-view active" id="viewClientLogin">
-        <div class="login-container">
-            <div class="login-box">
-                <div class="login-icon-badge">
-                    <i class="fa-solid fa-id-card-clip"></i>
+    <!-- Navbar -->
+    <nav class="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-700 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid font-bold fa-check-to-slot text-2xl text-amber-200"></i>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-wide hindi-font">पंचायती राज चुनाव प्रबंधन पोर्टल</h1>
+                        <p class="text-xs text-orange-100 hidden sm:block">डिजिटल मतदाता पर्ची एवं लाइव डेटाबेस प्रणाली</p>
+                    </div>
                 </div>
-                <h2 style="font-size: 1.35rem; color: #1e3a8a; font-weight: 700; margin-bottom: 2px;">पंचायती राज चुनाव</h2>
-                <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 10px;">मतदाता पर्ची एवं प्रबंधन पोर्टल</p>
                 
-                <div id="loginCloudBadge" class="cloud-status-badge cloud-online">
-                    <i class="fa-solid fa-cloud"></i> <span id="cloudStatusText">पंचायती राज चुनाव सक्रिय</span>
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fa-solid fa-user"></i> यूजर आईडी (Client ID):</label>
-                    <input type="text" id="inpClientId" class="form-control" placeholder="उदा० sarpanch या ward9_cand1" value="sarpanch">
-                </div>
-
-                <div class="form-group">
-                    <label><i class="fa-solid fa-key"></i> पासवर्ड (Password):</label>
-                    <input type="password" id="inpClientPass" class="form-control" placeholder="पासवर्ड लिखें...">
-                </div>
-
-                <button class="btn-main" onclick="handleClientLogin()">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> लॉगिन करें
-                </button>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 0.78rem;">
-                    <span style="color: #64748b;">मोबाइल लॉक समस्या?</span>
-                    <a href="javascript:void(0)" onclick="resetAllDeviceLocks()" style="color: #dc2626; font-weight: 700; text-decoration: underline;">
-                        <i class="fa-solid fa-unlock"></i> डिवाइस लॉक रीसेट करें
-                    </a>
-                </div>
-
-                <div style="margin-top: 18px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 0.82rem; color: var(--text-muted); text-align: center; line-height: 1.6;">
-                    <div>विकसितकर्ता: <b>संजय जाजुन्दा</b></div>
-                    <div>हेल्पलाइन / तकनीकी सहायता: <a href="tel:9829970310" style="color: var(--primary-light); font-weight: 700; text-decoration: none;">9829970310</a></div>
+                <div class="flex items-center space-x-2">
+                    <span id="userBadge" class="hidden text-xs bg-orange-800/60 px-3 py-1 rounded-full border border-orange-400/40 text-amber-200">
+                        <i class="fa-solid fa-user-shield mr-1"></i> <span id="userBadgeText">लॉगिन...</span>
+                    </span>
+                    <button id="logoutBtn" onclick="handleLogout()" class="hidden bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg transition shadow">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> लॉगआउट
+                    </button>
                 </div>
             </div>
         </div>
-    </section>
+    </nav>
 
-    <!-- VIEW 2: CLIENT VOTER SEARCH & INSTANT SLIP -->
-    <section class="app-view" id="viewClientSearch">
-        <header class="client-header">
-            <div>
-                <h2>मतदाता पर्ची खोज</h2>
-                <div style="font-size: 0.75rem; opacity: 0.9;" id="clientWardBadge">वार्ड: लोड हो रहा है...</div>
-            </div>
-            <button class="btn-main" style="width: auto; padding: 6px 12px; font-size: 0.82rem; background: rgba(255,255,255,0.2);" onclick="logoutClient()">
-                <i class="fa-solid fa-power-off"></i> लॉगआउट
-            </button>
-        </header>
-
-        <section class="campaign-strip">
-            <div class="cand-profile">
-                <img id="candDisplayPhoto" class="cand-avatar" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80" alt="प्रत्याशी फोटो">
-                <div class="cand-meta">
-                    <span class="post-tag" id="candDisplayPostTag">प्रत्याशी</span>
-                    <h3 id="candDisplayName">श्रीमती रेखा देवी जाट</h3>
-                    <p id="candDisplayPanchayat">ग्राम पंचायत: सुवाणा (भीलवाड़ा)</p>
-                </div>
-            </div>
-            <div style="text-align: center;">
-                <img id="candDisplaySymbol" class="symbol-avatar" src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png" alt="चुनाव चिन्ह">
-                <div style="font-size: 0.72rem; font-weight: 700; color: #92400e;" id="candDisplaySymbolName">चिन्ह: चाबी</div>
-            </div>
-        </section>
-
-        <div class="content-wrap">
-            <div class="search-card-main">
-                <div id="wardFilterContainer" class="ward-filter-row" style="display: none;">
-                    <label style="font-size: 0.88rem; font-weight: 700; color: #1e3a8a;"><i class="fa-solid fa-filter"></i> वार्ड चुनें:</label>
-                    <select id="selectWardFilter" class="ward-select-control" onchange="handleWardDropdownChange()">
-                        <option value="ALL">सभी वार्ड</option>
-                    </select>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
-                    <button type="button" id="tabBtnNameMode" class="btn-main" style="background: #1e3a8a; color: white; padding: 10px; font-size: 0.88rem;" onclick="setSearchMode('name')">
-                        <i class="fa-solid fa-user"></i> 1. नाम से खोजें
-                    </button>
-                    <button type="button" id="tabBtnHouseMode" class="btn-main" style="background: #f1f5f9; color: #334155; border: 1.5px solid #cbd5e1; padding: 10px; font-size: 0.88rem;" onclick="setSearchMode('house')">
-                        <i class="fa-solid fa-house-chimney-user"></i> 2. मकान नं० (ग्रुप खोज)
-                    </button>
-                </div>
-
-                <div id="boxNameSearchWrap" class="search-field-wrap">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="nameSearchInput" class="single-search-input" placeholder="मतदाता या पिता/पति का नाम लिखें (कुछ अक्षर)..." autofocus>
-                </div>
-
-                <div id="boxHouseSearchWrap" class="search-field-wrap" style="display: none;">
-                    <i class="fa-solid fa-house-chimney"></i>
-                    <input type="text" id="houseSearchInput" class="single-search-input" placeholder="मकान नंबर लिखें (उदा० 56, 93, 102)..." style="border-color: #f59e0b;">
-                </div>
-
-                <div class="quick-hint-bar">
-                    <div id="searchHintText"><i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i> नाम के कुछ अक्षर लिखते ही परिणाम आ जाएंगे</div>
-                    <div>परिणाम: <strong id="voterResultCount" style="color: #1e3a8a;">0</strong> मतदाता</div>
-                </div>
-            </div>
-
-            <div style="margin: 0 4px 10px 4px; font-size: 0.88rem; color: #1e3a8a; font-weight: 600;" id="boothNoticeTag">
-                <i class="fa-solid fa-location-dot"></i> वोटर सेंटर विवरण पर्ची में उपलब्ध
-            </div>
-
-            <div id="voterResultsContainer"></div>
-        </div>
-    </section>
-
-    <!-- VIEW 3: ADMIN DASHBOARD -->
-    <section class="app-view" id="viewAdminDashboard">
-        <div class="admin-wrap">
-            <div class="admin-top-bar">
-                <div>
-                    <h2 style="font-size: 1.25rem; font-weight: 700;"><i class="fa-solid fa-user-shield"></i> मुख्य एडमिन डैशबोर्ड</h2>
-                    <p style="font-size: 0.82rem; opacity: 0.85;">ग्राम पंचायत प्रबंधन, क्लाइंट्स एवं एक्सेल शीट अपलोड</p>
-                </div>
-                <button class="btn-main" style="width: auto; padding: 8px 14px; background: #dc2626;" onclick="exitAdmin()">
-                    <i class="fa-solid fa-xmark"></i> बाहर निकलें
-                </button>
-            </div>
-
-            <div class="admin-nav-tabs">
-                <button class="nav-tab-btn active" onclick="switchAdminTab('tabPanchayatManage', this)">
-                    <i class="fa-solid fa-landmark"></i> 1. ग्राम पंचायतें
-                </button>
-                <button class="nav-tab-btn" onclick="switchAdminTab('tabExcelUpload', this)">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> 2. एक्सेल अपलोड & डिलीट
-                </button>
-                <button class="nav-tab-btn" onclick="switchAdminTab('tabClientsManage', this)">
-                    <i class="fa-solid fa-users-gear"></i> 3. क्लाइंट्स & वार्ड
-                </button>
-                <button class="nav-tab-btn" onclick="switchAdminTab('tabCandidateManage', this)">
-                    <i class="fa-solid fa-bullhorn"></i> 4. प्रत्याशी ब्रांडिंग
-                </button>
-                <button class="nav-tab-btn" onclick="switchAdminTab('tabAdminPassword', this)">
-                    <i class="fa-solid fa-key"></i> 5. पासवर्ड
-                </button>
-            </div>
-
-            <!-- TAB 1: GRAM PANCHAYAT MANAGEMENT -->
-            <div id="tabPanchayatManage" class="admin-tab-pane">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 10px; color: #1e3a8a;"><i class="fa-solid fa-plus-circle"></i> नई ग्राम पंचायत बनाएं</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="form-group"><label>पंचायत कोड (Unique ID):</label><input type="text" id="newGpId" class="form-control" placeholder="उदा० suwana"></div>
-                        <div class="form-group"><label>ग्राम पंचायत का नाम:</label><input type="text" id="newGpName" class="form-control" placeholder="उदा० ग्राम पंचायत सुवाणा"></div>
-                    </div>
-                    <button class="btn-main" onclick="addNewPanchayat()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> पंचायत जोड़ें</button>
-                </div>
-
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 6px; color: #1e3a8a;"><i class="fa-solid fa-list"></i> पंजीकृत ग्राम पंचायतें</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="table-custom">
-                            <thead><tr><th>पंचायत आईडी</th><th>पंचायत नाम</th><th>कार्रवाई</th></tr></thead>
-                            <tbody id="panchayatTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 2: EXCEL UPLOAD & DELETE -->
-            <div id="tabExcelUpload" class="admin-tab-pane" style="display: none;">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-file-excel"></i> चुनी गई ग्राम पंचायत के लिए एक्सेल शीट अपलोड करें</h3>
-                    <div class="form-group">
-                        <label>ग्राम पंचायत चुनें:</label>
-                        <select id="uploadGpSelect" class="form-control" style="font-weight:600; color:var(--primary);"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>एक्सेल फ़ाइल (.xlsx / .xls):</label>
-                        <input type="file" id="excelFileLoader" accept=".xlsx, .xls" class="form-control" style="padding: 11px;">
-                    </div>
-                    <div id="uploadProgressBox" class="progress-box"><div id="uploadProgressBar" class="progress-bar-fill"></div></div>
-                    <div id="excelMsg" style="margin-top: 10px; font-weight: 600; font-size: 0.95rem;"></div>
-                    <div id="wardStatsCount" style="margin-top: 8px; font-size: 0.85rem; color: #64748b;"></div>
-                </div>
-
-                <div class="admin-card" style="border: 1.5px solid #fca5a5; background: #fff5f5;">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> फायरबेस से डेटा डिलीट करें</h3>
-                    <p style="font-size: 0.84rem; color: #7f1d1d; margin-bottom: 12px;">आप यहाँ से किसी भी ग्राम पंचायत का मतदाता डेटा सीधे फायरबेस क्लाउड से हमेशा के लिए हटा सकते हैं।</p>
-                    <div class="form-group">
-                        <label>डिलीट करने के लिए पंचायत चुनें:</label>
-                        <select id="deleteGpSelect" class="form-control" style="font-weight:600; color:var(--danger);"></select>
-                    </div>
-                    <button class="btn-main" style="background: #dc2626;" onclick="deletePanchayatVotersFromFirebase()"><i class="fa-solid fa-trash-can"></i> इस पंचायत का डेटा फायरबेस से डिलीट करें</button>
-                </div>
-            </div>
-
-            <!-- TAB 3: CLIENTS & WARD -->
-            <div id="tabClientsManage" class="admin-tab-pane" style="display: none;">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया प्रत्याशी / वार्ड पंच / कार्यकर्ता जोड़ें</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="form-group"><label>यूजर आईडी (Login ID):</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० ward9_cand1"></div>
-                        <div class="form-group"><label>पासवर्ड:</label><input type="text" id="addClientPass" class="form-control" placeholder="पासवर्ड..."></div>
-                        <div class="form-group"><label>यूजर/लॉगिन नाम:</label><input type="text" id="addClientName" class="form-control" placeholder="उदा० रमेश कुमार"></div>
-                        <div class="form-group">
-                            <label>ग्राम पंचायत निर्धारित करें:</label>
-                            <select id="addClientGp" class="form-control" style="font-weight:600; color:var(--primary);"></select>
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>वार्ड एक्सेस (जैसे वार्ड 9 के लिए 9 चुनें):</label>
-                            <select id="addClientWard" class="form-control">
-                                <option value="ALL">⭐ सभी वार्ड (सरपंच हेतु)</option>
-                                <option value="1">वार्ड 1</option><option value="2">वार्ड 2</option><option value="3">वार्ड 3</option>
-                                <option value="4">वार्ड 4</option><option value="5">वार्ड 5</option><option value="6">वार्ड 6</option>
-                                <option value="7">वार्ड 7</option><option value="8">वार्ड 8</option><option value="9">वार्ड 9</option>
-                                <option value="10">वार्ड 10</option><option value="11">वार्ड 11</option><option value="12">वार्ड 12</option>
-                                <option value="13">वार्ड 13</option><option value="14">वार्ड 14</option><option value="15">वार्ड 15</option>
-                                <option value="16">वार्ड 16</option><option value="17">वार्ड 17</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn-main" onclick="addClientAccount()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> नया उम्मीदवार/क्लाइंट जोड़ें</button>
-                </div>
-
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 6px; color: #1e3a8a;"><i class="fa-solid fa-mobile-screen-button"></i> पंजीकृत क्लाइंट्स सूची (हर वार्ड के अलग उम्मीदवार)</h3>
-                    <div style="overflow-x: auto;">
-                        <table class="table-custom">
-                            <thead><tr><th>आईडी</th><th>नाम / प्रत्याशी</th><th>पंचायत</th><th>वार्ड</th><th>पासवर्ड</th><th>लॉक</th><th>कार्रवाई (Edit/Delete)</th></tr></thead>
-                            <tbody id="clientsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB 4: CANDIDATE BRANDING -->
-            <div id="tabCandidateManage" class="admin-tab-pane" style="display: none;">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 14px; color: #1e3a8a;"><i class="fa-solid fa-address-card"></i> मुख्य सरपंच प्रत्याशी ब्रांडिंग</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div class="form-group"><label>पद:</label><select id="cfgPostType" class="form-control"><option value="सरपंच (Sarpanch)">सरपंच</option><option value="वार्ड पंच (Ward Panch)">वार्ड पंच</option></select></div>
-                        <div class="form-group"><label>नाम:</label><input type="text" id="cfgName" class="form-control" value="श्रीमती रेखा देवी जाट"></div>
-                        <div class="form-group"><label>पंचायत:</label><input type="text" id="cfgPanchayat" class="form-control" value="ग्राम पंचायत सुवाणा"></div>
-                        <div class="form-group"><label>चिन्ह:</label><input type="text" id="cfgSymbolName" class="form-control" value="चाबी (Key)"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>नारा:</label><input type="text" id="cfgSlogan" class="form-control" value="विकास के लिए चाबी पर वोट दें"></div>
-                        <div class="form-group"><label>मोबाइल:</label><input type="text" id="cfgContact" class="form-control" value="9829970310"></div>
-                    </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border);">
-                        <div class="form-group"><label>प्रत्याशी फोटो:</label><input type="file" id="filePhotoInput" accept="image/*" class="form-control"><img id="previewPhotoAdmin" src="" style="width: 60px; height: 60px; border-radius: 50%; margin-top: 8px; object-fit: cover;"></div>
-                        <div class="form-group"><label>चिन्ह फोटो:</label><input type="file" id="fileSymbolInput" accept="image/*" class="form-control"><img id="previewSymbolAdmin" src="" style="width: 60px; height: 60px; border-radius: 8px; margin-top: 8px; object-fit: contain;"></div>
-                    </div>
-                    <button class="btn-main" onclick="saveCandidateSettings()" style="margin-top: 14px;"><i class="fa-solid fa-floppy-disk"></i> सुरक्षित करें</button>
-                </div>
-            </div>
-
-            <!-- TAB 5: PASSWORD -->
-            <div id="tabAdminPassword" class="admin-tab-pane" style="display: none;">
-                <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-key"></i> एडमिन पासवर्ड बदलें</h3>
-                    <div class="form-group"><label>पुराना पासवर्ड:</label><input type="password" id="currentAdminPass" class="form-control"></div>
-                    <div class="form-group"><label>नया पासवर्ड:</label><input type="password" id="newAdminPass" class="form-control"></div>
-                    <div class="form-group"><label>कन्फर्म पासवर्ड:</label><input type="password" id="confirmAdminPass" class="form-control"></div>
-                    <button class="btn-main" onclick="updateAdminPassword()" style="margin-top: 10px;"><i class="fa-solid fa-shield-halved"></i> पासवर्ड बदलें</button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- VOTER SLIP MODAL -->
-    <div class="slip-overlay" id="slipModalOverlay">
-        <div class="slip-dialog">
-            <div class="slip-scroll-content">
-                <div id="printableSlipCard">
-                    <div class="slip-header-campaign">
-                        <img id="slCandImg" class="slip-cand-img" src="" alt="प्रत्याशी">
-                        <div class="slip-cand-info">
-                            <span style="font-size: 0.74rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;" id="slPostTag">प्रत्याशी</span>
-                            <h2 id="slCandName">नाम</h2>
-                            <p style="font-size: 0.78rem; opacity: 0.9;" id="slPanchayat">ग्राम पंचायत</p>
-                        </div>
-                        <img id="slSymbolImg" class="slip-symbol-img" src="" alt="चिन्ह">
-                    </div>
-
-                    <div style="text-align: center; border-bottom: 2px dashed #94a3b8; padding-bottom: 6px; margin-bottom: 8px;">
-                        <h4 style="color: #1e3a8a; font-size: 1.05rem;">मतदाता सूचना पर्ची (Voter Slip)</h4>
-                        <span style="font-size: 0.78rem; color: #64748b;" id="slReceiptWard">वार्ड क्रमांक: -</span>
-                    </div>
-
-                    <table class="slip-table-details">
-                        <tr><td class="td-lbl">मतदाता का नाम:</td><td class="td-v" style="font-size: 1.15rem; color: #1e3a8a;" id="slVoterName">-</td></tr>
-                        <tr><td class="td-lbl">वोटर आईडी (EPIC):</td><td class="td-v" style="color: #15803d; font-size: 1rem;" id="slVoterEpic">-</td></tr>
-                        <tr><td class="td-lbl" id="slRelLbl">पिता/पति का नाम:</td><td class="td-v" id="slVoterRelName">-</td></tr>
-                        <tr><td class="td-lbl">वार्ड एवं क्रमांक:</td><td class="td-v" style="font-size: 1.05rem;" id="slVoterWardSno">-</td></tr>
-                        <tr><td class="td-lbl">मकान संख्या:</td><td class="td-v" id="slVoterHouse">-</td></tr>
-                        <tr><td class="td-lbl">आयु एवं लिंग:</td><td class="td-v" id="slVoterAgeGender">-</td></tr>
-                        <tr><td class="td-lbl">मोहल्ला / क्षेत्र:</td><td class="td-v" id="slVoterArea">-</td></tr>
-                    </table>
-
-                    <div class="slip-center-box">
-                        <strong style="color: #1e40af;"><i class="fa-solid fa-school"></i> मतदान केंद्र:</strong>
-                        <div style="font-weight: 700; color: #0f172a; margin-top: 2px;" id="slVoterBooth">-</div>
-                    </div>
-
-                    <div class="slip-vote-appeal">
-                        <i class="fa-solid fa-stamp"></i> अपना अमूल्य मत <span id="slSymbolFooter" style="color: #b45309; font-size: 1rem;">''</span> के सामने वाला बटन दबाकर विजयी बनाएं।
-                    </div>
-                </div>
-            </div>
-
-            <div class="slip-footer-tools">
-                <button class="btn-main" style="background: #16a34a; padding: 12px; font-size: 0.95rem;" onclick="sendSlipWhatsAppModal()">
-                    <i class="fa-brands fa-whatsapp"></i> व्हाट्सएप पर टेक्स्ट भेजें
-                </button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <button class="btn-main" style="background: #2563eb; padding: 10px;" onclick="downloadSlipAsImage()">
-                        <i class="fa-solid fa-download"></i> 🖼️ पर्ची सेव (PNG)
-                    </button>
-                    <button class="btn-main" style="background: #d97706; padding: 10px;" onclick="printSingleVoterSlip()">
-                        <i class="fa-solid fa-print"></i> प्रिंट / PDF
-                    </button>
-                </div>
-                <button class="btn-main" style="background: #e2e8f0; color: #0f172a; padding: 9px;" onclick="closeSlipModal()">
-                    <i class="fa-solid fa-xmark"></i> बंद करें
-                </button>
-            </div>
+    <!-- Global Alert / Status Box -->
+    <div id="statusAlert" class="hidden max-w-7xl mx-auto px-4 mt-3">
+        <div id="statusAlertInner" class="p-3 rounded-lg text-sm flex items-center justify-between shadow-sm">
+            <span id="statusAlertMsg"></span>
+            <button onclick="hideAlert()" class="text-lg font-bold px-2">&times;</button>
         </div>
     </div>
 
-    <!-- Application JavaScript -->
-    <script>
-        let db = null;
-        let isFirebaseActive = false;
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-6">
+        
+        <!-- ================= SECTION 1: LOGIN SECTION ================= -->
+        <div id="loginSection" class="max-w-md mx-auto my-8 bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-100">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 hindi-font">पोर्टल लॉगिन</h2>
+                <p class="text-xs text-slate-500 mt-1">कार्यकर्ता (Client) या एडमिन अपनी आईडी से प्रवेश करें</p>
+            </div>
 
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">यूज़र आईडी (User ID)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="loginUserId" required class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm" placeholder="उदा. ward9_suresh या admin">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">पासवर्ड (Password)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="loginPassword" required class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 p-2.5 rounded-lg text-xs text-amber-800 flex items-start space-x-2">
+                    <i class="fa-solid fa-shield-halved mt-0.5 text-amber-600"></i>
+                    <span><b>सिंगल डिवाइस सुरक्षा:</b> किसी दूसरे मोबाइल पर लॉगिन करते ही पुराना मोबाइल अपने आप लॉगआउट हो जाएगा।</span>
+                </div>
+
+                <button type="submit" id="loginSubmitBtn" class="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold py-2.5 rounded-xl transition shadow-md flex items-center justify-center space-x-2">
+                    <span>लॉगिन करें</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- ================= SECTION 2: CLIENT VOTER SEARCH PORTAL ================= -->
+        <div id="clientPortal" class="hidden space-y-6">
+            
+            <!-- Candidate Dynamic Branding Banner -->
+            <div id="candidateHeaderCard" class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 rounded-2xl p-4 sm:p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-15 text-9xl text-white pointer-events-none">
+                    <i class="fa-solid fa-vote-yea"></i>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                    <!-- Candidate Photo & Details -->
+                    <div class="flex items-center space-x-4 text-center sm:text-left">
+                        <img id="headerCandidateImg" src="https://via.placeholder.com/100?text=Candidate" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-white/80 shadow-md bg-white">
+                        <div>
+                            <span id="headerPostBadge" class="bg-amber-900/40 text-amber-100 text-xs px-2.5 py-0.5 rounded-full border border-amber-300/30">उम्मीदवार</span>
+                            <h2 id="headerCandidateName" class="text-xl sm:text-2xl font-bold hindi-font mt-0.5">प्रत्याशी नाम</h2>
+                            <p id="headerPanchayatWard" class="text-xs sm:text-sm text-orange-100">ग्राम पंचायत: - | वार्ड: -</p>
+                            <p id="headerSlogan" class="text-xs italic text-amber-100 mt-1">"सबका साथ, सबका विकास"</p>
+                        </div>
+                    </div>
+
+                    <!-- Candidate Symbol -->
+                    <div class="flex flex-col items-center justify-center bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 min-w-[120px]">
+                        <span class="text-[10px] text-amber-100 uppercase font-semibold tracking-wider">चुनाव चिन्ह</span>
+                        <img id="headerSymbolImg" src="https://via.placeholder.com/80?text=Symbol" class="w-12 h-12 sm:w-14 sm:h-14 object-contain my-1">
+                        <span id="headerSymbolName" class="text-xs font-bold text-amber-100 hindi-font">चिन्ह नाम</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Controls & Filters -->
+            <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-md border border-slate-100 space-y-4">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-3">
+                    
+                    <!-- Search Tabs Switcher -->
+                    <div class="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto">
+                        <button id="searchTabNameBtn" onclick="switchSearchMode('name')" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition bg-white shadow-sm text-orange-600">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> नाम से खोजें
+                        </button>
+                        <button id="searchTabHouseBtn" onclick="switchSearchMode('house')" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-house-chimney mr-1"></i> मकान नंबर से खोजें (परिवार)
+                        </button>
+                    </div>
+
+                    <!-- Ward Filter Dropdown -->
+                    <div class="w-full md:w-64 flex items-center space-x-2">
+                        <label class="text-xs font-semibold text-slate-500 whitespace-nowrap"><i class="fa-solid fa-filter mr-1"></i>वार्ड:</label>
+                        <select id="wardFilterSelect" onchange="performSearch()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <option value="ALL">सभी वार्ड (All Wards)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Input Fields -->
+                <div id="nameSearchBox" class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-font"></i></span>
+                    <input type="text" id="searchInputName" oninput="performSearch()" placeholder="मतदाता का नाम या पिता/पति का नाम टाइप करें..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                </div>
+
+                <div id="houseSearchBox" class="hidden flex gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-hashtag"></i></span>
+                        <input type="text" id="searchInputHouse" placeholder="मकान नंबर दर्ज करें (उदा. 12 या 45/A)..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    </div>
+                    <button onclick="performSearch()" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow">
+                        खोजें
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search Results Stats -->
+            <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+                <span>कुल परिणाम: <b id="resultCount" class="text-slate-800">0</b> मतदाता</span>
+                <span id="familyPrintBtnContainer" class="hidden">
+                    <button onclick="printFamilyList()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs shadow flex items-center space-x-1">
+                        <i class="fa-solid fa-print"></i>
+                        <span>पूरे परिवार की सूची प्रिंट करें</span>
+                    </button>
+                </span>
+            </div>
+
+            <!-- Voter Cards Grid Container -->
+            <div id="votersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Voter Cards dynamically rendered here -->
+            </div>
+        </div>
+
+        <!-- ================= SECTION 3: ADMIN DASHBOARD ================= -->
+        <div id="adminPortal" class="hidden space-y-6">
+            
+            <div class="bg-slate-800 text-white p-4 rounded-2xl shadow-md flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-user-gear text-amber-400 text-2xl"></i>
+                    <div>
+                        <h2 class="text-lg font-bold hindi-font">मुख्य एडमिन कंट्रोल रूम</h2>
+                        <p class="text-xs text-slate-400">पंचायत डेटा, प्रत्याशी प्रोफाइल और यूजर एक्सेस प्रबंधन</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tabs Header -->
+            <div class="flex border-b border-slate-200 overflow-x-auto space-x-2 pb-1">
+                <button onclick="switchAdminTab(1)" id="adminTabBtn1" class="admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-orange-600 text-white whitespace-nowrap">
+                    <i class="fa-solid fa-file-excel mr-1"></i> 1. एक्सेल डेटा अपलोड
+                </button>
+                <button onclick="switchAdminTab(2)" id="adminTabBtn2" class="admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                    <i class="fa-solid fa-landmark mr-1"></i> 2. पंचायत प्रबंधन
+                </button>
+                <button onclick="switchAdminTab(3)" id="adminTabBtn3" class="admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                    <i class="fa-solid fa-users mr-1"></i> 3. क्लाइंट्स & एक्सेस
+                </button>
+                <button onclick="switchAdminTab(4)" id="adminTabBtn4" class="admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                    <i class="fa-solid fa-id-card mr-1"></i> 4. प्रत्याशी ब्रांडिंग
+                </button>
+                <button onclick="switchAdminTab(5)" id="adminTabBtn5" class="admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap">
+                    <i class="fa-solid fa-key mr-1"></i> 5. पास बदलें
+                </button>
+            </div>
+
+            <!-- Admin Tab Content Area -->
+            <div class="bg-white p-5 rounded-2xl shadow-md border border-slate-100 min-h-[350px]">
+                
+                <!-- TAB 1: Excel Upload -->
+                <div id="adminTab1" class="admin-tab-content space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 border-b pb-2">एक्सेल फाइल से मतदाता डेटा Firestore पर अपलोड करें</h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">ग्राम पंचायत का नाम *</label>
+                            <input type="text" id="uploadPanchayatName" placeholder="उदा. ग्राम पंचायत रामपुर" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">एक्सेल फाइल चुनें (.xlsx / .xls) *</label>
+                            <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-xl text-xs text-blue-800 space-y-1">
+                        <p class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> एक्सेल फाइल में कॉलम के नाम (Headers) निम्न अनुसार होने चाहिए:</p>
+                        <p class="text-[11px]"><b>EPIC</b>, <b>NAME</b> (मतदाता का नाम), <b>GUARDIAN</b> (पिता/पति का नाम), <b>HOUSE_NO</b>, <b>WARD</b>, <b>AGE</b>, <b>GENDER</b>, <b>BOOTH</b> (मतदान केंद्र), <b>SERIAL</b></p>
+                    </div>
+
+                    <div id="uploadProgressContainer" class="hidden space-y-2">
+                        <div class="flex justify-between text-xs text-slate-600">
+                            <span>अपलोड प्रगति:</span>
+                            <span id="uploadProgressText">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div id="uploadProgressBar" class="bg-orange-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <button onclick="processAndUploadExcel()" id="uploadExcelBtn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow flex items-center space-x-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Firestore पर डेटा अपलोड करें</span>
+                    </button>
+                </div>
+
+                <!-- TAB 2: Panchayat Management -->
+                <div id="adminTab2" class="admin-tab-content hidden space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 border-b pb-2">उपलब्ध ग्राम पंचायतें एवं डेटा हटाना</h3>
+                    <div id="panchayatListContainer" class="space-y-3">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: Clients & Access Control -->
+                <div id="adminTab3" class="admin-tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-2 mb-3">नया क्लाइंट / कार्यकर्ता आईडी बनाएं</h3>
+                        <form onsubmit="handleCreateClient(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">यूज़र आईडी *</label>
+                                <input type="text" id="newClientId" required placeholder="उदा. ward9_suresh" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">पासवर्ड *</label>
+                                <input type="password" id="newClientPassword" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">ग्राम पंचायत *</label>
+                                <select id="newClientPanchayat" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                    <option value="">पंचायत चुनें</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">वार्ड एक्सेस *</label>
+                                <input type="text" id="newClientWard" required placeholder="उदा. 9 या ALL" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            </div>
+                            <div class="sm:col-span-2 flex items-end">
+                                <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow w-full">
+                                    <i class="fa-solid fa-user-plus mr-1"></i> आईडी पंजीकृत करें
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-2 mb-3">पंजीकृत क्लाइंट्स की सूची</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-left text-slate-600">
+                                <thead class="bg-slate-100 text-slate-700 font-semibold">
+                                    <tr>
+                                        <th class="p-2.5">यूज़र ID</th>
+                                        <th class="p-2.5">पंचायत</th>
+                                        <th class="p-2.5">वार्ड</th>
+                                        <th class="p-2.5 text-right">कार्रवाई</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientsTableBody" class="divide-y divide-slate-100">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Candidate Branding -->
+                <div id="adminTab4" class="admin-tab-content hidden space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 border-b pb-2">प्रत्याशी विशिष्ट ब्रांडिंग सेटिंग्स</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">जिस प्रत्याशी / क्लाइंट ID के लिए सेटिंग्स बदलनी हैं उसे चुनें:</label>
+                        <select id="brandingClientSelect" onchange="loadSelectedClientBranding()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none font-semibold text-orange-700">
+                            <!-- Loaded dynamically -->
+                        </select>
+                    </div>
+
+                    <form onsubmit="handleSaveBranding(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">प्रत्याशी का नाम</label>
+                            <input type="text" id="brandCandidateName" placeholder="उदा. सुरेश शर्मा" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">पद (Post)</label>
+                            <input type="text" id="brandPost" placeholder="उदा. वार्ड पंच / सरपंच उम्मीदवार" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव चिन्ह का नाम</label>
+                            <input type="text" id="brandSymbolName" placeholder="उदा. उगता सूरज" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव चिन्ह फोटो URL</label>
+                            <input type="url" id="brandSymbolUrl" placeholder="https://..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">प्रत्याशी फोटो URL</label>
+                            <input type="url" id="brandPhotoUrl" placeholder="https://..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">संपर्क नंबर (WhatsApp/Call)</label>
+                            <input type="text" id="brandMobile" placeholder="9876543210" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव नारा (Slogan)</label>
+                            <input type="text" id="brandSlogan" placeholder="उदा. गांव का विकास, हमारा संकल्प" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow">
+                                <i class="fa-solid fa-floppy-disk mr-1"></i> प्रत्याशी ब्रांडिंग अपडेट करें
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TAB 5: Change Admin Password -->
+                <div id="adminTab5" class="admin-tab-content hidden space-y-4 max-w-md">
+                    <h3 class="text-sm font-bold text-slate-800 border-b pb-2">एडमिन पासवर्ड बदलें</h3>
+                    <form onsubmit="handleChangeAdminPassword(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">नया पासवर्ड</label>
+                            <input type="password" id="newAdminPass" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">नया पासवर्ड पुनः दर्ज करें</label>
+                            <input type="password" id="confirmAdminPass" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                        </div>
+                        <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow">
+                            पासवर्ड अपडेट करें
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ================= VOTER SLIP MODAL ================= -->
+    <div id="voterSlipModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col my-auto border border-slate-100">
+            
+            <!-- Modal Header -->
+            <div class="bg-slate-100 px-4 py-3 border-b flex items-center justify-between no-print">
+                <h3 class="text-xs font-bold text-slate-700 flex items-center space-x-1.5">
+                    <i class="fa-solid fa-address-card text-orange-600"></i>
+                    <span>डिजिटल मतदाता पर्ची</span>
+                </h3>
+                <button onclick="closeVoterSlipModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-2">&times;</button>
+            </div>
+
+            <!-- Printable Slip Content Card -->
+            <div id="printableSlipArea" class="p-4 bg-white">
+                <div class="border-2 border-orange-500 rounded-xl p-3 bg-gradient-to-b from-orange-50/40 via-white to-amber-50/30 relative">
+                    
+                    <!-- Candidate Header inside Slip -->
+                    <div class="border-b-2 border-dashed border-orange-300 pb-3 mb-3">
+                        <div class="flex items-center justify-between">
+                            <img id="slipCandidatePhoto" src="" class="w-14 h-14 rounded-full object-cover border-2 border-orange-500 bg-white">
+                            <div class="text-center flex-1 px-2">
+                                <h4 id="slipCandidateName" class="text-base font-bold text-orange-700 hindi-font"></h4>
+                                <p id="slipCandidatePost" class="text-[11px] font-semibold text-slate-700"></p>
+                                <p id="slipPanchayatName" class="text-[10px] text-slate-500 hindi-font"></p>
+                            </div>
+                            <div class="text-center">
+                                <img id="slipSymbolPhoto" src="" class="w-12 h-12 object-contain mx-auto">
+                                <span id="slipSymbolName" class="text-[9px] font-bold text-amber-800 hindi-font block"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Voter Information Details Table -->
+                    <div class="space-y-1.5 text-xs">
+                        <div class="flex justify-between bg-orange-100/60 p-1.5 rounded border border-orange-200/50">
+                            <span class="text-slate-600">मतदाता का नाम:</span>
+                            <span id="slipVoterName" class="font-bold text-slate-900 hindi-font"></span>
+                        </div>
+                        <div class="flex justify-between p-1">
+                            <span class="text-slate-500">पिता/पति का नाम:</span>
+                            <span id="slipGuardian" class="font-medium text-slate-800 hindi-font"></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 p-1">
+                            <div>
+                                <span class="text-slate-500">EPIC (पहचान पत्र):</span>
+                                <p id="slipEpic" class="font-bold text-slate-800"></p>
+                            </div>
+                            <div>
+                                <span class="text-slate-500">क्रम संख्या (Serial):</span>
+                                <p id="slipSerial" class="font-bold text-orange-600"></p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 bg-slate-50 p-1.5 rounded text-[11px]">
+                            <div><b>वार्ड:</b> <span id="slipWard"></span></div>
+                            <div><b>मकान:</b> <span id="slipHouse"></span></div>
+                            <div><b>आयु/लिंग:</b> <span id="slipAgeGender"></span></div>
+                        </div>
+                        <div class="bg-amber-100/40 p-2 rounded border border-amber-200/50 mt-2">
+                            <span class="text-[10px] text-slate-500 block">मतदान केंद्र (Polling Booth):</span>
+                            <p id="slipBooth" class="text-xs font-semibold text-slate-800 hindi-font mt-0.5"></p>
+                        </div>
+                    </div>
+
+                    <!-- Footer Slogan inside Slip -->
+                    <div class="border-t border-slate-200 mt-3 pt-2 text-center">
+                        <p id="slipSlogan" class="text-[11px] font-bold italic text-orange-700 hindi-font"></p>
+                        <p id="slipMobile" class="text-[10px] text-slate-500 mt-0.5"></p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="bg-slate-50 px-4 py-3 border-t flex flex-wrap gap-2 justify-end no-print">
+                <button onclick="downloadSlipPNG()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow">
+                    <i class="fa-solid fa-download"></i>
+                    <span>PNG फोटो</span>
+                </button>
+                <button onclick="shareVoterSlipWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>व्हाट्सएप</span>
+                </button>
+                <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1 shadow">
+                    <i class="fa-solid fa-print"></i>
+                    <span>प्रिंट / PDF</span>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ================= JS SCRIPT SECTION ================= -->
+    <script>
+        // --- FIREBASE CONFIGURATION ---
         let firebaseConfig = {
             "apiKey": "AIzaSyAcVuxuJlAPodE65yRUQH_hAEvG9U4z_I",
             "authDomain": "voter-11766.firebaseapp.com",
@@ -972,955 +529,835 @@
             "messagingSenderId": "1078819307357",
             "appId": "1:1078819307357:web:c8752d49751e34c037b2b4"
         };
+        
+        let db = null;
 
         function initFirebaseConnection() {
             try {
-                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
                 db = firebase.firestore();
-                isFirebaseActive = true;
-                syncCampaignFromFirebase();
-                syncClientsFromFirebase();
-                syncPanchayatsFromFirebase();
-            } catch(e) {
-                isFirebaseActive = false;
+                console.log("फायरबेस से सफलतापूर्वक कनेक्ट हो गया है!");
+            } catch (e) {
+                console.error("फायरबेस कनेक्शन त्रुटि:", e);
+                showAlert("फायरबेस कनेक्शन में समस्या आई है।", "error");
             }
         }
 
-        let panchayatsList = JSON.parse(localStorage.getItem('election_panchayats_db') || JSON.stringify([
-            { id: "suwana", name: "ग्राम पंचायत सुवाणा" }
-        ]));
+        // --- GLOBAL STATE ---
+        let currentUser = null; // { id, role, panchayat, ward, candidateInfo, sessionToken }
+        let currentPanchayatVoters = [];
+        let activeSearchMode = 'name'; // 'name' or 'house'
+        let currentSelectedVoterForSlip = null;
+        let allClientsListCache = [];
+        let sessionUnsubscribeListener = null; // Firestore realtime session listener
 
-        let allPanchayatVoters = JSON.parse(localStorage.getItem('election_multi_gp_voters_db') || '{}');
-        let campaign = JSON.parse(localStorage.getItem('election_campaign_data') || JSON.stringify({
-            postType: "सरपंच (Sarpanch)",
-            name: "श्रीमती रेखा देवी जाट",
-            panchayat: "ग्राम पंचायत सुवाणा (भीलवाड़ा)",
-            symbolName: "चाबी (Key)",
-            slogan: "गांव का सर्वांगीण विकास - चाबी के निशान पर मोहर लगाकर भारी मतों से विजयी बनाएं।",
-            contact: "9829970310",
-            photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-            symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png"
-        }));
+        // --- APP INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebaseConnection();
+            checkExistingSession();
+        });
 
-        let clientUsers = JSON.parse(localStorage.getItem('election_client_users') || JSON.stringify([
-            { id: "sarpanch", pass: "1234", name: "सरपंच प्रत्याशी / मुख्य एजेंट", gp: "suwana", ward: "ALL", boundDevice: null, status: "Active", candidateName: "श्रीमती रेखा देवी जाट", postType: "सरपंच (Sarpanch)", symbolName: "चाबी", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png" },
-            { id: "ward9_cand1", pass: "1234", name: "वार्ड 9 - उम्मीदवार 1", gp: "suwana", ward: "9", boundDevice: null, status: "Active", candidateName: "प्रत्याशी नाम 1", postType: "वार्ड पंच (Ward Panch) - वार्ड 9", symbolName: "बल्ला", photo: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/2954/2954848.png" }
-        ]));
+        // --- ALERT UTILITY ---
+        function showAlert(msg, type = 'info') {
+            const container = document.getElementById('statusAlert');
+            const inner = document.getElementById('statusAlertInner');
+            const msgSpan = document.getElementById('statusAlertMsg');
+            
+            container.classList.remove('hidden');
+            msgSpan.textContent = msg;
 
-        let loggedInClient = null;
-        let currentActiveVoter = null;
-        let currentAdminPassword = localStorage.getItem('custom_admin_password') || 'admin123';
-        const currentPhoneToken = localStorage.getItem('phone_device_token') || ('PHONE_' + Math.random().toString(36).substr(2, 9).toUpperCase());
-        localStorage.setItem('phone_device_token', currentPhoneToken);
-
-        function showView(viewId) {
-            document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            if (viewId === 'viewClientSearch') {
-                updateCampaignHeaderUI();
-                setupClientWardView();
-                document.getElementById('nameSearchInput').value = '';
-                document.getElementById('houseSearchInput').value = '';
-                setSearchMode('name');
-            } else if (viewId === 'viewAdminDashboard') {
-                populateAdminFields();
-                renderPanchayatsAdminTable();
-                renderClientsAdminTable();
-                populateGpDropdowns();
-                updateAdminExcelStats();
-            }
-        }
-
-        function openAdminModal() {
-            document.getElementById('modalAdminPass').value = '';
-            document.getElementById('adminLoginModal').classList.add('active');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminLoginModal').classList.remove('active');
-        }
-
-        function submitAdminModalPass() {
-            const p = document.getElementById('modalAdminPass').value.trim();
-            if (p === currentAdminPassword) {
-                closeAdminModal();
-                showView('viewAdminDashboard');
+            if (type === 'error') {
+                inner.className = "p-3 rounded-xl text-xs sm:text-sm flex items-center justify-between shadow-sm bg-red-100 text-red-800 border border-red-200";
+            } else if (type === 'success') {
+                inner.className = "p-3 rounded-xl text-xs sm:text-sm flex items-center justify-between shadow-sm bg-emerald-100 text-emerald-800 border border-emerald-200";
             } else {
-                alert('गलत एडमिन पासवर्ड!');
+                inner.className = "p-3 rounded-xl text-xs sm:text-sm flex items-center justify-between shadow-sm bg-blue-100 text-blue-800 border border-blue-200";
             }
+            
+            setTimeout(() => { hideAlert(); }, 6000);
         }
 
-        function exitAdmin() {
-            showView('viewClientLogin');
+        function hideAlert() {
+            document.getElementById('statusAlert').classList.add('hidden');
         }
 
-        function handleClientLogin() {
-            const u = document.getElementById('inpClientId').value.trim();
-            const p = document.getElementById('inpClientPass').value.trim();
+        // --- AUTHENTICATION & SINGLE ACTIVE SESSION LOGIN ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const userId = document.getElementById('loginUserId').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
 
-            if (!u || !p) {
-                alert('कृपया यूजर आईडी और पासवर्ड दोनों दर्ज करें!');
-                return;
-            }
-
-            if (u.toLowerCase() === 'admin' && p === currentAdminPassword) {
-                showView('viewAdminDashboard');
+            if (!userId || !password) {
+                showAlert("कृपया यूजर आईडी और पासवर्ड दर्ज करें", "error");
                 return;
             }
 
-            const client = clientUsers.find(c => c.id.toLowerCase() === u.toLowerCase());
-            if (!client) {
-                alert('अमान्य यूजर आईडी!');
-                return;
-            }
-            if (client.pass !== p) {
-                alert('गलत पासवर्ड!');
-                return;
-            }
-            if (client.status === 'Blocked') {
-                alert('यह आईडी ब्लॉक कर दी गई है!');
-                return;
-            }
+            try {
+                // 1. Check if login is Admin
+                const adminDoc = await db.collection('admin').doc('settings').get();
+                if (adminDoc.exists) {
+                    const adminData = adminDoc.data();
+                    if (userId === 'admin' && password === adminData.password) {
+                        currentUser = { id: 'admin', role: 'admin' };
+                        saveSession(currentUser);
+                        showAdminPortal();
+                        showAlert("मुख्य एडमिन कंट्रोल रूम में आपका स्वागत है", "success");
+                        return;
+                    }
+                }
 
-            if (!client.boundDevice) {
-                client.boundDevice = currentPhoneToken;
-                saveClientsState();
-            } else if (client.boundDevice !== currentPhoneToken) {
-                if (confirm("⚠️ यह आईडी दूसरे डिवाइस में खुली थी। क्या इसे इस मोबाइल पर रजिस्टर करना चाहते हैं?")) {
-                    client.boundDevice = currentPhoneToken;
-                    saveClientsState();
-                } else {
+                // 2. Check Client User Login
+                const clientRef = db.collection('clients').doc(userId);
+                const clientDoc = await clientRef.get();
+                
+                if (!clientDoc.exists) {
+                    showAlert("गलत यूजर आईडी या पासवर्ड!", "error");
                     return;
                 }
-            }
 
-            loggedInClient = client;
-            loadVotersForClientGP(client.gp || panchayatsList[0]?.id || 'suwana', () => {
-                showView('viewClientSearch');
-            });
+                const clientData = clientDoc.data();
+                if (clientData.password !== password) {
+                    showAlert("गलत पासवर्ड!", "error");
+                    return;
+                }
+
+                // Generate Unique Session Token for Single Device Active Control
+                const newSessionToken = 'SESS_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+
+                // Update Server Session Token
+                await clientRef.update({
+                    currentSessionToken: newSessionToken,
+                    lastLoginTime: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                currentUser = {
+                    id: userId,
+                    role: 'client',
+                    panchayat: clientData.panchayat,
+                    ward: clientData.ward,
+                    candidateInfo: clientData.candidateInfo || {},
+                    sessionToken: newSessionToken
+                };
+
+                saveSession(currentUser);
+                showClientPortal();
+                startSessionTokenListener(userId, newSessionToken);
+                showAlert("सफलतापूर्वक लॉगिन हुआ!", "success");
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                showAlert("लॉगिन के दौरान त्रुटि आई!", "error");
+            }
         }
 
-        function loadVotersForClientGP(gpId, callback) {
-            if (allPanchayatVoters[gpId] && allPanchayatVoters[gpId].length > 0) {
-                if (callback) callback();
-                return;
-            }
-            if (isFirebaseActive && db) {
-                db.collection("panchayats_data").doc(gpId).get().then(doc => {
-                    if (doc.exists && doc.data().voters) {
-                        allPanchayatVoters[gpId] = doc.data().voters;
-                        localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
+        // --- REALTIME SESSION MONITOR (Auto Logout if Opened in Another Device) ---
+        function startSessionTokenListener(userId, activeToken) {
+            if (sessionUnsubscribeListener) sessionUnsubscribeListener();
+
+            sessionUnsubscribeListener = db.collection('clients').doc(userId)
+                .onSnapshot(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.currentSessionToken && data.currentSessionToken !== activeToken) {
+                            // Unsubscribe listener
+                            if (sessionUnsubscribeListener) sessionUnsubscribeListener();
+                            
+                            // Auto Logout User
+                            handleLogout(true);
+                        }
                     }
-                    if (callback) callback();
-                }).catch(e => {
-                    if (callback) callback();
+                }, err => {
+                    console.error("Session listener error:", err);
                 });
+        }
+
+        function saveSession(user) {
+            sessionStorage.setItem('active_voter_session', JSON.stringify(user));
+        }
+
+        function checkExistingSession() {
+            const saved = sessionStorage.getItem('active_voter_session');
+            if (saved) {
+                try {
+                    currentUser = JSON.parse(saved);
+                    if (currentUser.role === 'admin') {
+                        showAdminPortal();
+                    } else {
+                        showClientPortal();
+                        startSessionTokenListener(currentUser.id, currentUser.sessionToken);
+                    }
+                } catch (e) {
+                    sessionStorage.removeItem('active_voter_session');
+                }
+            }
+        }
+
+        function handleLogout(forcedByOtherDevice = false) {
+            if (sessionUnsubscribeListener) sessionUnsubscribeListener();
+            
+            currentUser = null;
+            sessionStorage.removeItem('active_voter_session');
+            document.getElementById('clientPortal').classList.add('hidden');
+            document.getElementById('adminPortal').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userBadge').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+
+            if (forcedByOtherDevice) {
+                alert("🔒 आपकी आईडी किसी अन्य मोबाइल पर ओपन हो गई है!\nसुरक्षा कारणों से इस मोबाइल से आईडी स्वतः लॉगआउट / लॉक हो गई है।");
+                showAlert("आपकी आईडी दूसरे डिवाइस पर एक्टिव हो गई है!", "error");
             } else {
-                if (callback) callback();
+                showAlert("सफलतापूर्वक लॉगआउट हो गए हैं।", "info");
             }
         }
 
-        function resetAllDeviceLocks() {
-            clientUsers.forEach(c => c.boundDevice = null);
-            saveClientsState();
-            alert('✅ सभी डिवाइस लॉक रीसेट कर दिए गए हैं!');
+        // --- CLIENT PORTAL & VOTER SEARCH LOGIC ---
+        async function showClientPortal() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminPortal').classList.add('hidden');
+            document.getElementById('clientPortal').classList.remove('hidden');
+            
+            document.getElementById('userBadge').classList.remove('hidden');
+            document.getElementById('userBadgeText').textContent = currentUser.id;
+            document.getElementById('logoutBtn').classList.remove('hidden');
+
+            renderCandidateBrandingHeader();
+            await loadVotersDataForClient();
         }
 
-        function logoutClient() {
-            loggedInClient = null;
-            document.getElementById('inpClientPass').value = '';
-            showView('viewClientLogin');
+        function renderCandidateBrandingHeader() {
+            const c = currentUser.candidateInfo || {};
+            document.getElementById('headerCandidateName').textContent = c.candidateName || 'प्रत्याशी का नाम';
+            document.getElementById('headerPostBadge').textContent = c.post || 'उम्मीदवार';
+            document.getElementById('headerPanchayatWard').textContent = `ग्राम पंचायत: ${currentUser.panchayat} | वार्ड: ${currentUser.ward}`;
+            document.getElementById('headerSlogan').textContent = c.slogan ? `"${c.slogan}"` : '';
+            document.getElementById('headerSymbolName').textContent = c.symbolName || 'चुनाव चिन्ह';
+            
+            if (c.photoUrl) document.getElementById('headerCandidateImg').src = c.photoUrl;
+            if (c.symbolUrl) document.getElementById('headerSymbolImg').src = c.symbolUrl;
         }
 
-        function saveClientsState() {
-            localStorage.setItem('election_client_users', JSON.stringify(clientUsers));
-            if (isFirebaseActive && db) {
-                db.collection("settings").doc("clients").set({ list: clientUsers }).catch(e => {});
-            }
-        }
+        async function loadVotersDataForClient() {
+            showAlert("मतदाता सूची लोड की जा रही है...", "info");
+            try {
+                const snapshot = await db.collection('voters')
+                    .where('panchayat', '==', currentUser.panchayat)
+                    .get();
 
-        function syncClientsFromFirebase() {
-            if (!isFirebaseActive || !db) return;
-            db.collection("settings").doc("clients").onSnapshot(doc => {
-                if (doc.exists && doc.data().list) {
-                    clientUsers = doc.data().list;
-                    localStorage.setItem('election_client_users', JSON.stringify(clientUsers));
-                    renderClientsAdminTable();
-                }
-            });
-        }
+                currentPanchayatVoters = [];
+                const wardsSet = new Set();
 
-        function syncCampaignFromFirebase() {
-            if (!isFirebaseActive || !db) return;
-            db.collection("settings").doc("campaign").onSnapshot(doc => {
-                if (doc.exists) {
-                    campaign = { ...campaign, ...doc.data() };
-                    localStorage.setItem('election_campaign_data', JSON.stringify(campaign));
-                    updateCampaignHeaderUI();
-                }
-            });
-        }
-
-        function syncPanchayatsFromFirebase() {
-            if (!isFirebaseActive || !db) return;
-            db.collection("settings").doc("panchayats").onSnapshot(doc => {
-                if (doc.exists && doc.data().list) {
-                    panchayatsList = doc.data().list;
-                    localStorage.setItem('election_panchayats_db', JSON.stringify(panchayatsList));
-                    renderPanchayatsAdminTable();
-                    populateGpDropdowns();
-                }
-            });
-        }
-
-        function populateGpDropdowns() {
-            const uploadSelect = document.getElementById('uploadGpSelect');
-            const deleteSelect = document.getElementById('deleteGpSelect');
-            const addClientGp = document.getElementById('addClientGp');
-
-            if (uploadSelect) {
-                uploadSelect.innerHTML = '';
-                panchayatsList.forEach(gp => {
-                    uploadSelect.innerHTML += `<option value="${gp.id}">${gp.name} (${gp.id})</option>`;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    currentPanchayatVoters.push(data);
+                    if (data.ward) wardsSet.add(data.ward.toString());
                 });
-            }
-            if (deleteSelect) {
-                deleteSelect.innerHTML = '';
-                panchayatsList.forEach(gp => {
-                    deleteSelect.innerHTML += `<option value="${gp.id}">${gp.name} (${gp.id})</option>`;
+
+                // Populate Ward Filter
+                const wardSelect = document.getElementById('wardFilterSelect');
+                wardSelect.innerHTML = '<option value="ALL">सभी वार्ड (All Wards)</option>';
+                
+                Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                    const opt = document.createElement('option');
+                    opt.value = w;
+                    opt.textContent = `वार्ड नंबर ${w}`;
+                    wardSelect.appendChild(opt);
                 });
-            }
-            if (addClientGp) {
-                addClientGp.innerHTML = '';
-                panchayatsList.forEach(gp => {
-                    addClientGp.innerHTML += `<option value="${gp.id}">${gp.name}</option>`;
-                });
-            }
-        }
 
-        function addNewPanchayat() {
-            const id = document.getElementById('newGpId').value.trim().toLowerCase();
-            const name = document.getElementById('newGpName').value.trim();
-            if (!id || !name) {
-                alert('कृपया पंचायत आईडी और नाम दोनों दर्ज करें!');
-                return;
-            }
-            if (panchayatsList.some(gp => gp.id === id)) {
-                alert('यह पंचायत आईडी पहले से मौजूद है!');
-                return;
-            }
-            panchayatsList.push({ id, name });
-            localStorage.setItem('election_panchayats_db', JSON.stringify(panchayatsList));
-            if (isFirebaseActive && db) {
-                db.collection("settings").doc("panchayats").set({ list: panchayatsList }).catch(e => {});
-            }
-            renderPanchayatsAdminTable();
-            populateGpDropdowns();
-            document.getElementById('newGpId').value = '';
-            document.getElementById('newGpName').value = '';
-            alert('✅ नई ग्राम पंचायत सफलतापूर्वक जोड़ दी गई!');
-        }
-
-        function renderPanchayatsAdminTable() {
-            const tb = document.getElementById('panchayatTableBody');
-            if (!tb) return;
-            tb.innerHTML = '';
-            panchayatsList.forEach((gp, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><code>${gp.id}</code></td>
-                    <td><strong>${gp.name}</strong></td>
-                    <td>
-                        <button class="btn-main" style="width:auto; padding:5px 10px; font-size:0.75rem; background:#ef4444;" onclick="deletePanchayatMeta(${idx})">हटाएं</button>
-                    </td>
-                `;
-                tb.appendChild(tr);
-            });
-        }
-
-        function deletePanchayatMeta(idx) {
-            if (confirm('क्या आप इस ग्राम पंचायत को सूची से हटाना चाहते हैं?')) {
-                const gpId = panchayatsList[idx].id;
-                panchayatsList.splice(idx, 1);
-                localStorage.setItem('election_panchayats_db', JSON.stringify(panchayatsList));
-                if (isFirebaseActive && db) {
-                    db.collection("settings").doc("panchayats").set({ list: panchayatsList }).catch(e => {});
+                // Auto select client ward if specific
+                if (currentUser.ward !== 'ALL' && currentUser.ward) {
+                    wardSelect.value = currentUser.ward;
                 }
-                renderPanchayatsAdminTable();
-                populateGpDropdowns();
+
+                performSearch();
+                showAlert("मतदाता डेटा सफलता से लोड हुआ!", "success");
+
+            } catch (error) {
+                console.error("Error loading voters:", error);
+                showAlert("मतदाता डेटा लोड करने में विफल!", "error");
             }
         }
 
-        function deletePanchayatVotersFromFirebase() {
-            const gpId = document.getElementById('deleteGpSelect').value;
-            const gpObj = panchayatsList.find(g => g.id === gpId);
-            const gpName = gpObj ? gpObj.name : gpId;
-
-            if (confirm(`⚠️ क्या आप वाकई "${gpName}" (${gpId}) का सारा मतदाता डेटा फायरबेस क्लाउड से हमेशा के लिए डिलीट करना चाहते हैं?`)) {
-                if (allPanchayatVoters[gpId]) {
-                    delete allPanchayatVoters[gpId];
-                    localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
-                }
-                if (isFirebaseActive && db) {
-                    db.collection("panchayats_data").doc(gpId).delete().then(() => {
-                        alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक डिलीट कर दिया गया है!`);
-                        updateAdminExcelStats();
-                    }).catch(e => {
-                        alert('डेटा हटाने में त्रुटि: ' + e.message);
-                    });
-                } else {
-                    alert(`✅ "${gpName}" का स्थानीय डेटा हटा दिया गया है!`);
-                    updateAdminExcelStats();
-                }
-            }
-        }
-
-        function setupClientWardView() {
-            if (!loggedInClient) return;
-            const wardFilterContainer = document.getElementById('wardFilterContainer');
-            const selectWardFilter = document.getElementById('selectWardFilter');
-            const clientWardBadge = document.getElementById('clientWardBadge');
-
-            const gpObj = panchayatsList.find(g => g.id === loggedInClient.gp);
-            const gpDisplayName = gpObj ? gpObj.name : loggedIdClientGPName();
-
-            if (loggedInClient.ward === 'ALL') {
-                clientWardBadge.innerText = `${gpDisplayName} • सभी वार्ड • ${loggedInClient.name}`;
-                wardFilterContainer.style.display = 'flex';
-                selectWardFilter.innerHTML = `<option value="ALL">🔍 सभी वार्ड</option>`;
-                for (let w = 1; w <= 17; w++) {
-                    selectWardFilter.innerHTML += `<option value="${w}">वार्ड नंबर ${w}</option>`;
-                }
-            } else {
-                clientWardBadge.innerText = `${gpDisplayName} • वार्ड ${loggedInClient.ward} • ${loggedInClient.name}`;
-                wardFilterContainer.style.display = 'none';
-            }
-        }
-
-        function loggedIdClientGPName() {
-            if (!loggedInClient) return 'ग्राम पंचायत';
-            const gpObj = panchayatsList.find(g => g.id === loggedInClient.gp);
-            return gpObj ? gpObj.name : 'ग्राम पंचायत';
-        }
-
-        function handleWardDropdownChange() {
-            if (currentSearchMode === 'name') {
-                nameSearchInput.dispatchEvent(new Event('input'));
-            } else {
-                houseSearchInput.dispatchEvent(new Event('input'));
-            }
-        }
-
-        let currentSearchMode = 'name';
-        const nameSearchInput = document.getElementById('nameSearchInput');
-        const houseSearchInput = document.getElementById('houseSearchInput');
-        const voterResultsContainer = document.getElementById('voterResultsContainer');
-        const voterResultCount = document.getElementById('voterResultCount');
-        const searchHintText = document.getElementById('searchHintText');
-
-        function setSearchMode(mode) {
-            currentSearchMode = mode;
-            const btnName = document.getElementById('tabBtnNameMode');
-            const btnHouse = document.getElementById('tabBtnHouseMode');
-            const wrapName = document.getElementById('boxNameSearchWrap');
-            const wrapHouse = document.getElementById('boxHouseSearchWrap');
+        function switchSearchMode(mode) {
+            activeSearchMode = mode;
+            const nameBtn = document.getElementById('searchTabNameBtn');
+            const houseBtn = document.getElementById('searchTabHouseBtn');
+            const nameBox = document.getElementById('nameSearchBox');
+            const houseBox = document.getElementById('houseSearchBox');
 
             if (mode === 'name') {
-                btnName.style.background = '#1e3a8a'; btnName.style.color = '#fff';
-                btnHouse.style.background = '#f1f5f9'; btnHouse.style.color = '#334155';
-                wrapName.style.display = 'block'; wrapHouse.style.display = 'none';
-                nameSearchInput.focus();
-                nameSearchInput.dispatchEvent(new Event('input'));
+                nameBtn.className = "flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition bg-white shadow-sm text-orange-600";
+                houseBtn.className = "flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900";
+                nameBox.classList.remove('hidden');
+                houseBox.classList.add('hidden');
+                document.getElementById('familyPrintBtnContainer').classList.add('hidden');
             } else {
-                btnHouse.style.background = '#d97706'; btnHouse.style.color = '#fff';
-                btnName.style.background = '#f1f5f9'; btnName.style.color = '#334155';
-                wrapHouse.style.display = 'block'; wrapName.style.display = 'none';
-                houseSearchInput.focus();
-                houseSearchInput.dispatchEvent(new Event('input'));
+                houseBtn.className = "flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition bg-white shadow-sm text-orange-600";
+                nameBtn.className = "flex-1 md:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900";
+                houseBox.classList.remove('hidden');
+                nameBox.classList.add('hidden');
             }
+            performSearch();
         }
 
-        function showInitialSearchPrompt() {
-            voterResultCount.innerText = '0';
-            if (currentSearchMode === 'name') {
-                voterResultsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 45px 16px; background: white; border-radius: 16px; border: 1.5px dashed #cbd5e1; margin-top: 10px;">
-                        <i class="fa-solid fa-user-tag" style="font-size: 2.6rem; color: #3b82f6; margin-bottom: 10px;"></i>
-                        <h3 style="font-size: 1.1rem; color: #1e3a8a; font-weight: 700; margin-bottom: 4px;">मतदाता या पिता का नाम लिखें</h3>
-                        <p style="font-size: 0.85rem; color: #64748b;">नाम के कुछ अक्षर लिखते ही परिणाम सामने आ जाएंगे।</p>
-                    </div>
-                `;
-            } else {
-                voterResultsContainer.innerHTML = `
-                    <div style="text-align: center; padding: 45px 16px; background: white; border-radius: 16px; border: 1.5px dashed #f59e0b; margin-top: 10px;">
-                        <i class="fa-solid fa-people-roof" style="font-size: 2.6rem; color: #d97706; margin-bottom: 10px;"></i>
-                        <h3 style="font-size: 1.1rem; color: #92400e; font-weight: 700; margin-bottom: 4px;">मकान नंबर दर्ज करें (पारिवारिक खोज)</h3>
-                        <p style="font-size: 0.85rem; color: #78350f;">मकान नंबर लिखते ही उस घर के सभी सदस्यों की पर्चियां आ जाएंगी।</p>
-                    </div>
-                `;
-            }
-        }
+        function performSearch() {
+            const selectedWard = document.getElementById('wardFilterSelect').value;
+            let results = [...currentPanchayatVoters];
 
-        function getActiveWardFilter() {
-            let targetWard = 'ALL';
-            if (loggedInClient) {
-                if (loggedInClient.ward === 'ALL') {
-                    const wardDropdown = document.getElementById('selectWardFilter');
-                    if (wardDropdown) targetWard = wardDropdown.value;
+            // Ward Filter
+            if (selectedWard !== 'ALL') {
+                results = results.filter(v => v.ward && v.ward.toString() === selectedWard.toString());
+            }
+
+            // Search Term Filter
+            if (activeSearchMode === 'name') {
+                const term = document.getElementById('searchInputName').value.trim().toLowerCase();
+                if (term) {
+                    results = results.filter(v => 
+                        (v.name && v.name.toLowerCase().includes(term)) ||
+                        (v.guardian && v.guardian.toLowerCase().includes(term)) ||
+                        (v.epic && v.epic.toLowerCase().includes(term))
+                    );
+                }
+                document.getElementById('familyPrintBtnContainer').classList.add('hidden');
+            } else {
+                const houseTerm = document.getElementById('searchInputHouse').value.trim().toLowerCase();
+                if (houseTerm) {
+                    results = results.filter(v => v.houseNo && v.houseNo.toString().toLowerCase() === houseTerm);
+                    if (results.length > 0) {
+                        document.getElementById('familyPrintBtnContainer').classList.remove('hidden');
+                    } else {
+                        document.getElementById('familyPrintBtnContainer').classList.add('hidden');
+                    }
                 } else {
-                    targetWard = String(loggedInClient.ward);
+                    document.getElementById('familyPrintBtnContainer').classList.add('hidden');
                 }
             }
-            return targetWard;
+
+            renderVoterCards(results);
         }
 
-        function getCurrentClientVotersList() {
-            if (!loggedInClient) return [];
-            const gpId = loggedInClient.gp || panchayatsList[0]?.id || 'suwana';
-            return allPanchayatVoters[gpId] || [];
-        }
+        function renderVoterCards(voters) {
+            const grid = document.getElementById('votersGrid');
+            document.getElementById('resultCount').textContent = voters.length;
+            grid.innerHTML = '';
 
-        nameSearchInput.addEventListener('input', function() {
-            const query = this.value.trim().toLowerCase();
-            if (!query) { showInitialSearchPrompt(); return; }
-            const targetWard = getActiveWardFilter();
-            const votersList = getCurrentClientVotersList();
-            const filtered = votersList.filter(v => {
-                if (targetWard !== 'ALL' && String(v.ward) !== String(targetWard)) return false;
-                return (v.name && v.name.toLowerCase().includes(query)) || 
-                       (v.rel_name && v.rel_name.toLowerCase().includes(query)) || 
-                       (v.epic && v.epic.toLowerCase().includes(query));
-            });
-            renderNameResults(filtered);
-        });
-
-        houseSearchInput.addEventListener('input', function() {
-            const query = this.value.trim().toLowerCase();
-            if (!query) { showInitialSearchPrompt(); return; }
-            const targetWard = getActiveWardFilter();
-            const votersList = getCurrentClientVotersList();
-            const filtered = votersList.filter(v => {
-                if (targetWard !== 'ALL' && String(v.ward) !== String(targetWard)) return false;
-                const vHouse = String(v.house || '').trim().toLowerCase();
-                return vHouse === query || vHouse.includes(query);
-            });
-            renderHouseGroupResults(filtered, query);
-        });
-
-        function renderNameResults(list) {
-            voterResultsContainer.innerHTML = '';
-            voterResultCount.innerText = list.length;
-            if (list.length === 0) {
-                voterResultsContainer.innerHTML = `<div style="text-align: center; padding: 30px; background: white; border-radius: 14px;">कोई मतदाता नहीं मिला!</div>`;
+            if (voters.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300 mb-2"></i>
+                        <p class="text-sm text-slate-500 font-medium">कोई मतदाता रिकॉर्ड नहीं मिला!</p>
+                    </div>
+                `;
                 return;
             }
-            list.forEach(v => {
+
+            voters.forEach(v => {
                 const card = document.createElement('div');
-                card.className = 'voter-card';
+                card.className = "bg-white p-4 rounded-2xl shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between space-y-3";
                 card.innerHTML = `
-                    <div class="voter-card-header">
-                        <span class="ward-badge-pill">वार्ड: <b>${v.ward || '-'}</b></span>
-                        <span class="epic-chip">${v.epic || 'EPIC N/A'}</span>
-                        <span style="font-size: 0.85rem; font-weight:600; color: #64748b;">#${v.sno}</span>
+                    <div>
+                        <div class="flex items-start justify-between border-b border-slate-100 pb-2 mb-2">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800 hindi-font">${v.name || 'अज्ञात'}</h3>
+                                <p class="text-xs text-slate-500 hindi-font">पिता/पति: ${v.guardian || '-'}</p>
+                            </div>
+                            <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-md font-semibold">
+                                वार्ड ${v.ward || '-'}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-slate-600">
+                            <div><span class="text-slate-400">EPIC:</span> <b>${v.epic || '-'}</b></div>
+                            <div><span class="text-slate-400">मकान नं:</span> <b>${v.houseNo || '-'}</b></div>
+                            <div><span class="text-slate-400">क्रमांक:</span> <b>${v.serial || '-'}</b></div>
+                            <div><span class="text-slate-400">आयु/लिंग:</span> <b>${v.age || '-'}/${v.gender || '-'}</b></div>
+                        </div>
+
+                        <div class="mt-2 text-[11px] text-slate-500 bg-slate-50 p-1.5 rounded hindi-font">
+                            <i class="fa-solid fa-location-dot text-orange-500 mr-1"></i> बूथ: ${v.booth || '-'}
+                        </div>
                     </div>
-                    <div class="voter-name-title">${v.name}</div>
-                    <div class="voter-meta-grid">
-                        <div><b>${v.relation || 'संबंधी'}:</b> ${v.rel_name || '-'}</div>
-                        <div><b>मकान नं०:</b> ${v.house || '-'}</div>
-                        <div><b>आयु / लिंग:</b> ${v.age} / ${v.gender}</div>
-                        <div><b>मोहल्ला:</b> ${v.area || '-'}</div>
-                    </div>
-                    <div class="voter-booth-box">📍 <b>बूथ:</b> ${v.booth || 'सुवाणा'}</div>
-                    <div class="voter-action-row">
-                        <button class="btn-view-slip" onclick='openVoterSlip(${JSON.stringify(v)})'><i class="fa-solid fa-ticket"></i> पर्ची देखें</button>
-                        <button class="btn-wa-slip" onclick='quickSendWhatsApp(${JSON.stringify(v)})'><i class="fa-brands fa-whatsapp"></i> व्हाट्सएप</button>
+
+                    <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                        <button onclick="openVoterSlipModal('${v.epic}')" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-xs py-2 rounded-xl font-semibold transition shadow-sm flex items-center justify-center space-x-1">
+                            <i class="fa-solid fa-ticket"></i>
+                            <span>पर्ची देखें</span>
+                        </button>
+                        <button onclick="directWhatsAppShareCard('${v.name}', '${v.epic}', '${v.ward}', '${v.houseNo}', '${v.booth}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-xl font-semibold transition shadow-sm flex items-center justify-center">
+                            <i class="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
                     </div>
                 `;
-                voterResultsContainer.appendChild(card);
+                grid.appendChild(card);
             });
         }
 
-        function renderHouseGroupResults(list, searchedHouse) {
-            voterResultsContainer.innerHTML = '';
-            voterResultCount.innerText = list.length;
-            if (list.length === 0) {
-                voterResultsContainer.innerHTML = `<div style="text-align: center; padding: 30px; background: white; border-radius: 14px;">मकान नंबर "${searchedHouse}" में कोई नहीं मिला!</div>`;
+        // --- DIGITAL VOTER SLIP MODAL & SHARES ---
+        function openVoterSlipModal(epic) {
+            const voter = currentPanchayatVoters.find(v => v.epic === epic);
+            if (!voter) return;
+
+            currentSelectedVoterForSlip = voter;
+            const c = currentUser.candidateInfo || {};
+
+            // Candidate Info on Slip
+            document.getElementById('slipCandidateName').textContent = c.candidateName || 'प्रत्याशी नाम';
+            document.getElementById('slipCandidatePost').textContent = c.post || 'उम्मीदवार';
+            document.getElementById('slipPanchayatName').textContent = currentUser.panchayat || '';
+            document.getElementById('slipSymbolName').textContent = c.symbolName || '';
+            document.getElementById('slipSlogan').textContent = c.slogan ? `"${c.slogan}"` : '';
+            document.getElementById('slipMobile').textContent = c.mobile ? `संपर्क: ${c.mobile}` : '';
+
+            if (c.photoUrl) document.getElementById('slipCandidatePhoto').src = c.photoUrl;
+            if (c.symbolUrl) document.getElementById('slipSymbolPhoto').src = c.symbolUrl;
+
+            // Voter Info
+            document.getElementById('slipVoterName').textContent = voter.name || '';
+            document.getElementById('slipGuardian').textContent = voter.guardian || '';
+            document.getElementById('slipEpic').textContent = voter.epic || '';
+            document.getElementById('slipSerial').textContent = voter.serial || '-';
+            document.getElementById('slipWard').textContent = voter.ward || '-';
+            document.getElementById('slipHouse').textContent = voter.houseNo || '-';
+            document.getElementById('slipAgeGender').textContent = `${voter.age || '-'}/${voter.gender || '-'}`;
+            document.getElementById('slipBooth').textContent = voter.booth || '-';
+
+            document.getElementById('voterSlipModal').classList.remove('hidden');
+        }
+
+        function closeVoterSlipModal() {
+            document.getElementById('voterSlipModal').classList.add('hidden');
+        }
+
+        function shareVoterSlipWhatsApp() {
+            if (!currentSelectedVoterForSlip) return;
+            const v = currentSelectedVoterForSlip;
+            const c = currentUser.candidateInfo || {};
+
+            const msg = `🗳️ *मतदाता पर्ची - ${currentUser.panchayat}* 🗳️\n\n` +
+                `👤 *मतदाता:* ${v.name}\n` +
+                `👨‍👩‍👦 *पिता/पति:* ${v.guardian}\n` +
+                `🆔 *EPIC:* ${v.epic}\n` +
+                `🔢 *क्रमांक:* ${v.serial} | *वार्ड:* ${v.ward} | *मकान:* ${v.houseNo}\n` +
+                `📍 *मतदान केंद्र:* ${v.booth}\n\n` +
+                `🚩 *निवेदक (प्रत्याशी):* ${c.candidateName || ''} (${c.post || ''})\n` +
+                `⭐ *चुनाव चिन्ह:* ${c.symbolName || ''}\n` +
+                `📢 *"${c.slogan || ''}"*`;
+
+            openWhatsAppDirect(msg);
+        }
+
+        function directWhatsAppShareCard(name, epic, ward, houseNo, booth) {
+            const c = currentUser.candidateInfo || {};
+            const msg = `🗳️ *मतदाता पर्ची सूचना* 🗳️\n\n` +
+                `👤 *मतदाता:* ${name}\n` +
+                `🆔 *EPIC:* ${epic}\n` +
+                `🔢 *वार्ड:* ${ward} | *मकान:* ${houseNo}\n` +
+                `📍 *बूथ:* ${booth}\n\n` +
+                `🚩 *प्रत्याशी:* ${c.candidateName || ''} (${c.symbolName || ''})`;
+
+            openWhatsAppDirect(msg);
+        }
+
+        function openWhatsAppDirect(msg) {
+            let phone = prompt("व्हाट्सएप भेजने के लिए 10 अंकों का मोबाइल नंबर दर्ज करें (वैकल्पिक):", "");
+            let cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+            if (cleanPhone.length === 10) {
+                cleanPhone = '91' + cleanPhone;
+            }
+            
+            // Direct WhatsApp API URL Window Open
+            const url = 'https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg);
+            window.open(url, '_blank');
+        }
+
+        function downloadSlipPNG() {
+            const element = document.getElementById('printableSlipArea');
+            showAlert("इमेज जनरेट की जा रही है...", "info");
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Voter_Slip_${currentSelectedVoterForSlip ? currentSelectedVoterForSlip.epic : 'Slip'}.png`;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+                showAlert("इमेज डाउनलोड हो गई!", "success");
+            }).catch(e => {
+                console.error(e);
+                showAlert("इमेज बनाने में विफलता!", "error");
+            });
+        }
+
+        function printFamilyList() {
+            window.print();
+        }
+
+        // ================= ADMIN DASHBOARD LOGIC =================
+        function showAdminPortal() {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('clientPortal').classList.add('hidden');
+            document.getElementById('adminPortal').classList.remove('hidden');
+
+            document.getElementById('userBadge').classList.remove('hidden');
+            document.getElementById('userBadgeText').textContent = "मुख्य एडमिन";
+            document.getElementById('logoutBtn').classList.remove('hidden');
+
+            switchAdminTab(1);
+            loadPanchayatsForAdmin();
+            loadClientsForAdmin();
+        }
+
+        function switchAdminTab(tabIndex) {
+            for (let i = 1; i <= 5; i++) {
+                const content = document.getElementById(`adminTab${i}`);
+                const btn = document.getElementById(`adminTabBtn${i}`);
+                if (i === tabIndex) {
+                    content.classList.remove('hidden');
+                    btn.className = "admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-orange-600 text-white whitespace-nowrap shadow-sm";
+                } else {
+                    content.classList.add('hidden');
+                    btn.className = "admin-tab-btn px-4 py-2 text-xs font-semibold rounded-t-xl transition bg-slate-200 text-slate-700 hover:bg-slate-300 whitespace-nowrap";
+                }
+            }
+        }
+
+        // --- TAB 1: EXCEL UPLOAD TO FIRESTORE ---
+        async function processAndUploadExcel() {
+            const panchayatName = document.getElementById('uploadPanchayatName').value.trim();
+            const fileInput = document.getElementById('excelFileInput');
+
+            if (!panchayatName) {
+                showAlert("कृपया ग्राम पंचायत का नाम दर्ज करें!", "error");
                 return;
             }
-            const groups = {};
-            list.forEach(v => {
-                const h = v.house || 'अज्ञात';
-                if (!groups[h]) groups[h] = [];
-                groups[h].push(v);
-            });
-
-            for (let houseNo in groups) {
-                const members = groups[houseNo];
-                const groupWrap = document.createElement('div');
-                groupWrap.style.marginBottom = '20px';
-                groupWrap.innerHTML = `
-                    <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <div><b>मकान संख्या: ${houseNo}</b> (कुल सदस्य: ${members.length})</div>
-                        <button class="btn-main" style="width: auto; background: #d97706; padding: 6px 12px; font-size: 0.8rem;" onclick='printHouseMembers(${JSON.stringify(members)})'>प्रिंट सभी</button>
-                    </div>
-                `;
-                members.forEach(v => {
-                    const card = document.createElement('div');
-                    card.className = 'voter-card';
-                    card.style.borderLeft = '4px solid #f59e0b';
-                    card.innerHTML = `
-                        <div class="voter-card-header">
-                            <span class="ward-badge-pill">वार्ड ${v.ward || '-'}</span>
-                            <span class="epic-chip">${v.epic || '-'}</span>
-                            <span>#${v.sno}</span>
-                        </div>
-                        <div class="voter-name-title" style="color: #92400e;">${v.name}</div>
-                        <div class="voter-meta-grid">
-                            <div><b>${v.relation || 'संबंधी'}:</b> ${v.rel_name || '-'}</div>
-                            <div><b>मकान:</b> ${v.house}</div>
-                            <div><b>आयु/लिंग:</b> ${v.age} / ${v.gender}</div>
-                            <div><b>मोहल्ला:</b> ${v.area || '-'}</div>
-                        </div>
-                        <div class="voter-action-row">
-                            <button class="btn-view-slip" onclick='openVoterSlip(${JSON.stringify(v)})'>पर्ची देखें</button>
-                            <button class="btn-wa-slip" onclick='quickSendWhatsApp(${JSON.stringify(v)})'>व्हाट्सएप</button>
-                        </div>
-                    `;
-                    groupWrap.appendChild(card);
-                });
-                voterResultsContainer.appendChild(groupWrap);
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showAlert("कृपया एक्सेल फाइल (.xlsx) चुनें!", "error");
+                return;
             }
-        }
 
-        function printHouseMembers(membersList) {
-            let printWindow = window.open('', '_blank');
-            let slipsHtml = '';
-            const camp = getActiveCampaign();
-            membersList.forEach(voter => {
-                slipsHtml += `
-                    <div class="print-slip-box">
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 8px;">
-                            <img src="${camp.photo}" style="width: 70px; height: 70px; border-radius: 50%; border: 2.5px solid #d97706; object-fit: cover;" alt="प्रत्याशी">
-                            <div style="text-align: center; flex: 1; padding: 0 4px;">
-                                <span style="font-size: 0.72rem; background: #d97706; color: white; padding: 1px 6px; border-radius: 8px; font-weight: 600;">${camp.postType} प्रत्याशी</span>
-                                <h3 style="margin:2px 0 0 0; font-size:1.15rem; color:#1e3a8a; font-weight:800;">${camp.name}</h3>
-                                <p style="margin:0; font-size:0.75rem; color:#78350f;">${camp.panchayat}</p>
-                            </div>
-                            <img src="${camp.symbol}" style="width: 60px; height: 60px; background: white; border-radius: 8px; border: 2.5px solid #d97706; object-fit: contain; padding: 2px;" alt="चिन्ह">
-                        </div>
-                        <div style="text-align: center; background: #eff6ff; padding: 3px; font-weight: bold; color: #1e3a8a; font-size: 0.85rem; margin-bottom: 6px; border-radius: 4px;">
-                            मतदाता पर्ची | वार्ड नं० ${voter.ward || '-'} | क्रमांक: #${voter.sno}
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 0.86rem;">
-                            <tr><td style="padding: 2px 4px; color:#64748b; width:38%;">मतदाता का नाम:</td><td style="font-weight:bold; font-size:1.02rem; color:#0f172a;">${voter.name}</td></tr>
-                            <tr><td style="padding: 2px 4px; color:#64748b;">वोटर आईडी (EPIC):</td><td style="font-weight:bold; color:#16a34a;">${voter.epic || '-'}</td></tr>
-                            <tr><td style="padding: 2px 4px; color:#64748b;">${voter.relation || 'संबंधी'} का नाम:</td><td style="font-weight:bold;">${voter.rel_name || '-'}</td></tr>
-                            <tr><td style="padding: 2px 4px; color:#64748b;">मकान संख्या:</td><td style="font-weight:bold;">${voter.house || '-'}</td></tr>
-                            <tr><td style="padding: 2px 4px; color:#64748b;">आयु / लिंग:</td><td style="font-weight:bold;">${voter.age} वर्ष / ${voter.gender}</td></tr>
-                            <tr><td style="padding: 2px 4px; color:#64748b;">वोटर सेंटर:</td><td style="font-weight:bold; color:#1e40af;">📍 ${voter.booth || 'सुवाणा'}</td></tr>
-                        </table>
-                        <div style="margin-top: 6px; text-align: center; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 3px; border-radius: 4px; font-size: 0.78rem; font-weight: bold;">
-                            अमूल्य मत '${camp.symbolName}' के सामने वाला बटन दबाकर विजयी बनाएं।
-                        </div>
-                    </div>
-                `;
-            });
-            printWindow.document.write(`
-                <html><head><title>पारिवारिक पर्चियां</title><style>
-                    body { font-family: sans-serif; margin: 10px; }
-                    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-                    .print-slip-box { border: 2.5px solid #1e3a8a; border-radius: 10px; padding: 10px; page-break-inside: avoid; background: #fff; }
-                    @media print { body { margin: 5mm; } .grid { grid-template-columns: 1fr 1fr; gap: 8mm; } }
-                </style></head><body onload="window.print(); window.close();">
-                    <h3 style="text-align:center; color:#1e3a8a; margin-bottom:10px;">पारिवारिक मतदाता पर्चियां (मकान सं०: ${membersList[0].house || '-'})</h3>
-                    <div class="grid">${slipsHtml}</div>
-                </body></html>
-            `);
-            printWindow.document.close();
-        }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
 
-        // 🌟 डायनेमिक प्रत्याशी मैपिंग फंक्शन (हर वार्ड के अलग उम्मीदवार की पहचान हेतु)
-        function getActiveCampaign() {
-            if (loggedInClient && loggedInClient.id.toLowerCase() !== 'sarpanch' && loggedInClient.ward !== 'ALL') {
-                return {
-                    postType: loggedInClient.postType || ("वार्ड पंच (Ward Panch) - वार्ड " + loggedInClient.ward),
-                    name: loggedInClient.candidateName || loggedInClient.name,
-                    panchayat: loggedIdClientGPName(),
-                    symbolName: loggedInClient.symbolName || "चाबी",
-                    slogan: loggedInClient.slogan || campaign.slogan,
-                    contact: loggedInClient.contact || campaign.contact,
-                    photo: loggedInClient.photo || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-                    symbol: loggedInClient.symbol || "https://cdn-icons-png.flaticon.com/512/1995/1995574.png"
-                };
-            }
-            return campaign;
-        }
-
-        function updateCampaignHeaderUI() {
-            const camp = getActiveCampaign();
-            document.getElementById('candDisplayPostTag').innerText = camp.postType + " प्रत्याशी";
-            document.getElementById('candDisplayName').innerText = camp.name;
-            document.getElementById('candDisplayPanchayat').innerText = loggedIdClientGPName();
-            document.getElementById('candDisplaySymbolName').innerText = "चिन्ह: " + camp.symbolName;
-            document.getElementById('candDisplayPhoto').src = camp.photo;
-            document.getElementById('candDisplaySymbol').src = camp.symbol;
-        }
-
-        function openVoterSlip(voter) {
-            currentActiveVoter = voter;
-            const camp = getActiveCampaign();
-            document.getElementById('slPostTag').innerText = camp.postType + " प्रत्याशी";
-            document.getElementById('slCandName').innerText = camp.name;
-            document.getElementById('slPanchayat').innerText = loggedIdClientGPName();
-            document.getElementById('slCandImg').src = camp.photo;
-            document.getElementById('slSymbolImg').src = camp.symbol;
-            document.getElementById('slSymbolFooter').innerText = "'" + camp.symbolName + "'";
-            document.getElementById('slReceiptWard').innerText = `वार्ड क्रमांक: ${voter.ward || '1'} | ${loggedIdClientGPName()}`;
-            document.getElementById('slVoterName').innerText = voter.name;
-            document.getElementById('slVoterEpic').innerText = voter.epic || 'लागू नहीं';
-            document.getElementById('slRelLbl').innerText = (voter.relation || 'संबंधी') + ' का नाम:';
-            document.getElementById('slVoterRelName').innerText = voter.rel_name || '-';
-            document.getElementById('slVoterWardSno').innerText = `वार्ड नं० ${voter.ward || '-'} (क्रमांक: #${voter.sno})`;
-            document.getElementById('slVoterHouse').innerText = voter.house || '-';
-            document.getElementById('slVoterAgeGender').innerText = voter.age + ' वर्ष / ' + voter.gender;
-            document.getElementById('slVoterArea').innerText = voter.area || loggedIdClientGPName();
-            document.getElementById('slVoterBooth').innerText = voter.booth || loggedIdClientGPName();
-            document.getElementById('slipModalOverlay').classList.add('active');
-        }
-
-        function closeSlipModal() {
-            document.getElementById('slipModalOverlay').classList.remove('active');
-        }
-
-        function quickSendWhatsApp(voter) {
-            currentActiveVoter = voter;
-            const num = prompt("मतदाता " + voter.name + " की पर्ची भेजने के लिए मोबाइल नंबर दर्ज करें:");
-            if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), voter);
-        }
-
-        function sendSlipWhatsAppModal() {
-            if (!currentActiveVoter) return;
-            const num = prompt("मोबाइल नंबर दर्ज करें:");
-            if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), currentActiveVoter);
-        }
-
-        function sendWA(phone, voter) {
-    // मोबाइल नंबर को साफ करें और देश का कोड (91) जोड़ें
-    let cleanPhone = phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-
-    // प्रत्याशी और मतदाता की जानकारी प्राप्त करें
-    const camp = getActiveCampaign();
-    
-    // व्हाट्सएप पर भेजने के लिए मैसेज का टेक्स्ट तैयार करें
-    const lines = [
-        '🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️',
-        '━━━━━━━━━━━━━━━━━━',
-        '🚩 *वार्ड संख्या:* *वार्ड नं० ' + (voter.ward || '1') + '*',
-        '👤 *मतदाता का नाम:* ' + (voter.name || '-'),
-        '🔢 *क्रमांक संख्या (S.No.):* #' + voter.sno,
-        '🆔 *वोटर आईडी (EPIC):* ' + (voter.epic || 'उपलब्ध नहीं'),
-        '👨‍👩‍👦 *' + (voter.relation || 'संबंधी') + ' का नाम:* ' + (voter.rel_name || '-'),
-        '🏠 *मकान संख्या:* ' + (voter.house || '-'),
-        '📍 *क्षेत्र:* ' + (voter.area || loggedIdClientGPName()),
-        '━━━━━━━━━━━━━━━━━━',
-        '🏫 *मतदान केंद्र (वोटर सेंटर):*',
-        '📍 *' + (voter.booth || loggedIdClientGPName()) + '*',
-        '━━━━━━━━━━━━━━━━━━',
-        '🚩 *' + camp.postType + ' हेतु योग्य एवं संघर्षशील प्रत्याशी:*',
-        '⭐ *' + camp.name + '*',
-        '🗳️ *चुनाव चिन्ह:* *' + camp.symbolName + '*',
-        '💬 *संदेश:* ' + camp.slogan,
-        '📞 *संपर्क:* ' + camp.contact,
-        '━━━━━━━━━━━━━━━━━━',
-        '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
-    ];
-    
-    const textData = lines.join('\n');
-
-    // इमेज में दिखाए गए फॉर्मेट के अनुसार window.open का उपयोग
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textData)}`, '_blank');
-}
-
-        }
-
-        function switchAdminTab(tabId, btn) {
-            document.querySelectorAll('.admin-tab-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).style.display = 'block';
-            btn.classList.add('active');
-        }
-
-        function populateAdminFields() {
-            document.getElementById('cfgPostType').value = campaign.postType;
-            document.getElementById('cfgName').value = campaign.name;
-            document.getElementById('cfgPanchayat').value = campaign.panchayat;
-            document.getElementById('cfgSymbolName').value = campaign.symbolName;
-            document.getElementById('cfgSlogan').value = campaign.slogan;
-            document.getElementById('cfgContact').value = campaign.contact;
-            document.getElementById('previewPhotoAdmin').src = campaign.photo;
-            document.getElementById('previewSymbolAdmin').src = campaign.symbol;
-        }
-
-        function saveCandidateSettings() {
-            campaign.postType = document.getElementById('cfgPostType').value;
-            campaign.name = document.getElementById('cfgName').value.trim();
-            campaign.panchayat = document.getElementById('cfgPanchayat').value.trim();
-            campaign.symbolName = document.getElementById('cfgSymbolName').value.trim();
-            campaign.slogan = document.getElementById('cfgSlogan').value.trim();
-            campaign.contact = document.getElementById('cfgContact').value.trim();
-            localStorage.setItem('election_campaign_data', JSON.stringify(campaign));
-            alert('✅ मुख्य प्रत्याशी विवरण सुरक्षित हो गया!');
-        }
-
-        document.getElementById('filePhotoInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const r = new FileReader();
-            r.onload = function(evt) { campaign.photo = evt.target.result; document.getElementById('previewPhotoAdmin').src = evt.target.result; };
-            r.readAsDataURL(file);
-        });
-
-        document.getElementById('fileSymbolInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const r = new FileReader();
-            r.onload = function(evt) { campaign.symbol = evt.target.result; document.getElementById('previewSymbolAdmin').src = evt.target.result; };
-            r.readAsDataURL(file);
-        });
-
-        function renderClientsAdminTable() {
-            const tb = document.getElementById('clientsTableBody');
-            if (!tb) return;
-            tb.innerHTML = '';
-            clientUsers.forEach((c, idx) => {
-                const gpObj = panchayatsList.find(g => g.id === c.gp);
-                const gpNameStr = gpObj ? gpObj.name : (c.gp || '-');
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${c.id}</strong></td>
-                    <td>${c.candidateName || c.name} <br><small style="color:#64748b;">(${c.postType || 'वार्ड पंच'})</small></td>
-                    <td><span style="background:#eff6ff; color:#1e3a8a; padding:2px 6px; border-radius:6px; font-weight:600; font-size:0.8rem;">${gpNameStr}</span></td>
-                    <td><b>वार्ड ${c.ward}</b></td>
-                    <td><code>${c.pass}</code></td>
-                    <td>${c.boundDevice ? '🔒 लॉक्ड' : '🟢 खुला'}</td>
-                    <td>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#3b82f6;" onclick="unlockClientDevice(${idx})">अनलॉक</button>
-                            <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#d97706;" onclick="editClient(${idx})">एडिट</button>
-                            <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#ef4444;" onclick="deleteClient(${idx})">हटाएं</button>
-                        </div>
-                    </td>
-                `;
-                tb.appendChild(tr);
-            });
-        }
-
-        // 🌟 हर वार्ड के उम्मीदवार की पूरी जानकारी (नाम, फोटो, चिन्ह) एडिट करने का नया रूप
-        function editClient(idx) {
-            const c = clientUsers[idx];
-            const newName = prompt("यूजर/लॉगिन नाम:", c.name); if (newName === null) return;
-            const newPass = prompt("नया पासवर्ड:", c.pass); if (newPass === null) return;
-            const newGp = prompt("ग्राम पंचायत आईडी (उदा० suwana):", c.gp || 'suwana'); if (newGp === null) return;
-            const newWard = prompt("वार्ड नंबर (जैसे 9 या ALL):", c.ward); if (newWard === null) return;
-            
-            // प्रत्याशी विशेष ब्रांडिंग फील्ड्स
-            const candName = prompt("प्रत्याशी का वास्तविक नाम (पर्ची पर छपने के लिए):", c.candidateName || c.name); if (candName === null) return;
-            const postType = prompt("पद (जैसे 'वार्ड पंच (Ward Panch) - वार्ड 9'):", c.postType || ("वार्ड पंच (Ward Panch) - वार्ड " + newWard)); if (postType === null) return;
-            const symbolName = prompt("चुनाव चिन्ह का नाम (जैसे 'बल्ला', 'कमल', 'हाथ'):", c.symbolName || "चाबी"); if (symbolName === null) return;
-            const symbolImgUrl = prompt("चुनाव चिन्ह की इमेज का URL (Image URL):", c.symbol || ""); if (symbolImgUrl === null) return;
-            const candPhotoUrl = prompt("प्रत्याशी की फोटो का URL (Photo URL):", c.photo || ""); if (candPhotoUrl === null) return;
-
-            c.name = newName.trim(); 
-            c.pass = newPass.trim(); 
-            c.gp = newGp.trim().toLowerCase(); 
-            c.ward = newWard.trim().toUpperCase();
-            c.candidateName = candName.trim(); 
-            c.postType = postType.trim(); 
-            c.symbolName = symbolName.trim();
-            if(symbolImgUrl.trim()) c.symbol = symbolImgUrl.trim();
-            if(candPhotoUrl.trim()) c.photo = candPhotoUrl.trim();
-
-            saveClientsState(); 
-            renderClientsAdminTable(); 
-            alert('✅ इस प्रत्याशी का विवरण सफलतापूर्वक अपडेट कर दिया गया है!');
-        }
-
-        function addClientAccount() {
-            const id = document.getElementById('addClientId').value.trim();
-            const pass = document.getElementById('addClientPass').value.trim();
-            const name = document.getElementById('addClientName').value.trim() || 'प्रत्याशी';
-            const gp = document.getElementById('addClientGp').value;
-            const ward = document.getElementById('addClientWard').value;
-
-            if (!id || !pass) { alert('यूजर आईडी और पासवर्ड भरें!'); return; }
-            
-            clientUsers.push({ 
-                id, 
-                pass, 
-                name, 
-                gp, 
-                ward, 
-                boundDevice: null, 
-                status: "Active", 
-                candidateName: name, 
-                postType: ward === 'ALL' ? 'सरपंच (Sarpanch)' : 'वार्ड पंच (Ward Panch) - वार्ड ' + ward, 
-                symbolName: 'चाबी',
-                photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-                symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png"
-            });
-            saveClientsState(); 
-            renderClientsAdminTable(); 
-            alert('✅ नया प्रत्याशी/क्लाइंट सफलतापूर्वक जोड़ दिया गया! अब ' + id + ' की विशिष्ट फोटो व चिन्ह सेट करने के लिए सूची में "एडिट" बटन पर क्लिक करें।');
-            document.getElementById('addClientId').value = ''; 
-            document.getElementById('addClientPass').value = '';
-            document.getElementById('addClientName').value = '';
-        }
-
-        function unlockClientDevice(idx) {
-            clientUsers[idx].boundDevice = null; saveClientsState(); renderClientsAdminTable(); alert('✅ अनलॉक कर दिया!');
-        }
-
-        function deleteClient(idx) {
-            if (confirm('क्या आप इस क्लाइंट को हटाना चाहते हैं?')) { clientUsers.splice(idx, 1); saveClientsState(); renderClientsAdminTable(); }
-        }
-
-        function updateAdminExcelStats() {
-            let totalCount = 0;
-            for (let gp in allPanchayatVoters) {
-                if (allPanchayatVoters[gp]) totalCount += allPanchayatVoters[gp].length;
-            }
-            const statsBox = document.getElementById('wardStatsCount');
-            if (statsBox) {
-                statsBox.innerHTML = `कुल लोडेड मतदाता (सभी पंचायतों में): <b>${totalCount}</b>`;
-            }
-        }
-
-        document.getElementById('excelFileLoader').addEventListener('change', function(e) {
-            const file = e.target.files[0]; if (!file) return;
-            const selectedGp = document.getElementById('uploadGpSelect').value;
-            const gpObj = panchayatsList.find(g => g.id === selectedGp);
-            const gpName = gpObj ? gpObj.name : selectedGp;
-
-            const r = new FileReader();
-            document.getElementById('uploadProgressBox').style.display = 'block';
-            document.getElementById('uploadProgressBar').style.width = '50%';
-
-            r.onload = function(evt) {
+            reader.onload = async function(e) {
                 try {
-                    const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
-                    let rows = [];
-                    wb.SheetNames.forEach(s => rows = rows.concat(XLSX.utils.sheet_to_json(wb.Sheets[s])));
-                    
-                    const parsedVoters = rows.map((r, i) => ({
-                        ward: String(r['Ward No.'] || r['वार्ड नंबर'] || '1'),
-                        sno: r['क्र० सं० (S.No.)'] || (i + 1),
-                        epic: String(r['ईपिक सं० (EPIC No.)'] || ''),
-                        name: String(r['नाम (Name)'] || ''),
-                        relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || ''),
-                        house: String(r['मकान संख्या (House No.)'] || ''),
-                        age: String(r['आयु (Age)'] || ''),
-                        gender: String(r['लिंग (Gender)'] || ''),
-                        area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || gpName),
-                        booth: String(r['मतदान बूथ सं० व पता'] || gpName)
-                    }));
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonRows = XLSX.utils.sheet_to_json(worksheet);
 
-                    allPanchayatVoters[selectedGp] = parsedVoters;
-                    localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
-
-                    document.getElementById('uploadProgressBar').style.width = '100%';
-                    setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
-
-                    if (isFirebaseActive && db) {
-                        db.collection("panchayats_data").doc(selectedGp).set({
-                            panchayatId: selectedGp,
-                            panchayatName: gpName,
-                            voters: parsedVoters,
-                            updatedAt: new Date().toISOString()
-                        }).then(() => {
-                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता फायरबेस क्लाउड पर सफलतापूर्वक अपलोड हो गए!</span>`;
-                            updateAdminExcelStats();
-                        }).catch(err => {
-                            document.getElementById('excelMsg').innerHTML = `<span style="color:#dc2626;">❌ फायरबेस अपलोड त्रुटि: ${err.message}</span>`;
-                        });
-                    } else {
-                        document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता स्थानीय रूप से सेव हो गए!</span>`;
-                        updateAdminExcelStats();
+                    if (jsonRows.length === 0) {
+                        showAlert("एक्सेल फाइल में कोई डेटा नहीं मिला!", "error");
+                        return;
                     }
-                } catch(err) {
-                    document.getElementById('uploadProgressBox').style.display = 'none';
-                    alert('एक्सेल फाइल पढ़ने में त्रुटि: ' + err.message);
+
+                    document.getElementById('uploadProgressContainer').classList.remove('hidden');
+                    document.getElementById('uploadExcelBtn').disabled = true;
+
+                    // Batch upload to Firestore
+                    const batchSize = 250;
+                    let processed = 0;
+                    const total = jsonRows.length;
+
+                    for (let i = 0; i < total; i += batchSize) {
+                        const chunk = jsonRows.slice(i, i + batchSize);
+                        const batch = db.batch();
+
+                        chunk.forEach(row => {
+                            const docRef = db.collection('voters').doc();
+                            batch.set(docRef, {
+                                panchayat: panchayatName,
+                                epic: (row.EPIC || row.epic || '').toString(),
+                                name: (row.NAME || row.name || '').toString(),
+                                guardian: (row.GUARDIAN || row.guardian || '').toString(),
+                                houseNo: (row.HOUSE_NO || row.houseNo || row.house_no || '').toString(),
+                                ward: (row.WARD || row.ward || '').toString(),
+                                age: (row.AGE || row.age || '').toString(),
+                                gender: (row.GENDER || row.gender || '').toString(),
+                                booth: (row.BOOTH || row.booth || '').toString(),
+                                serial: (row.SERIAL || row.serial || '').toString(),
+                                uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+
+                        await batch.commit();
+                        processed += chunk.length;
+                        const pct = Math.round((processed / total) * 100);
+                        document.getElementById('uploadProgressBar').style.width = pct + '%';
+                        document.getElementById('uploadProgressText').textContent = pct + '%';
+                    }
+
+                    // Register Panchayat in registry if not exists
+                    await db.collection('panchayats').doc(panchayatName).set({
+                        name: panchayatName,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
+                    showAlert(`सफलतापूर्वक ${total} मतदाता Firestore पर अपलोड किए गए!`, "success");
+                    document.getElementById('uploadPanchayatName').value = '';
+                    fileInput.value = '';
+                    document.getElementById('uploadProgressContainer').classList.add('hidden');
+                    document.getElementById('uploadExcelBtn').disabled = false;
+                    
+                    loadPanchayatsForAdmin();
+
+                } catch (err) {
+                    console.error("Excel Upload Error:", err);
+                    showAlert("अपलोड के दौरान समस्या आई!", "error");
+                    document.getElementById('uploadExcelBtn').disabled = false;
                 }
             };
-            r.readAsArrayBuffer(file);
-        });
 
-        window.addEventListener('DOMContentLoaded', () => { 
-            initFirebaseConnection(); 
-            populateGpDropdowns();
-        });
-
-        async function generateSlipCanvas() {
-            return await html2canvas(document.getElementById('printableSlipCard'), { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+            reader.readAsArrayBuffer(file);
         }
 
-        async function downloadSlipAsImage() {
-            const canvas = await generateSlipCanvas();
-            if (canvas) {
-                const link = document.createElement('a');
-                link.download = `voter_slip.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+        // --- TAB 2: PANCHAYAT MANAGEMENT ---
+        async function loadPanchayatsForAdmin() {
+            const container = document.getElementById('panchayatListContainer');
+            const selectDropdown = document.getElementById('newClientPanchayat');
+            
+            try {
+                const snapshot = await db.collection('panchayats').get();
+                container.innerHTML = '';
+                selectDropdown.innerHTML = '<option value="">पंचायत चुनें</option>';
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-xs text-slate-500">कोई ग्राम पंचायत डेटाबेस में नहीं है।</p>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    
+                    // Add to Dropdown
+                    const opt = document.createElement('option');
+                    opt.value = data.name;
+                    opt.textContent = data.name;
+                    selectDropdown.appendChild(opt);
+
+                    // Add to Admin List
+                    const card = document.createElement('div');
+                    card.className = "flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs";
+                    card.innerHTML = `
+                        <div>
+                            <h4 class="font-bold text-slate-800 hindi-font">${data.name}</h4>
+                            <span class="text-[10px] text-slate-500">Cloud Data Active</span>
+                        </div>
+                        <button onclick="deletePanchayatData('${data.name}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-semibold shadow flex items-center space-x-1">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>पूरा डेटा डिलीट करें</span>
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (e) {
+                console.error("Error loading panchayats:", e);
             }
         }
 
-        function printSingleVoterSlip() {
-            if (!currentActiveVoter) return;
-            const voter = currentActiveVoter;
-            const camp = getActiveCampaign();
-            let printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>मतदाता सूचना पर्ची - ${voter.name}</title>
-                    <style>
-                        body { font-family: sans-serif; padding: 20px; background: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-                        .slip-box { border: 2.5px solid #1e3a8a; border-radius: 14px; padding: 16px; width: 420px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-                        @media print { body { padding: 0; } .slip-box { border: 2.5px solid #1e3a8a; width: 100%; box-shadow: none; } }
-                    </style>
-                </head>
-                <body onload="window.print(); window.close();">
-                    <div class="slip-box">
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2.5px solid #1e3a8a; padding-bottom: 8px; margin-bottom: 10px; background: #1e3a8a; color: white; padding: 10px; border-radius: 8px;">
-                            <img src="${camp.photo}" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #facc15; object-fit: cover; background: white;" alt="प्रत्याशी">
-                            <div style="text-align: center; flex: 1; padding: 0 6px;">
-                                <span style="font-size: 0.74rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;">${camp.postType} प्रत्याशी</span>
-                                <h3 style="margin:2px 0 0 0; font-size:1.15rem; color:#facc15; font-weight:800;">${camp.name}</h3>
-                                <p style="margin:0; font-size:0.78rem; opacity:0.9;">${loggedIdClientGPName()}</p>
-                            </div>
-                            <img src="${camp.symbol}" style="width: 54px; height: 54px; background: white; border-radius: 8px; border: 2px solid #facc15; object-fit: contain; padding: 2px;" alt="चिन्ह">
-                        </div>
-                        <div style="text-align: center; border-bottom: 2px dashed #94a3b8; padding-bottom: 6px; margin-bottom: 8px;">
-                            <h4 style="color: #1e3a8a; font-size: 1.05rem; margin:0;">मतदाता सूचना पर्ची (Voter Slip)</h4>
-                            <span style="font-size: 0.78rem; color: #64748b;">वार्ड क्रमांक: ${voter.ward || '-'} | ${loggedIdClientGPName()}</span>
-                        </div>
-                        <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem;">
-                            <tr><td style="padding: 5px 6px; color:#64748b; width:38%;">मतदाता का नाम:</td><td style="font-weight:bold; font-size:1.1rem; color:#1e3a8a;">${voter.name}</td></tr>
-                            <tr><td style="padding: 5px 6px; color:#64748b;">वोटर आईडी (EPIC):</td><td style="font-weight:bold; color:#16a34a; font-size:1rem;">${voter.epic || '-'}</td></tr>
-                            <tr><td style="padding: 5px 6px; color:#64748b;">${voter.relation || 'संबंधी'} का नाम:</td><td style="font-weight:bold;">${voter.rel_name || '-'}</td></tr>
-                            <tr><td style="padding: 5px 6px; color:#64748b;">मकान संख्या:</td><td style="font-weight:bold;">${voter.house || '-'}</td></tr>
-                            <tr><td style="padding: 5px 6px; color:#64748b;">आयु एवं लिंग:</td><td style="font-weight:bold;">${voter.age} वर्ष / ${voter.gender}</td></tr>
-                            <tr><td style="padding: 5px 6px; color:#64748b;">वोटर सेंटर:</td><td style="font-weight:bold; color:#1e40af;">📍 ${voter.booth || loggedIdClientGPName()}</td></tr>
-                        </table>
-                        <div style="margin-top: 12px; text-align: center; background: #fffbeb; border: 1.5px solid #fde68a; color: #92400e; padding: 6px; border-radius: 6px; font-size: 0.88rem; font-weight: bold;">
-                            अपना अमूल्य मत '${camp.symbolName}' के सामने वाला बटन दबाकर विजयी बनाएं।
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
+        async function deletePanchayatData(panchayatName) {
+            if (!confirm(`क्या आप वाकई "${panchayatName}" का पूरा मतदाता डेटा और डॉक्यूमेंट डिलीट करना चाहते हैं?`)) return;
+
+            showAlert("डेटा डिलीट हो रहा है, कृपया प्रतीक्षा करें...", "info");
+            try {
+                // Delete voters matching panchayat
+                const snapshot = await db.collection('voters').where('panchayat', '==', panchayatName).get();
+                const batchSize = 400;
+                let docs = snapshot.docs;
+
+                while (docs.length > 0) {
+                    const chunk = docs.splice(0, batchSize);
+                    const batch = db.batch();
+                    chunk.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+                }
+
+                // Delete panchayat record
+                await db.collection('panchayats').doc(panchayatName).delete();
+                showAlert(`"${panchayatName}" का डेटा सफलता से डिलीट हुआ।`, "success");
+                loadPanchayatsForAdmin();
+
+            } catch (e) {
+                console.error("Delete Error:", e);
+                showAlert("डेटा डिलीट करने में विफल!", "error");
+            }
+        }
+
+        // --- TAB 3 & TAB 4: CLIENTS & CANDIDATE BRANDING ---
+        async function loadClientsForAdmin() {
+            try {
+                const snapshot = await db.collection('clients').get();
+                const tbody = document.getElementById('clientsTableBody');
+                const brandSelect = document.getElementById('brandingClientSelect');
+
+                tbody.innerHTML = '';
+                brandSelect.innerHTML = '<option value="">प्रत्याशी / क्लाइंट ID चुनें</option>';
+                allClientsListCache = [];
+
+                snapshot.forEach(doc => {
+                    const c = doc.data();
+                    allClientsListCache.push(c);
+
+                    // Dropdown for branding
+                    const opt = document.createElement('option');
+                    opt.value = c.clientId;
+                    opt.textContent = `${c.clientId} (${c.candidateInfo ? c.candidateInfo.candidateName || 'No Name' : 'No Candidate'}) - ${c.panchayat}`;
+                    brandSelect.appendChild(opt);
+
+                    // Table row
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 border-b border-slate-100";
+                    tr.innerHTML = `
+                        <td class="p-2.5 font-bold text-slate-800">${c.clientId}</td>
+                        <td class="p-2.5 hindi-font">${c.panchayat}</td>
+                        <td class="p-2.5">वार्ड ${c.ward}</td>
+                        <td class="p-2.5 text-right space-x-1">
+                            <button onclick="deleteClientUser('${c.clientId}')" class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-[10px]" title="आईडी डिलीट करें"><i class="fa-solid fa-trash"></i> डिलीट</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (e) {
+                console.error("Error loading clients:", e);
+            }
+        }
+
+        async function handleCreateClient(e) {
+            e.preventDefault();
+            const id = document.getElementById('newClientId').value.trim();
+            const pass = document.getElementById('newClientPassword').value.trim();
+            const panchayat = document.getElementById('newClientPanchayat').value;
+            const ward = document.getElementById('newClientWard').value.trim();
+
+            if (!id || !pass || !panchayat || !ward) {
+                showAlert("कृपया सभी फ़ील्ड भरें!", "error");
+                return;
+            }
+
+            try {
+                await db.collection('clients').doc(id).set({
+                    clientId: id,
+                    password: pass,
+                    panchayat: panchayat,
+                    ward: ward,
+                    currentSessionToken: null,
+                    candidateInfo: {
+                        candidateName: "नया प्रत्याशी",
+                        post: "उम्मीदवार",
+                        symbolName: "",
+                        symbolUrl: "",
+                        photoUrl: "",
+                        slogan: "",
+                        mobile: ""
+                    },
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showAlert(`क्लाइंट ID "${id}" सफलतापूर्वक बनाई गई!`, "success");
+                document.getElementById('newClientId').value = '';
+                document.getElementById('newClientPassword').value = '';
+                document.getElementById('newClientWard').value = '';
+                loadClientsForAdmin();
+
+            } catch (e) {
+                console.error("Client Create Error:", e);
+                showAlert("क्लाइंट बनाने में त्रुटि!", "error");
+            }
+        }
+
+        async function deleteClientUser(clientId) {
+            if (!confirm(`क्या आप क्लाइंट "${clientId}" की आईडी डिलीट करना चाहते हैं?`)) return;
+            try {
+                await db.collection('clients').doc(clientId).delete();
+                showAlert(`क्लाइंट "${clientId}" हटा दिया गया।`, "success");
+                loadClientsForAdmin();
+            } catch (e) {
+                showAlert("आईडी डिलीट करने में विफल!", "error");
+            }
+        }
+
+        // TAB 4 BRANDING SELECTION
+        function loadSelectedClientBranding() {
+            const clientId = document.getElementById('brandingClientSelect').value;
+            const client = allClientsListCache.find(c => c.clientId === clientId);
+
+            if (!client || !client.candidateInfo) {
+                document.getElementById('brandCandidateName').value = '';
+                document.getElementById('brandPost').value = '';
+                document.getElementById('brandSymbolName').value = '';
+                document.getElementById('brandSymbolUrl').value = '';
+                document.getElementById('brandPhotoUrl').value = '';
+                document.getElementById('brandMobile').value = '';
+                document.getElementById('brandSlogan').value = '';
+                return;
+            }
+
+            const info = client.candidateInfo;
+            document.getElementById('brandCandidateName').value = info.candidateName || '';
+            document.getElementById('brandPost').value = info.post || '';
+            document.getElementById('brandSymbolName').value = info.symbolName || '';
+            document.getElementById('brandSymbolUrl').value = info.symbolUrl || '';
+            document.getElementById('brandPhotoUrl').value = info.photoUrl || '';
+            document.getElementById('brandMobile').value = info.mobile || '';
+            document.getElementById('brandSlogan').value = info.slogan || '';
+        }
+
+        async function handleSaveBranding(e) {
+            e.preventDefault();
+            const clientId = document.getElementById('brandingClientSelect').value;
+            if (!clientId) {
+                showAlert("कृपया पहले कोई क्लाइंट/प्रत्याशी आईडी चुनें!", "error");
+                return;
+            }
+
+            const candidateInfo = {
+                candidateName: document.getElementById('brandCandidateName').value.trim(),
+                post: document.getElementById('brandPost').value.trim(),
+                symbolName: document.getElementById('brandSymbolName').value.trim(),
+                symbolUrl: document.getElementById('brandSymbolUrl').value.trim(),
+                photoUrl: document.getElementById('brandPhotoUrl').value.trim(),
+                mobile: document.getElementById('brandMobile').value.trim(),
+                slogan: document.getElementById('brandSlogan').value.trim(),
+            };
+
+            try {
+                await db.collection('clients').doc(clientId).update({
+                    candidateInfo: candidateInfo
+                });
+
+                showAlert(`"${clientId}" के लिए प्रत्याशी ब्रांडिंग अपडेट हो गई!`, "success");
+                loadClientsForAdmin();
+
+            } catch (e) {
+                console.error("Branding Save Error:", e);
+                showAlert("ब्रांडिंग अपडेट करने में त्रुटि!", "error");
+            }
+        }
+
+        // TAB 5 ADMIN PASSWORD CHANGE
+        async function handleChangeAdminPassword(e) {
+            e.preventDefault();
+            const p1 = document.getElementById('newAdminPass').value.trim();
+            const p2 = document.getElementById('confirmAdminPass').value.trim();
+
+            if (p1 !== p2) {
+                showAlert("दोनों पासवर्ड मेल नहीं खाते हैं!", "error");
+                return;
+            }
+
+            try {
+                await db.collection('admin').doc('settings').set({
+                    password: p1
+                }, { merge: true });
+
+                showAlert("एडमिन पासवर्ड सफलतापूर्वक अपडेट हो गया!", "success");
+                document.getElementById('newAdminPass').value = '';
+                document.getElementById('confirmAdminPass').value = '';
+            } catch (e) {
+                showAlert("पासवर्ड बदलने में त्रुटि!", "error");
+            }
         }
     </script>
 </body>
