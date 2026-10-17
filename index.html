@@ -47,25 +47,6 @@
             flex-direction: column;
         }
 
-        .admin-corner-btn {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 999;
-            background: #ffffff;
-            color: #64748b;
-            border: 1.5px solid #cbd5e1;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.15rem;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-        }
-
         .app-view {
             display: none;
         }
@@ -570,66 +551,17 @@
             gap: 8px;
         }
 
-        #adminLoginModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.75);
-            z-index: 1001;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-
-        #adminLoginModal.active {
-            display: flex;
-        }
-
-        .admin-modal-box {
-            background: white;
-            width: 100%;
-            max-width: 360px;
-            border-radius: 16px;
-            padding: 22px;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
         @media print {
             body * { visibility: hidden; }
             #printableSlipCard, #printableSlipCard * { visibility: visible; }
             #printableSlipCard { position: fixed; left: 5%; top: 5%; width: 90%; }
-            .slip-overlay, .slip-footer-tools, .admin-corner-btn, #adminLoginModal { display: none !important; }
+            .slip-overlay, .slip-footer-tools, .app-view { display: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- TOP-RIGHT HIDDEN ADMIN ACCESS BUTTON -->
-    <button class="admin-corner-btn" title="एडमिन पोर्टल" onclick="openAdminModal()">
-        <i class="fa-solid fa-lock"></i>
-    </button>
-
-    <!-- ADMIN MODAL DIALOG -->
-    <div id="adminLoginModal">
-        <div class="admin-modal-box">
-            <div style="width: 52px; height: 52px; background: #0f172a; color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px;">
-                <i class="fa-solid fa-user-shield"></i>
-            </div>
-            <h3 style="font-size: 1.15rem; color: #0f172a; margin-bottom: 4px;">एडमिन कंट्रोल रूम</h3>
-            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 16px;">कृपया मुख्य एडमिन पासवर्ड दर्ज करें:</p>
-            <input type="password" id="modalAdminPass" class="form-control" placeholder="एडमिन पासवर्ड..." style="text-align: center; font-size: 1.1rem; letter-spacing: 2px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px;">
-                <button class="btn-main" onclick="submitAdminModalPass()">लॉगिन</button>
-                <button class="btn-main" style="background: #e2e8f0; color: #334155;" onclick="closeAdminModal()">रद्द करें</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- VIEW 1: CLIENT LOGIN SCREEN -->
+    <!-- UNIFIED LOGIN SCREEN (FOR BOTH ADMIN & USERS) -->
     <section class="app-view active" id="viewClientLogin">
         <div class="login-container">
             <div class="login-box">
@@ -640,12 +572,12 @@
                 <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 10px;">मतदाता पर्ची एवं प्रबंधन पोर्टल</p>
                 
                 <div id="loginCloudBadge" class="cloud-status-badge cloud-online">
-                    <i class="fa-solid fa-cloud"></i> <span id="cloudStatusText">पंचायती राज चुनाव सक्रिय</span>
+                    <i class="fa-solid fa-cloud"></i> <span id="cloudStatusText">सिस्टम सक्रिय</span>
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-user"></i> यूजर आईडी (Client ID):</label>
-                    <input type="text" id="inpClientId" class="form-control" placeholder="उदा० sarpanch1 या ward1" value="sarpanch1">
+                    <label><i class="fa-solid fa-user"></i> यूजर आईडी (ID):</label>
+                    <input type="text" id="inpClientId" class="form-control" placeholder="अपनी आईडी लिखें..." value="admin">
                 </div>
 
                 <div class="form-group">
@@ -653,7 +585,7 @@
                     <input type="password" id="inpClientPass" class="form-control" placeholder="पासवर्ड लिखें...">
                 </div>
 
-                <button class="btn-main" onclick="handleClientLogin()">
+                <button class="btn-main" onclick="handleUnifiedLogin()">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i> लॉगिन करें
                 </button>
 
@@ -763,7 +695,7 @@
                     <i class="fa-solid fa-users-gear"></i> 3. सरपंच / वार्ड पंच (प्रत्याशी) जोड़ें
                 </button>
                 <button class="nav-tab-btn" onclick="switchAdminTab('tabAdminPassword', this)">
-                    <i class="fa-solid fa-key"></i> 4. पासवर्ड
+                    <i class="fa-solid fa-key"></i> 4. एडमिन आईडी और पासवर्ड
                 </button>
             </div>
 
@@ -868,14 +800,16 @@
                 </div>
             </div>
 
-            <!-- TAB 4: PASSWORD -->
+            <!-- TAB 4: ADMIN ID & PASSWORD CHANGE -->
             <div id="tabAdminPassword" class="admin-tab-pane" style="display: none;">
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-key"></i> एडमिन पासवर्ड बदलें</h3>
-                    <div class="form-group"><label>पुराना पासवर्ड:</label><input type="password" id="currentAdminPass" class="form-control"></div>
-                    <div class="form-group"><label>नया पासवर्ड:</label><input type="password" id="newAdminPass" class="form-control"></div>
-                    <div class="form-group"><label>कन्फर्म पासवर्ड:</label><input type="password" id="confirmAdminPass" class="form-control"></div>
-                    <button class="btn-main" onclick="updateAdminPassword()" style="margin-top: 10px;"><i class="fa-solid fa-shield-halved"></i> पासवर्ड बदलें</button>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-key"></i> एडमिन आईडी और पासवर्ड बदलें</h3>
+                    <div class="form-group"><label>मौजूदा एडमिन आईडी:</label><input type="text" id="currentAdminIdDisplay" class="form-control" disabled style="background:#e2e8f0; font-weight:bold;"></div>
+                    <div class="form-group"><label>पुराना पासवर्ड:</label><input type="password" id="currentAdminPass" class="form-control" placeholder="पुराना पासवर्ड..."></div>
+                    <div class="form-group"><label>नई एडमिन आईडी (Admin ID):</label><input type="text" id="newAdminId" class="form-control" placeholder="नई आईडी लिखें..."></div>
+                    <div class="form-group"><label>नया पासवर्ड:</label><input type="password" id="newAdminPass" class="form-control" placeholder="नया पासवर्ड..."></div>
+                    <div class="form-group"><label>कन्फर्म नया पासवर्ड:</label><input type="password" id="confirmAdminPass" class="form-control" placeholder="पासवर्ड दोबारा लिखें..."></div>
+                    <button class="btn-main" onclick="updateAdminCredentials()" style="margin-top: 10px;"><i class="fa-solid fa-shield-halved"></i> एडमिन क्रेडेंशियल अपडेट करें</button>
                 </div>
             </div>
         </div>
@@ -956,6 +890,7 @@
                 isFirebaseActive = true;
                 syncClientsFromFirebase();
                 syncPanchayatsFromFirebase();
+                syncAdminCredentialsFromFirebase();
             } catch(e) {
                 isFirebaseActive = false;
             }
@@ -973,7 +908,11 @@
 
         let loggedInClient = null;
         let currentActiveVoter = null;
+
+        // एडमिन क्रेडेंशियल्स (डिफ़ॉल्ट ID: admin, Password: admin123)
+        let currentAdminId = localStorage.getItem('custom_admin_id') || 'admin';
         let currentAdminPassword = localStorage.getItem('custom_admin_password') || 'admin123';
+
         const currentPhoneToken = localStorage.getItem('phone_device_token') || ('PHONE_' + Math.random().toString(36).substr(2, 9).toUpperCase());
         localStorage.setItem('phone_device_token', currentPhoneToken);
 
@@ -990,33 +929,11 @@
                 renderPanchayatsAdminTable();
                 renderClientsAdminTable();
                 populateGpDropdowns();
+                document.getElementById('currentAdminIdDisplay').value = currentAdminId;
             }
         }
 
-        function openAdminModal() {
-            document.getElementById('modalAdminPass').value = '';
-            document.getElementById('adminLoginModal').classList.add('active');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('adminLoginModal').classList.remove('active');
-        }
-
-        function submitAdminModalPass() {
-            const p = document.getElementById('modalAdminPass').value.trim();
-            if (p === currentAdminPassword) {
-                closeAdminModal();
-                showView('viewAdminDashboard');
-            } else {
-                alert('गलत एडमिन पासवर्ड!');
-            }
-        }
-
-        function exitAdmin() {
-            showView('viewClientLogin');
-        }
-
-        function handleClientLogin() {
+        function handleUnifiedLogin() {
             const u = document.getElementById('inpClientId').value.trim();
             const p = document.getElementById('inpClientPass').value.trim();
 
@@ -1025,14 +942,16 @@
                 return;
             }
 
-            if (u.toLowerCase() === 'admin' && p === currentAdminPassword) {
+            // 1. Check if Admin Login
+            if (u.toLowerCase() === currentAdminId.toLowerCase() && p === currentAdminPassword) {
                 showView('viewAdminDashboard');
                 return;
             }
 
+            // 2. Check if Client/Candidate Login
             const client = clientUsers.find(c => c.id.toLowerCase() === u.toLowerCase());
             if (!client) {
-                alert('अमान्य यूजर आईडी!');
+                alert('अमान्य यूजर आईडी या पासवर्ड!');
                 return;
             }
             if (client.pass !== p) {
@@ -1044,12 +963,11 @@
                 return;
             }
 
-            // Secure Device Binding Check
             if (!client.boundDevice) {
                 client.boundDevice = currentPhoneToken;
                 saveClientsState();
             } else if (client.boundDevice !== currentPhoneToken) {
-                alert('⚠️ सुरक्षा चेतावनी: यह आईडी पहले से किसी अन्य डिवाइस पर लॉगिन है। इसे दूसरे डिवाइस पर चलाने के लिए कृपया एडमिन से संपर्क करके "अनलॉक" करवाएं।');
+                alert('⚠️ सुरक्षा चेतावनी: यह आईडी पहले से किसी अन्य डिवाइस पर लॉगिन है। इसे इस डिवाइस पर चलाने के लिए कृपया एडमिन से संपर्क करके "अनलॉक" करवाएं।');
                 return;
             }
 
@@ -1111,6 +1029,10 @@
             showView('viewClientLogin');
         }
 
+        function exitAdmin() {
+            showView('viewClientLogin');
+        }
+
         function saveClientsState() {
             localStorage.setItem('election_client_users', JSON.stringify(clientUsers));
             if (isFirebaseActive && db) {
@@ -1137,6 +1059,22 @@
                     localStorage.setItem('election_panchayats_db', JSON.stringify(panchayatsList));
                     renderPanchayatsAdminTable();
                     populateGpDropdowns();
+                }
+            });
+        }
+
+        function syncAdminCredentialsFromFirebase() {
+            if (!isFirebaseActive || !db) return;
+            db.collection("settings").doc("admin_credentials").onSnapshot(doc => {
+                if (doc.exists) {
+                    if (doc.data().adminId) {
+                        currentAdminId = doc.data().adminId;
+                        localStorage.setItem('custom_admin_id', currentAdminId);
+                    }
+                    if (doc.data().password) {
+                        currentAdminPassword = doc.data().password;
+                        localStorage.setItem('custom_admin_password', currentAdminPassword);
+                    }
                 }
             });
         }
@@ -1632,7 +1570,7 @@
         }
 
         function addCandidateAccount() {
-            const id = document.getElementById('addClientId').value.trim();
+            const id = document.getElementById('addClientId').value.trim().toLowerCase();
             const pass = document.getElementById('addClientPass').value.trim();
             const candName = document.getElementById('addClientCandName').value.trim();
             const postType = document.getElementById('addClientPostType').value;
@@ -1649,21 +1587,21 @@
                 return;
             }
 
-            if (clientUsers.some(c => c.id.toLowerCase() === id.toLowerCase())) {
-                alert('यह यूजर आईडी पहले से मौजूद है!');
+            if (clientUsers.some(c => c.id.toLowerCase() === id)) {
+                alert('यह यूजर आईडी पहले से मौजूद है! कृपया कोई दूसरी आईडी लिखें।');
                 return;
             }
 
             let newCandidate = {
-                id,
-                pass,
+                id: id,
+                pass: pass,
                 name: candName,
                 candidateName: candName,
-                postType,
-                gp,
-                ward,
-                symbolName,
-                contact,
+                postType: postType,
+                gp: gp,
+                ward: ward,
+                symbolName: symbolName,
+                contact: contact,
                 photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
                 symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png",
                 boundDevice: null,
@@ -1720,13 +1658,14 @@
             }
         }
 
-        function updateAdminPassword() {
+        function updateAdminCredentials() {
             const currentPass = document.getElementById('currentAdminPass').value.trim();
+            const newId = document.getElementById('newAdminId').value.trim().toLowerCase();
             const newPass = document.getElementById('newAdminPass').value.trim();
             const confirmPass = document.getElementById('confirmAdminPass').value.trim();
 
             if (!currentPass || !newPass || !confirmPass) {
-                alert('कृपया सभी पासवर्ड फील्ड भरें!');
+                alert('कृपया पासवर्ड संबंधित सभी फील्ड भरें!');
                 return;
             }
 
@@ -1742,10 +1681,30 @@
 
             currentAdminPassword = newPass;
             localStorage.setItem('custom_admin_password', newPass);
-            alert('✅ एडमिन पासवर्ड सफलतापूर्वक बदल दिया गया है!');
+
+            if (newId) {
+                currentAdminId = newId;
+                localStorage.setItem('custom_admin_id', newId);
+            }
+
+            if (isFirebaseActive && db) {
+                db.collection("settings").doc("admin_credentials").set({
+                    adminId: currentAdminId,
+                    password: newPass
+                }).then(() => {
+                    alert('✅ एडमिन आईडी और पासवर्ड सफलतापूर्वक अपडेट हो गए हैं!');
+                }).catch(e => {
+                    alert('✅ एडमिन क्रेडेंशियल स्थानीय रूप से अपडेट हो गए हैं!');
+                });
+            } else {
+                alert('✅ एडमिन क्रेडेंशियल सफलतापूर्वक अपडेट हो गए हैं!');
+            }
+
             document.getElementById('currentAdminPass').value = '';
+            document.getElementById('newAdminId').value = '';
             document.getElementById('newPass').value = '';
             document.getElementById('confirmAdminPass').value = '';
+            document.getElementById('currentAdminIdDisplay').value = currentAdminId;
         }
 
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
