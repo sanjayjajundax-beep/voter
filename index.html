@@ -30,7 +30,7 @@
 </head>
 <body class="h-full bg-slate-100 text-slate-800 flex flex-col">
 
-    <!-- Toast Modal -->
+    <!-- Global Toast Modal -->
     <div id="toast-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
             <div id="toast-icon" class="text-4xl mb-3 text-emerald-600"><i class="fa-solid fa-circle-check"></i></div>
@@ -331,11 +331,11 @@
         }
 
         const STORAGE_KEYS = {
-            PANCHAYATS: 'elec_panchayats_v8',
-            SARPANCHS: 'elec_sarpanchs_v8',
-            WARDPANCHS: 'elec_wardpanchs_v8',
-            VOTERS: 'elec_voters_v8',
-            ADMIN_CRED: 'elec_admin_cred_v8'
+            PANCHAYATS: 'elec_panchayats_v9',
+            SARPANCHS: 'elec_sarpanchs_v9',
+            WARDPANCHS: 'elec_wardpanchs_v9',
+            VOTERS: 'elec_voters_v9',
+            ADMIN_CRED: 'elec_admin_cred_v9'
         };
 
         function initDefaultData() {
@@ -393,7 +393,6 @@
                 return;
             }
 
-            // Check Sarpanch / Ward Panch login
             const sarpanchs = JSON.parse(localStorage.getItem(STORAGE_KEYS.SARPANCHS)) || [];
             let found = sarpanchs.find(s => s.userId === u && s.pass === p);
             if (found) {
