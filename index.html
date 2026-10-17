@@ -595,7 +595,6 @@
             }
 
             try {
-                // 1. Check Admin Login
                 const adminDoc = await db.collection('admin').doc('settings').get();
                 if (adminDoc.exists) {
                     const adminData = adminDoc.data();
@@ -608,7 +607,6 @@
                     }
                 }
 
-                // 2. Check Client User Login
                 const clientRef = db.collection('clients').doc(userId);
                 const clientDoc = await clientRef.get();
                 
@@ -707,7 +705,6 @@
             }
         }
 
-        // --- CLIENT PORTAL & VOTER SEARCH LOGIC (FLEXIBLE HINDI/ENGLISH MATCH) ---
         async function showClientPortal() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('adminPortal').classList.add('hidden');
@@ -736,7 +733,6 @@
         async function loadVotersDataForClient() {
             showAlert("मतदाता सूची लोड की जा रही है...", "info");
             try {
-                // Fetch all voters to handle case/language mismatch (SUWANA vs सुवाणा) smoothly
                 const snapshot = await db.collection('voters').get();
 
                 currentPanchayatVoters = [];
@@ -755,7 +751,6 @@
                     }
                 });
 
-                // Populate Ward Filter
                 const wardSelect = document.getElementById('wardFilterSelect');
                 wardSelect.innerHTML = '';
 
@@ -765,7 +760,7 @@
                     opt.textContent = `वार्ड नंबर ${currentUser.ward}`;
                     wardSelect.appendChild(opt);
                     wardSelect.value = currentUser.ward;
-                    wardSelect.disabled = true; // Locked for candidate ward
+                    wardSelect.disabled = true;
                 } else {
                     wardSelect.disabled = false;
                     const optAll = document.createElement('option');
@@ -820,12 +815,10 @@
 
             let results = [...currentPanchayatVoters];
 
-            // Ward Filter
             if (selectedWard !== 'ALL') {
                 results = results.filter(v => v.ward !== undefined && String(v.ward).trim().toLowerCase() === String(selectedWard).trim().toLowerCase());
             }
 
-            // Search Term Filter
             if (activeSearchMode === 'name') {
                 const term = document.getElementById('searchInputName').value.trim().toLowerCase();
                 if (term) {
@@ -909,7 +902,6 @@
             });
         }
 
-        // --- DIGITAL VOTER SLIP MODAL & SHARES ---
         function openVoterSlipModal(epic) {
             const voter = currentPanchayatVoters.find(v => v.epic === epic);
             if (!voter) return;
@@ -1003,7 +995,6 @@
             window.print();
         }
 
-        // ================= ADMIN DASHBOARD LOGIC =================
         function showAdminPortal() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('clientPortal').classList.add('hidden');
@@ -1032,7 +1023,7 @@
             }
         }
 
-        // --- TAB 1: EXCEL UPLOAD TO FIRESTORE ---
+        // --- TAB 1: EXCEL UPLOAD TO FIRESTORE (UPDATED FOR FLEXIBLE HEADERS) ---
         async function processAndUploadExcel() {
             const panchayatName = document.getElementById('uploadPanchayatName').value.trim();
             const fileInput = document.getElementById('excelFileInput');
@@ -1077,15 +1068,15 @@
                             const docRef = db.collection('voters').doc();
                             batch.set(docRef, {
                                 panchayat: panchayatName,
-                                epic: (row.EPIC || row.epic || '').toString(),
-                                name: (row.NAME || row.name || '').toString(),
-                                guardian: (row.GUARDIAN || row.guardian || '').toString(),
-                                houseNo: (row.HOUSE_NO || row.houseNo || row.house_no || '').toString(),
-                                ward: (row.WARD || row.ward || '').toString(),
-                                age: (row.AGE || row.age || '').toString(),
-                                gender: (row.GENDER || row.gender || '').toString(),
-                                booth: (row.BOOTH || row.booth || '').toString(),
-                                serial: (row.SERIAL || row.serial || '').toString(),
+                                epic: (row.EPIC || row.epic || row.EPIC_NO || '').toString(),
+                                name: (row.NAME || row.name || row.VOTER_NAME || row.नाम || '').toString(),
+                                guardian: (row.GUARDIAN || row.guardian || row.FATHER_HUSBAND || row.father || row.रिश्तेदार || '').toString(),
+                                houseNo: (row.HOUSE_NO || row.houseNo || row.house_no || row.HOUSE || row.मकान || row.makan || '').toString(),
+                                ward: (row.WARD || row.ward || row.WARD_NO || row.वार्ड || '').toString(),
+                                age: (row.AGE || row.age || row.आयु || '').toString(),
+                                gender: (row.GENDER || row.gender || row.SEX || row.लिंग || '').toString(),
+                                booth: (row.BOOTH || row.booth || row.POLLING_BOOTH || row.बूथ || '').toString(),
+                                serial: (row.SERIAL || row.serial || row.SR || row.SERIAL_NO || row.क्रम || row.क्रमांक || '').toString(),
                                 uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
                             });
                         });
@@ -1120,7 +1111,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- TAB 2: PANCHAYAT MANAGEMENT ---
         async function loadPanchayatsForAdmin() {
             const container = document.getElementById('panchayatListContainer');
             const selectDropdown = document.getElementById('newClientPanchayat');
@@ -1189,7 +1179,6 @@
             }
         }
 
-        // --- TAB 3 & TAB 4: CLIENTS & CANDIDATE BRANDING ---
         async function loadClientsForAdmin() {
             try {
                 const snapshot = await db.collection('clients').get();
