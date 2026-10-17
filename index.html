@@ -959,7 +959,7 @@
                 loadAllPanchayatsFromFirebase();
             } catch(e) {
                 isFirebaseActive = false;
-                alert("Firebase connection failed!");
+                alert("Firebase connection failed: " + e.message);
             }
         }
 
@@ -1594,7 +1594,7 @@
                                     list = list.filter(item => item !== panchayatName);
                                     db.collection("panchayats_meta").doc("list").set({ names: list }).then(() => {
                                         delete panchayatVotersMap[panchayatName];
-                                        alert(`✅ फायरबेस से "${panchayatName}" का डेटा सफलताપૂર્વक डिलीट कर दिया गया है!`);
+                                        alert(`✅ फायरबेस से "${panchayatName}" का डेटा सफलताપूवंक डिलीट कर दिया गया है!`);
                                         renderPanchayatAdminTable();
                                         populatePanchayatDropdownInClients();
                                     });
