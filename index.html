@@ -990,7 +990,9 @@
             { id: "suwana", name: "ग्राम पंचायत सुवाणा" }
         ]));
 
-        let allPanchayatVoters = JSON.parse(localStorage.getItem('election_multi_gp_voters_db') || '{}');
+        // अब मतदाताओं की सूची को localStorage में सेव नहीं किया जाएगा ताकि quota exceeded एरर न आए
+        let allPanchayatVoters = {};
+
         let campaign = JSON.parse(localStorage.getItem('election_campaign_data') || JSON.stringify({
             postType: "सरपंच (Sarpanch)",
             name: "श्रीमती रेखा देवी जाट",
@@ -1027,7 +1029,6 @@
                 renderPanchayatsAdminTable();
                 renderClientsAdminTable();
                 populateGpDropdowns();
-                updateAdminExcelStats();
             }
         }
 
@@ -1106,7 +1107,6 @@
                 return;
             }
             if (isFirebaseActive && db) {
-                // Load from sub-collection chunks
                 db.collection("panchayats_data").doc(gpId).collection("chunks").get().then(snapshot => {
                     if (!snapshot.empty) {
                         let combinedVoters = [];
@@ -1117,13 +1117,10 @@
                             }
                         });
                         allPanchayatVoters[gpId] = combinedVoters;
-                        localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
                     } else {
-                        // Fallback for legacy single document
                         db.collection("panchayats_data").doc(gpId).get().then(doc => {
                             if (doc.exists && doc.data().voters) {
                                 allPanchayatVoters[gpId] = doc.data().voters;
-                                localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
                             }
                         }).catch(e => {});
                     }
@@ -1132,7 +1129,6 @@
                     db.collection("panchayats_data").doc(gpId).get().then(doc => {
                         if (doc.exists && doc.data().voters) {
                             allPanchayatVoters[gpId] = doc.data().voters;
-                            localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
                         }
                         if (callback) callback();
                     }).catch(err => {
@@ -1282,7 +1278,6 @@
             if (confirm(`⚠️ क्या आप वाकई "${gpName}" (${gpId}) का सारा मतदाता डेटा फायरबेस क्लाउड से हमेशा के लिए डिलीट करना चाहते हैं?`)) {
                 if (allPanchayatVoters[gpId]) {
                     delete allPanchayatVoters[gpId];
-                    localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
                 }
                 if (isFirebaseActive && db) {
                     const gpRef = db.collection("panchayats_data").doc(gpId);
@@ -1293,16 +1288,13 @@
                         return batch.commit();
                     }).then(() => {
                         alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक डिलीट कर दिया गया है!`);
-                        updateAdminExcelStats();
                     }).catch(e => {
                         gpRef.delete().then(() => {
                             alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक डिलीट कर दिया गया है!`);
-                            updateAdminExcelStats();
                         }).catch(err => alert('डेटा हटाने में त्रुटि: ' + err.message));
                     });
                 } else {
                     alert(`✅ "${gpName}" का स्थानीय डेटा हटा दिया गया है!`);
-                    updateAdminExcelStats();
                 }
             }
         }
@@ -1788,17 +1780,6 @@
             if (confirm('हटाना चाहते हैं?')) { clientUsers.splice(idx, 1); saveClientsState(); renderClientsAdminTable(); }
         }
 
-        function updateAdminExcelStats() {
-            let totalCount = 0;
-            for (let gp in allPanchayatVoters) {
-                if (allPanchayatVoters[gp]) totalCount += allPanchayatVoters[gp].length;
-            }
-            const statsBox = document.getElementById('wardStatsCount');
-            if (statsBox) {
-                statsBox.innerHTML = `कुल लोडेड मतदाता (सभी पंचायतों में): <b>${totalCount}</b>`;
-            }
-        }
-
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
             const selectedGp = document.getElementById('uploadGpSelect').value;
@@ -1829,13 +1810,9 @@
                         booth: String(r['मतदान बूथ सं० व पता'] || r['Booth'] || gpName)
                     }));
 
-                    allPanchayatVoters[selectedGp] = parsedVoters;
-                    localStorage.setItem('election_multi_gp_voters_db', JSON.stringify(allPanchayatVoters));
-
                     document.getElementById('uploadProgressBar').style.width = '80%';
 
                     if (isFirebaseActive && db) {
-                        // Chunking to avoid 1MB Firestore document limit
                         const CHUNK_SIZE = 300;
                         const chunks = [];
                         for (let i = 0; i < parsedVoters.length; i += CHUNK_SIZE) {
@@ -1844,7 +1821,6 @@
 
                         const gpDocRef = db.collection("panchayats_data").doc(selectedGp);
                         
-                        // First save metadata
                         gpDocRef.set({
                             panchayatId: selectedGp,
                             panchayatName: gpName,
@@ -1852,7 +1828,6 @@
                             totalChunks: chunks.length,
                             updatedAt: new Date().toISOString()
                         }).then(async () => {
-                            // Clear old chunks if any, then save new chunks
                             const oldChunksSnap = await gpDocRef.collection("chunks").get();
                             let batch = db.batch();
                             oldChunksSnap.forEach(doc => batch.delete(doc.ref));
@@ -1870,7 +1845,6 @@
                             setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
 
                             document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता फायरबेस क्लाउड पर सफलतापूर्वक अपलोड हो गए!</span>`;
-                            updateAdminExcelStats();
                         }).catch(err => {
                             document.getElementById('uploadProgressBox').style.display = 'none';
                             document.getElementById('excelMsg').innerHTML = `<span style="color:#dc2626;">❌ फायरबेस अपलोड त्रुटि: ${err.message}</span>`;
@@ -1878,8 +1852,7 @@
                     } else {
                         document.getElementById('uploadProgressBar').style.width = '100%';
                         setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
-                        document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता स्थानीय रूप से सेव हो गए!</span>`;
-                        updateAdminExcelStats();
+                        document.getElementById('excelMsg').innerHTML = `<span style="color:#dc2626;">❌ फायरबेस कनेक्टेड नहीं है! डेटा सेव नहीं हो सका।</span>`;
                     }
                 } catch(err) {
                     document.getElementById('uploadProgressBox').style.display = 'none';
