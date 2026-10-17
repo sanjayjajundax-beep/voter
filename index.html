@@ -742,7 +742,6 @@
         async function loadVotersDataForClient() {
             showAlert("मतदाता सूची लोड की जा रही है...", "info");
             try {
-                // strict query की जगह सभी voters लाएं ताकि हिंदी/इंग्लिश स्पेलिंग इश्यू न आए
                 const snapshot = await db.collection('voters').get();
                 
                 currentPanchayatVoters = [];
@@ -754,7 +753,6 @@
                     const data = doc.data();
                     const voterPanchayat = (data.panchayat || '').trim().toLowerCase();
                     
-                    // अगर पंचायत का नाम मैच हो या हिंदी/इंग्लिश में थोड़ा अंतर भी हो तो स्वीकार करे
                     if (!userPanchayat || voterPanchayat === userPanchayat || voterPanchayat.includes(userPanchayat) || userPanchayat.includes(voterPanchayat)) {
                         currentPanchayatVoters.push(data);
                         if (data.ward !== undefined && data.ward !== null) {
@@ -763,7 +761,7 @@
                     }
                 });
 
-                // Populate Ward Filter (Locked for Candidate Ward)
+                // Populate Ward Filter
                 const wardSelect = document.getElementById('wardFilterSelect');
                 wardSelect.innerHTML = '';
 
@@ -778,6 +776,26 @@
                 } else {
                     wardSelect.disabled = false;
                     const optAll = document.createElement('option');
+                    optAll.value = 'ALL';
+                    optAll.textContent = 'सभी वार्ड (All Wards)';
+                    wardSelect.appendChild(optAll);
+
+                    Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w;
+                        opt.textContent = `वार्ड नंबर ${w}`;
+                        wardSelect.appendChild(opt);
+                    });
+                }
+
+                performSearch();
+                showAlert("मतदाता डेटा सफलता से लोड हुआ!", "success");
+
+            } catch (error) {
+                console.error("Error loading voters:", error);
+                showAlert("मतदाता डेटा लोड करने में विफल!", "error");
+            }
+        }
                     optAll.value = 'ALL';
                     optAll.textContent = 'सभी वार्ड (All Wards)';
                     wardSelect.appendChild(optAll);
