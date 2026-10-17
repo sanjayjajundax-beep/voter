@@ -356,36 +356,20 @@
         }
 
         .voter-action-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            display: flex;
             margin-top: 12px;
             padding-top: 10px;
             border-top: 1px solid #f1f5f9;
         }
 
         .btn-view-slip {
+            width: 100%;
             background: #f1f5f9;
             color: #1e293b;
             border: 1px solid #cbd5e1;
-            padding: 9px;
+            padding: 10px;
             border-radius: 8px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .btn-wa-slip {
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 9px;
-            border-radius: 8px;
-            font-size: 0.88rem;
+            font-size: 0.92rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
@@ -941,9 +925,6 @@
             </div>
 
             <div class="slip-footer-tools">
-                <button class="btn-main" style="background: #16a34a; padding: 12px; font-size: 0.95rem;" onclick="sendSlipWhatsAppModal()">
-                    <i class="fa-brands fa-whatsapp"></i> व्हाट्सएप पर टेक्स्ट भेजें
-                </button>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <button class="btn-main" style="background: #2563eb; padding: 10px;" onclick="downloadSlipAsImage()">
                         <i class="fa-solid fa-download"></i> 🖼️ पर्ची सेव (PNG)
@@ -990,7 +971,6 @@
             { id: "suwana", name: "ग्राम पंचायत सुवाणा" }
         ]));
 
-        // अब मतदाताओं की सूची को localStorage में सेव नहीं किया जाएगा ताकि quota exceeded एरर न आए
         let allPanchayatVoters = {};
 
         let campaign = JSON.parse(localStorage.getItem('election_campaign_data') || JSON.stringify({
@@ -1456,7 +1436,6 @@
                     <div class="voter-booth-box">📍 <b>बूथ:</b> ${v.booth || 'सुवाणा'}</div>
                     <div class="voter-action-row">
                         <button class="btn-view-slip" onclick='openVoterSlip(${JSON.stringify(v)})'><i class="fa-solid fa-ticket"></i> पर्ची देखें</button>
-                        <button class="btn-wa-slip" onclick='quickSendWhatsApp(${JSON.stringify(v)})'><i class="fa-brands fa-whatsapp"></i> व्हाट्सएप</button>
                     </div>
                 `;
                 voterResultsContainer.appendChild(card);
@@ -1506,7 +1485,6 @@
                         </div>
                         <div class="voter-action-row">
                             <button class="btn-view-slip" onclick='openVoterSlip(${JSON.stringify(v)})'>पर्ची देखें</button>
-                            <button class="btn-wa-slip" onclick='quickSendWhatsApp(${JSON.stringify(v)})'>व्हाट्सएप</button>
                         </div>
                     `;
                     groupWrap.appendChild(card);
@@ -1614,48 +1592,6 @@
             document.getElementById('slipModalOverlay').classList.remove('active');
         }
 
-        function quickSendWhatsApp(voter) {
-            currentActiveVoter = voter;
-            const num = prompt("मतदाता " + voter.name + " की पर्ची भेजने के लिए मोबाइल नंबर दर्ज करें:");
-            if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), voter);
-        }
-
-        function sendSlipWhatsAppModal() {
-            if (!currentActiveVoter) return;
-            const num = prompt("मोबाइल नंबर दर्ज करें:");
-            if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), currentActiveVoter);
-        }
-
-        function dispatchWhatsApp(phone, voter) {
-            let cleanPhone = phone.replace(/[^0-9]/g, '');
-            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-            const camp = getActiveCampaign();
-            const lines = [
-                '🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *वार्ड संख्या:* *वार्ड नं० ' + (voter.ward || '1') + '*',
-                '👤 *मतदाता का नाम:* ' + (voter.name || '-'),
-                '🔢 *क्रमांक संख्या (S.No.):* #' + voter.sno,
-                '🆔 *वोटर आईडी (EPIC):* ' + (voter.epic || 'उपलब्ध नहीं'),
-                '👨‍👩‍👦 *' + (voter.relation || 'संबंधी') + ' का नाम:* ' + (voter.rel_name || '-'),
-                '🏠 *मकान संख्या:* ' + (voter.house || '-'),
-                '📍 *क्षेत्र:* ' + (voter.area || loggedIdClientGPName()),
-                '━━━━━━━━━━━━━━━━━━',
-                '🏫 *मतदान केंद्र (वोटर सेंटर):*',
-                '📍 *' + (voter.booth || loggedIdClientGPName()) + '*',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *' + camp.postType + ' पद हेतु योग्य एवं संघर्षशील प्रत्याशी:*',
-                '⭐ *' + camp.name + '*',
-                '🗳️ *चुनाव चिन्ह:* *' + camp.symbolName + '*',
-                '💬 *संदेश:* ' + camp.slogan,
-                '📞 *संपर्क:* ' + camp.contact,
-                '━━━━━━━━━━━━━━━━━━',
-                '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
-            ];
-            const msg = lines.join('\n');
-            window.open('https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg), '_blank');
-        }
-
         function switchAdminTab(tabId, btn) {
             document.querySelectorAll('.admin-tab-pane').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1681,15 +1617,28 @@
             campaign.symbolName = document.getElementById('cfgSymbolName').value.trim();
             campaign.slogan = document.getElementById('cfgSlogan').value.trim();
             campaign.contact = document.getElementById('cfgContact').value.trim();
+            
             localStorage.setItem('election_campaign_data', JSON.stringify(campaign));
-            alert('✅ प्रत्याशी विवरण सुरक्षित हो गया!');
+            if (isFirebaseActive && db) {
+                db.collection("settings").doc("campaign").set(campaign).then(() => {
+                    alert('✅ प्रत्याशी विवरण सुरक्षित एवं फायरबेस पर सिंक हो गया!');
+                }).catch(e => {
+                    alert('✅ प्रत्याशी विवरण स्थानीय रूप से सुरक्षित हो गया!');
+                });
+            } else {
+                alert('✅ प्रत्याशी विवरण सुरक्षित हो गया!');
+            }
+            updateCampaignHeaderUI();
         }
 
         document.getElementById('filePhotoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             const r = new FileReader();
-            r.onload = function(evt) { campaign.photo = evt.target.result; document.getElementById('previewPhotoAdmin').src = evt.target.result; };
+            r.onload = function(evt) { 
+                campaign.photo = evt.target.result; 
+                document.getElementById('previewPhotoAdmin').src = evt.target.result; 
+            };
             r.readAsDataURL(file);
         });
 
@@ -1697,7 +1646,10 @@
             const file = e.target.files[0];
             if (!file) return;
             const r = new FileReader();
-            r.onload = function(evt) { campaign.symbol = evt.target.result; document.getElementById('previewSymbolAdmin').src = evt.target.result; };
+            r.onload = function(evt) { 
+                campaign.symbol = evt.target.result; 
+                document.getElementById('previewSymbolAdmin').src = evt.target.result; 
+            };
             r.readAsDataURL(file);
         });
 
