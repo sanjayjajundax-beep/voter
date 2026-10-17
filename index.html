@@ -265,7 +265,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">ग्राम पंचायत का नाम *</label>
-                            <input type="text" id="uploadPanchayatName" placeholder="उदा. ग्राम पंचायत रामपुर" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                            <input type="text" id="uploadPanchayatName" placeholder="उदा. सुवाणा" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">एक्सेल फाइल चुनें (.xlsx / .xls) *</label>
@@ -309,7 +309,7 @@
                         <form onsubmit="handleCreateClient(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">यूज़र आईडी *</label>
-                                <input type="text" id="newClientId" required placeholder="उदा. ward9_suresh" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                <input type="text" id="newClientId" required placeholder="उदा. ward6_candidate" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">पासवर्ड *</label>
@@ -323,7 +323,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-600 mb-1">वार्ड एक्सेस *</label>
-                                <input type="text" id="newClientWard" required placeholder="उदा. 9 या ALL" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                                <input type="text" id="newClientWard" required placeholder="उदा. 6 या ALL" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none">
                             </div>
                             <div class="sm:col-span-2 flex items-end">
                                 <button type="submit" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded-xl text-xs font-semibold shadow w-full">
@@ -367,15 +367,15 @@
                     <form onsubmit="handleSaveBranding(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">प्रत्याशी का नाम</label>
-                            <input type="text" id="brandCandidateName" placeholder="उदा. सुरेश शर्मा" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="brandCandidateName" placeholder="उदा. नया प्रत्याशी 2" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">पद (Post)</label>
-                            <input type="text" id="brandPost" placeholder="उदा. वार्ड पंच / सरपंच उम्मीदवार" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="brandPost" placeholder="उदा. वार्ड पंच उम्मीदवार" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव चिन्ह का नाम</label>
-                            <input type="text" id="brandSymbolName" placeholder="उदा. उगता सूरज" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="brandSymbolName" placeholder="उदा. साइकिल" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव चिन्ह फोटो URL</label>
@@ -391,7 +391,7 @@
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-xs font-semibold text-slate-600 mb-1">चुनाव नारा (Slogan)</label>
-                            <input type="text" id="brandSlogan" placeholder="उदा. गांव का विकास, हमारा संकल्प" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
+                            <input type="text" id="brandSlogan" placeholder="उदा. VOTE AND SPORT" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-orange-500">
                         </div>
 
                         <div class="sm:col-span-2">
@@ -546,12 +546,12 @@
         }
 
         // --- GLOBAL STATE ---
-        let currentUser = null; // { id, role, panchayat, ward, candidateInfo, sessionToken }
+        let currentUser = null; 
         let currentPanchayatVoters = [];
-        let activeSearchMode = 'name'; // 'name' or 'house'
+        let activeSearchMode = 'name'; 
         let currentSelectedVoterForSlip = null;
         let allClientsListCache = [];
-        let sessionUnsubscribeListener = null; // Firestore realtime session listener
+        let sessionUnsubscribeListener = null;
 
         // --- APP INITIALIZATION ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -595,7 +595,7 @@
             }
 
             try {
-                // 1. Check if login is Admin
+                // 1. Check Admin Login
                 const adminDoc = await db.collection('admin').doc('settings').get();
                 if (adminDoc.exists) {
                     const adminData = adminDoc.data();
@@ -623,10 +623,8 @@
                     return;
                 }
 
-                // Generate Unique Session Token for Single Device Active Control
                 const newSessionToken = 'SESS_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 
-                // Update Server Session Token
                 await clientRef.update({
                     currentSessionToken: newSessionToken,
                     lastLoginTime: firebase.firestore.FieldValue.serverTimestamp()
@@ -652,7 +650,6 @@
             }
         }
 
-        // --- REALTIME SESSION MONITOR (Auto Logout if Opened in Another Device) ---
         function startSessionTokenListener(userId, activeToken) {
             if (sessionUnsubscribeListener) sessionUnsubscribeListener();
 
@@ -661,10 +658,7 @@
                     if (doc.exists) {
                         const data = doc.data();
                         if (data.currentSessionToken && data.currentSessionToken !== activeToken) {
-                            // Unsubscribe listener
                             if (sessionUnsubscribeListener) sessionUnsubscribeListener();
-                            
-                            // Auto Logout User
                             handleLogout(true);
                         }
                     }
@@ -706,14 +700,14 @@
             document.getElementById('logoutBtn').classList.add('hidden');
 
             if (forcedByOtherDevice) {
-                alert("🔒 आपकी आईडी किसी अन्य मोबाइल पर ओपन हो गई है!\nसुरक्षा कारणों से इस मोबाइल से आईडी स्वतः लॉगआउट / लॉक हो गई है।");
+                alert("🔒 आपकी आईडी किसी अन्य मोबाइल पर ओपन हो गई है!\nसुरक्षा कारणों से इस मोबाइल से आईडी स्वतः लॉगआउट हो गई है।");
                 showAlert("आपकी आईडी दूसरे डिवाइस पर एक्टिव हो गई है!", "error");
             } else {
                 showAlert("सफलतापूर्वक लॉगआउट हो गए हैं।", "info");
             }
         }
 
-        // --- CLIENT PORTAL & VOTER SEARCH LOGIC ---
+        // --- CLIENT PORTAL & VOTER SEARCH LOGIC (FLEXIBLE HINDI/ENGLISH MATCH) ---
         async function showClientPortal() {
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('adminPortal').classList.add('hidden');
@@ -742,33 +736,49 @@
         async function loadVotersDataForClient() {
             showAlert("मतदाता सूची लोड की जा रही है...", "info");
             try {
-                const snapshot = await db.collection('voters')
-                    .where('panchayat', '==', currentUser.panchayat)
-                    .get();
+                // Fetch all voters to handle case/language mismatch (SUWANA vs सुवाणा) smoothly
+                const snapshot = await db.collection('voters').get();
 
                 currentPanchayatVoters = [];
                 const wardsSet = new Set();
+                const userPanchayat = (currentUser.panchayat || '').trim().toLowerCase();
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    currentPanchayatVoters.push(data);
-                    if (data.ward) wardsSet.add(data.ward.toString());
+                    const voterPanchayat = (data.panchayat || '').trim().toLowerCase();
+                    
+                    if (!userPanchayat || voterPanchayat === userPanchayat || voterPanchayat.includes(userPanchayat) || userPanchayat.includes(voterPanchayat)) {
+                        currentPanchayatVoters.push(data);
+                        if (data.ward !== undefined && data.ward !== null) {
+                            wardsSet.add(data.ward.toString().trim());
+                        }
+                    }
                 });
 
                 // Populate Ward Filter
                 const wardSelect = document.getElementById('wardFilterSelect');
-                wardSelect.innerHTML = '<option value="ALL">सभी वार्ड (All Wards)</option>';
-                
-                Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
-                    const opt = document.createElement('option');
-                    opt.value = w;
-                    opt.textContent = `वार्ड नंबर ${w}`;
-                    wardSelect.appendChild(opt);
-                });
+                wardSelect.innerHTML = '';
 
-                // Auto select client ward if specific
-                if (currentUser.ward !== 'ALL' && currentUser.ward) {
+                if (currentUser.ward && currentUser.ward !== 'ALL') {
+                    const opt = document.createElement('option');
+                    opt.value = currentUser.ward;
+                    opt.textContent = `वार्ड नंबर ${currentUser.ward}`;
+                    wardSelect.appendChild(opt);
                     wardSelect.value = currentUser.ward;
+                    wardSelect.disabled = true; // Locked for candidate ward
+                } else {
+                    wardSelect.disabled = false;
+                    const optAll = document.createElement('option');
+                    optAll.value = 'ALL';
+                    optAll.textContent = 'सभी वार्ड (All Wards)';
+                    wardSelect.appendChild(optAll);
+
+                    Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w;
+                        opt.textContent = `वार्ड नंबर ${w}`;
+                        wardSelect.appendChild(opt);
+                    });
                 }
 
                 performSearch();
@@ -803,12 +813,16 @@
         }
 
         function performSearch() {
-            const selectedWard = document.getElementById('wardFilterSelect').value;
+            let selectedWard = document.getElementById('wardFilterSelect').value;
+            if (currentUser.ward && currentUser.ward !== 'ALL') {
+                selectedWard = currentUser.ward.toString();
+            }
+
             let results = [...currentPanchayatVoters];
 
             // Ward Filter
             if (selectedWard !== 'ALL') {
-                results = results.filter(v => v.ward && v.ward.toString() === selectedWard.toString());
+                results = results.filter(v => v.ward !== undefined && String(v.ward).trim().toLowerCase() === String(selectedWard).trim().toLowerCase());
             }
 
             // Search Term Filter
@@ -825,7 +839,7 @@
             } else {
                 const houseTerm = document.getElementById('searchInputHouse').value.trim().toLowerCase();
                 if (houseTerm) {
-                    results = results.filter(v => v.houseNo && v.houseNo.toString().toLowerCase() === houseTerm);
+                    results = results.filter(v => v.houseNo && String(v.houseNo).trim().toLowerCase() === houseTerm);
                     if (results.length > 0) {
                         document.getElementById('familyPrintBtnContainer').classList.remove('hidden');
                     } else {
@@ -903,7 +917,6 @@
             currentSelectedVoterForSlip = voter;
             const c = currentUser.candidateInfo || {};
 
-            // Candidate Info on Slip
             document.getElementById('slipCandidateName').textContent = c.candidateName || 'प्रत्याशी नाम';
             document.getElementById('slipCandidatePost').textContent = c.post || 'उम्मीदवार';
             document.getElementById('slipPanchayatName').textContent = currentUser.panchayat || '';
@@ -914,7 +927,6 @@
             if (c.photoUrl) document.getElementById('slipCandidatePhoto').src = c.photoUrl;
             if (c.symbolUrl) document.getElementById('slipSymbolPhoto').src = c.symbolUrl;
 
-            // Voter Info
             document.getElementById('slipVoterName').textContent = voter.name || '';
             document.getElementById('slipGuardian').textContent = voter.guardian || '';
             document.getElementById('slipEpic').textContent = voter.epic || '';
@@ -968,7 +980,6 @@
                 cleanPhone = '91' + cleanPhone;
             }
             
-            // Direct WhatsApp API URL Window Open
             const url = 'https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg);
             window.open(url, '_blank');
         }
@@ -1054,7 +1065,6 @@
                     document.getElementById('uploadProgressContainer').classList.remove('hidden');
                     document.getElementById('uploadExcelBtn').disabled = true;
 
-                    // Batch upload to Firestore
                     const batchSize = 250;
                     let processed = 0;
                     const total = jsonRows.length;
@@ -1087,7 +1097,6 @@
                         document.getElementById('uploadProgressText').textContent = pct + '%';
                     }
 
-                    // Register Panchayat in registry if not exists
                     await db.collection('panchayats').doc(panchayatName).set({
                         name: panchayatName,
                         lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
@@ -1129,13 +1138,11 @@
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     
-                    // Add to Dropdown
                     const opt = document.createElement('option');
                     opt.value = data.name;
                     opt.textContent = data.name;
                     selectDropdown.appendChild(opt);
 
-                    // Add to Admin List
                     const card = document.createElement('div');
                     card.className = "flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs";
                     card.innerHTML = `
@@ -1157,11 +1164,10 @@
         }
 
         async function deletePanchayatData(panchayatName) {
-            if (!confirm(`क्या आप वाकई "${panchayatName}" का पूरा मतदाता डेटा और डॉक्यूमेंट डिलीट करना चाहते हैं?`)) return;
+            if (!confirm(`क्या आप वाकई "${panchayatName}" का पूरा मतदाता डेटा डिलीट करना चाहते हैं?`)) return;
 
             showAlert("डेटा डिलीट हो रहा है, कृपया प्रतीक्षा करें...", "info");
             try {
-                // Delete voters matching panchayat
                 const snapshot = await db.collection('voters').where('panchayat', '==', panchayatName).get();
                 const batchSize = 400;
                 let docs = snapshot.docs;
@@ -1173,7 +1179,6 @@
                     await batch.commit();
                 }
 
-                // Delete panchayat record
                 await db.collection('panchayats').doc(panchayatName).delete();
                 showAlert(`"${panchayatName}" का डेटा सफलता से डिलीट हुआ।`, "success");
                 loadPanchayatsForAdmin();
@@ -1199,13 +1204,11 @@
                     const c = doc.data();
                     allClientsListCache.push(c);
 
-                    // Dropdown for branding
                     const opt = document.createElement('option');
                     opt.value = c.clientId;
                     opt.textContent = `${c.clientId} (${c.candidateInfo ? c.candidateInfo.candidateName || 'No Name' : 'No Candidate'}) - ${c.panchayat}`;
                     brandSelect.appendChild(opt);
 
-                    // Table row
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 border-b border-slate-100";
                     tr.innerHTML = `
@@ -1278,7 +1281,6 @@
             }
         }
 
-        // TAB 4 BRANDING SELECTION
         function loadSelectedClientBranding() {
             const clientId = document.getElementById('brandingClientSelect').value;
             const client = allClientsListCache.find(c => c.clientId === clientId);
@@ -1336,7 +1338,6 @@
             }
         }
 
-        // TAB 5 ADMIN PASSWORD CHANGE
         async function handleChangeAdminPassword(e) {
             e.preventDefault();
             const p1 = document.getElementById('newAdminPass').value.trim();
