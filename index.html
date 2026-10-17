@@ -974,10 +974,8 @@
 
         let allPanchayatVoters = {};
 
-        // एकाधिक सरपंच / प्रत्याशियों की सूची
         let clientUsers = JSON.parse(localStorage.getItem('election_client_users') || JSON.stringify([
-            { id: "sarpanch1", pass: "1234", name: "रमेश जाट", candidateName: "रमेश जाट", postType: "सरपंच (Sarpanch)", gp: "suwana", ward: "ALL", symbolName: "चाबी", contact: "9829970310", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png", boundDevice: null, status: "Active" },
-            { id: "sarpanch2", pass: "1234", name: "सुरेश गुर्जर", candidateName: "सुरेश गुर्जर", postType: "सरपंच (Sarpanch)", gp: "suwana", ward: "ALL", symbolName: "कमल", contact: "9829970311", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png", boundDevice: null, status: "Active" }
+            { id: "sarpanch1", pass: "1234", name: "रमेश जाट", candidateName: "रमेश जाट", postType: "सरपंच (Sarpanch)", gp: "suwana", ward: "ALL", symbolName: "चाबी", contact: "9829970310", photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80", symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png", boundDevice: null, status: "Active" }
         ]));
 
         let loggedInClient = null;
