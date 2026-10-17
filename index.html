@@ -832,9 +832,9 @@
 
             let results = [...currentPanchayatVoters];
 
-            // Ward Filter
+           // Ward Filter (Updated for safe matching)
             if (selectedWard !== 'ALL') {
-                results = results.filter(v => v.ward && v.ward.toString() === selectedWard.toString());
+                results = results.filter(v => v.ward && String(v.ward).trim() === String(selectedWard).trim());
             }
 
             // Search Term Filter
