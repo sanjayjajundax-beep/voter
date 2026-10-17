@@ -788,11 +788,15 @@
             <div id="tabPanchayatManage" class="admin-tab-pane">
                 <div class="admin-card">
                     <h3 style="font-size: 1.05rem; margin-bottom: 8px; color: #1e3a8a;"><i class="fa-solid fa-plus-circle"></i> नई ग्राम पंचायत जोड़ें और एक्सेल अपलोड करें</h3>
-                    <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 12px;">एक्सेल शीट अपलोड होते ही उस पंचायत के कुल वार्ड ऑटोमैटिकली डिटेक्ट और फिक्स हो जाएंगे।</p>
+                    <p style="font-size: 0.84rem; color: #64748b; margin-bottom: 12px;">एक्सेल शीट अपलोड करते वक्त उस पंचायत के कुल वार्डों की संख्या या नंबर (उदा. 1 से 11 या 1,2,3...) यहाँ दर्ज कर सकते हैं।</p>
                     
                     <div class="form-group">
                         <label>ग्राम पंचायत का नाम:</label>
                         <input type="text" id="newPanchayatNameInput" class="form-control" placeholder="उदा० सुवाणा या मंगरोप">
+                    </div>
+                    <div class="form-group">
+                        <label>इस पंचायत में कुल वार्ड संख्या / वार्ड लिस्ट (उदा० 11 या 1,2,3...):</label>
+                        <input type="text" id="newPanchayatWardsInput" class="form-control" placeholder="उदा० 11 या 1 से 15 तक">
                     </div>
                     <div class="form-group">
                         <label>पंचायत की मतदाता सूची (Excel File):</label>
@@ -977,11 +981,10 @@
             }
         }
 
-        // Multi-Panchayat Database Storage Structure with Dynamic Wards
         let panchayatsDB = JSON.parse(localStorage.getItem('election_panchayats_db') || JSON.stringify({
             "सुवाणा": {
                 voters: [],
-                wards: [],
+                wards: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17"],
                 campaign: {
                     postType: "सरपंच (Sarpanch)",
                     name: "श्रीमती रेखा देवी जाट",
@@ -1021,11 +1024,6 @@
                 opt.textContent = "ग्राम पंचायत: " + p;
                 select.appendChild(opt);
             });
-            updateLoginWardOptions();
-        }
-
-        function updateLoginWardOptions() {
-            // Can be used if needed
         }
 
         function getActiveCampaign() {
@@ -1514,23 +1512,37 @@
             btn.classList.add('active');
         }
 
-        // Helper function to extract unique sorted wards from voters list
-        function extractWardsFromVoters(votersList) {
+        // Helper to parse wards from manual input or fallback to sheet detection
+        function parseWardsInput(inputStr, votersList) {
+            if (inputStr && inputStr.trim() !== "") {
+                let clean = inputStr.trim();
+                // If admin entered a single number like "11", generate ["1", "2", ..., "11"]
+                if (!isNaN(clean) && Number(clean) > 0 && !clean.includes(',')) {
+                    let total = Number(clean);
+                    let arr = [];
+                    for (let i = 1; i <= total; i++) arr.push(String(i));
+                    return arr;
+                }
+                // If admin entered comma separated or range like "1,2,3"
+                return clean.split(',').map(s => s.trim()).filter(Boolean);
+            }
+            
+            // Fallback: auto-detect from sheet if input is empty
             let wardsSet = new Set();
             votersList.forEach(v => {
                 if (v.ward !== undefined && v.ward !== null && String(v.ward).trim() !== "") {
                     wardsSet.add(String(v.ward).trim());
                 }
             });
-            // Sort numerically if possible, otherwise alphabetically
             return Array.from(wardsSet).sort((a, b) => {
                 return (Number(a) && Number(b)) ? Number(a) - Number(b) : a.localeCompare(b);
             });
         }
 
-        // Admin: Add new Panchayat with Excel & Dynamic Wards Detection
+        // Admin: Add new Panchayat with manual Wards input & Excel
         function addNewPanchayatWithExcel() {
             const pName = document.getElementById('newPanchayatNameInput').value.trim();
+            const wardsInputStr = document.getElementById('newPanchayatWardsInput').value.trim();
             const fileInput = document.getElementById('newPanchayatExcelLoader');
             const file = fileInput.files[0];
 
@@ -1556,12 +1568,12 @@
                     booth: String(r['मतदान बूथ सं० व पता'] || pName)
                 }));
 
-                // Auto-extract dynamic wards from the uploaded sheet
-                const detectedWards = extractWardsFromVoters(votersList);
+                // Get wards based on admin manual entry or auto-detection
+                const finalWards = parseWardsInput(wardsInputStr, votersList);
 
                 panchayatsDB[pName] = {
                     voters: votersList,
-                    wards: detectedWards,
+                    wards: finalWards,
                     campaign: {
                         postType: "सरपंच (Sarpanch)",
                         name: "प्रत्याशी नाम",
@@ -1578,8 +1590,9 @@
                 updateLoginPanchayatDropdown();
                 renderPanchayatsAdminTable();
                 populateAdminSelects();
-                alert(`✅ नई ग्राम पंचायत "${pName}" जोड़ दी गई!\nकुल वार्ड डिटेक्ट हुए: ${detectedWards.join(', ')}\nकुल मतदाता: ${votersList.length}`);
+                alert(`✅ नई ग्राम पंचायत "${pName}" जोड़ दी गई!\nवार्ड सेट हुए: ${finalWards.join(', ')}\nकुल मतदाता: ${votersList.length}`);
                 document.getElementById('newPanchayatNameInput').value = '';
+                document.getElementById('newPanchayatWardsInput').value = '';
                 fileInput.value = '';
             };
             r.readAsArrayBuffer(file);
@@ -1808,7 +1821,7 @@
                     area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
                     booth: String(r['मतदान बूथ सं० व पता'] || pName)
                 }));
-                const detectedWards = extractWardsFromVoters(votersList);
+                const detectedWards = parseWardsInput("", votersList);
                 panchayatsDB[pName].voters = votersList;
                 panchayatsDB[pName].wards = detectedWards;
                 saveStateToStorage();
