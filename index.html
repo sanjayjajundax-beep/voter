@@ -12,9 +12,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDKs (App, Firestore, Storage) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <style>
         :root {
@@ -771,7 +772,7 @@
             <!-- TAB 3: CANDIDATES & CLIENTS MANAGEMENT -->
             <div id="tabClientsManage" class="admin-tab-pane" style="display: none;">
                 <div class="admin-card">
-                    <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया सरपंच / वार्ड पंच प्रत्याशी जोड़ें</h3>
+                    <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया सरपंच / वार्ड पंच प्रत्याशी जोड़ें (फायरबेस स्टोरेज)</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div class="form-group"><label>लॉगिन यूजर आईडी:</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० sarpanch1"></div>
                         <div class="form-group"><label>पासवर्ड:</label><input type="text" id="addClientPass" class="form-control" placeholder="पासवर्ड..."></div>
@@ -802,10 +803,11 @@
                         <div class="form-group"><label>चुनाव चिन्ह नाम:</label><input type="text" id="addClientSymbolName" class="form-control" value="चाबी (Key)"></div>
                         <div class="form-group"><label>मोबाइल नंबर:</label><input type="text" id="addClientContact" class="form-control" value="9829970310"></div>
                         
-                        <div class="form-group"><label>प्रत्याशी फोटो अपलोड:</label><input type="file" id="addClientPhotoFile" accept="image/*" class="form-control"></div>
-                        <div class="form-group"><label>चुनाव चिन्ह फोटो अपलोड:</label><input type="file" id="addClientSymbolFile" accept="image/*" class="form-control"></div>
+                        <div class="form-group"><label>प्रत्याशी फोटो (फायरबेस अपलोड):</label><input type="file" id="addClientPhotoFile" accept="image/*" class="form-control"></div>
+                        <div class="form-group"><label>चुनाव चिन्ह फोटो (फायरबेस अपलोड):</label><input type="file" id="addClientSymbolFile" accept="image/*" class="form-control"></div>
                     </div>
-                    <button class="btn-main" onclick="addCandidateAccount()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> प्रत्याशी अकाउंट जोड़ें</button>
+                    <div id="candidateUploadProgress" style="font-size: 0.85rem; color: var(--primary); font-weight: 600; margin-top: 5px;"></div>
+                    <button class="btn-main" onclick="addCandidateAccount()" style="margin-top: 10px;"><i class="fa-solid fa-cloud-arrow-up"></i> फायरबेस पर फोटो अपलोड कर प्रत्याशी जोड़ें</button>
                 </div>
 
                 <div class="admin-card">
@@ -891,6 +893,7 @@
     <!-- Application JavaScript -->
     <script>
         let db = null;
+        let storage = null;
         let isFirebaseActive = false;
 
         let firebaseConfig = {
@@ -906,6 +909,7 @@
             try {
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
+                storage = firebase.storage();
                 isFirebaseActive = true;
                 syncClientsFromFirebase();
                 syncPanchayatsFromFirebase();
@@ -929,7 +933,6 @@
         let currentActiveVoter = null;
         let currentAdminId = localStorage.getItem('custom_admin_id') || 'admin';
         let currentAdminPassword = localStorage.getItem('custom_admin_password') || 'admin123';
-
         const currentPhoneToken = localStorage.getItem('phone_device_token') || ('PHONE_' + Math.random().toString(36).substr(2, 9).toUpperCase());
         localStorage.setItem('phone_device_token', currentPhoneToken);
 
@@ -959,13 +962,11 @@
                 return;
             }
 
-            // 1. Check if Admin Login (Case-insensitive matching)
             if (u.toLowerCase() === currentAdminId.toLowerCase() && p === currentAdminPassword) {
                 showView('viewAdminDashboard');
                 return;
             }
 
-            // 2. Check if Client/Candidate Login
             const client = clientUsers.find(c => c.id.toLowerCase() === u.toLowerCase());
             if (!client) {
                 alert('अमान्य यूजर आईडी या पासवर्ड!');
@@ -1586,7 +1587,7 @@
             });
         }
 
-        function addCandidateAccount() {
+        async function addCandidateAccount() {
             const id = document.getElementById('addClientId').value.trim().toLowerCase();
             const pass = document.getElementById('addClientPass').value.trim();
             const candName = document.getElementById('addClientCandName').value.trim();
@@ -1598,6 +1599,7 @@
             
             const photoInput = document.getElementById('addClientPhotoFile');
             const symbolInput = document.getElementById('addClientSymbolFile');
+            const progressEl = document.getElementById('candidateUploadProgress');
 
             if (!id || !pass || !candName) {
                 alert('कृपया यूजर आईडी, पासवर्ड और प्रत्याशी का नाम दर्ज करें!');
@@ -1607,6 +1609,32 @@
             if (clientUsers.some(c => c.id.toLowerCase() === id)) {
                 alert('यह यूजर आईडी पहले से मौजूद है! कृपया कोई दूसरी आईडी लिखें।');
                 return;
+            }
+
+            progressEl.innerText = "⏳ फाइलें फायरबेस स्टोरेज पर अपलोड हो रही हैं...";
+
+            let defaultPhotoUrl = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80";
+            let defaultSymbolUrl = "https://cdn-icons-png.flaticon.com/512/1995/1995574.png";
+
+            try {
+                if (isFirebaseActive && storage) {
+                    if (photoInput.files && photoInput.files[0]) {
+                        const photoFile = photoInput.files[0];
+                        const photoRef = storage.ref().child(`candidates_photos/${id}_${Date.now()}_${photoFile.name}`);
+                        const photoSnapshot = await photoRef.put(photoFile);
+                        defaultPhotoUrl = await photoSnapshot.ref.getDownloadURL();
+                    }
+
+                    if (symbolInput.files && symbolInput.files[0]) {
+                        const symbolFile = symbolInput.files[0];
+                        const symbolRef = storage.ref().child(`candidates_symbols/${id}_${Date.now()}_${symbolFile.name}`);
+                        const symbolSnapshot = await symbolRef.put(symbolFile);
+                        defaultSymbolUrl = await symbolSnapshot.ref.getDownloadURL();
+                    }
+                }
+            } catch (err) {
+                console.error("Storage upload error:", err);
+                alert("फायरबेस स्टोरेज अपलोड त्रुटि: " + err.message + "\n(डिफ़ॉल्ट इमेज का उपयोग किया जा रहा है)");
             }
 
             let newCandidate = {
@@ -1619,52 +1647,24 @@
                 ward: ward,
                 symbolName: symbolName,
                 contact: contact,
-                photo: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-                symbol: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png",
+                photo: defaultPhotoUrl,
+                symbol: defaultSymbolUrl,
                 boundDevice: null,
                 status: "Active"
             };
 
-            const processAndSave = () => {
-                clientUsers.push(newCandidate);
-                saveClientsState();
-                renderClientsAdminTable();
-                alert('✅ नया प्रत्याशी अकाउंट सफलतापूर्वक जोड़ दिया गया है!');
-                document.getElementById('addClientId').value = '';
-                document.getElementById('addClientPass').value = '';
-                document.getElementById('addClientCandName').value = '';
-            };
-
-            let filesLoaded = 0;
-            let totalFilesToLoad = 0;
-
-            if (photoInput.files && photoInput.files[0]) totalFilesToLoad++;
-            if (symbolInput.files && symbolInput.files[0]) totalFilesToLoad++;
-
-            if (totalFilesToLoad === 0) {
-                processAndSave();
-                return;
-            }
-
-            if (photoInput.files && photoInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newCandidate.photo = e.target.result;
-                    filesLoaded++;
-                    if (filesLoaded === totalFilesToLoad) processAndSave();
-                };
-                reader.readAsDataURL(photoInput.files[0]);
-            }
-
-            if (symbolInput.files && symbolInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    newCandidate.symbol = e.target.result;
-                    filesLoaded++;
-                    if (filesLoaded === totalFilesToLoad) processAndSave();
-                };
-                reader.readAsDataURL(symbolInput.files[0]);
-            }
+            clientUsers.push(newCandidate);
+            saveClientsState();
+            renderClientsAdminTable();
+            
+            progressEl.innerText = "";
+            alert('✅ नया प्रत्याशी और उसकी फायरबेस-स्टोरेज लिंक्ड फोटो सफलतापूर्वक जोड़ दी गई है!');
+            
+            document.getElementById('addClientId').value = '';
+            document.getElementById('addClientPass').value = '';
+            document.getElementById('addClientCandName').value = '';
+            document.getElementById('addClientPhotoFile').value = '';
+            document.getElementById('addClientSymbolFile').value = '';
         }
 
         function deleteClient(idx) {
