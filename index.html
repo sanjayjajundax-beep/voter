@@ -753,7 +753,7 @@
                     <i class="fa-solid fa-cloud-arrow-up"></i> 1. एक्सेल अपलोड
                 </button>
                 <button class="nav-tab-btn" onclick="switchAdminTab('tabPanchayatManage', this)">
-                    <i class="fa-solid: fa-database"></i> 2. पंचायत प्रबंधन & डिलीट
+                    <i class="fa-solid fa-database"></i> 2. पंचायत प्रबंधन & डिलीट
                 </button>
                 <button class="nav-tab-btn" onclick="switchAdminTab('tabClientsManage', this)">
                     <i class="fa-solid fa-users-gear"></i> 3. क्लाइंट्स & एक्सेस
@@ -1583,13 +1583,11 @@
             if (!confirm(`⚠️ क्या आप सचमुच फायरबेस से "${panchayatName}" ग्राम पंचायत का पूरा डेटा डिलीट करना चाहते हैं?`)) return;
 
             if (isFirebaseActive && db) {
-                // Delete voters subcollection documents
                 db.collection("panchayats").doc(panchayatName).collection("voters").get().then(snapshot => {
                     const batch = db.batch();
                     snapshot.docs.forEach(doc => batch.delete(doc.ref));
                     batch.commit().then(() => {
                         db.collection("panchayats").doc(panchayatName).delete().then(() => {
-                            // Update meta list
                             db.collection("panchayats_meta").doc("list").get().then(doc => {
                                 if (doc.exists) {
                                     let list = doc.data().names || [];
@@ -1695,71 +1693,82 @@
 
             const file = fileInput.files[0];
             const r = new FileReader();
+            
             r.onload = function(evt) {
-                const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
-                let rows = [];
-                wb.SheetNames.forEach(s => rows = rows.concat(XLSX.utils.sheet_to_json(wb.Sheets[s])));
-                
-                const loadedVoters = rows.map((r, i) => ({
-                    panchayat: pName,
-                    ward: String(r['Ward No.'] || r['वार्ड नंबर'] || '1'),
-                    sno: r['क्र० सं० (S.No.)'] || (i + 1),
-                    epic: String(r['ईपिक सं० (EPIC No.)'] || ''),
-                    name: String(r['नाम (Name)'] || ''),
-                    relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                    rel_name: String(r['संबंधी का नाम (Relative Name)'] || ''),
-                    house: String(r['मकान संख्या (House No.)'] || ''),
-                    age: String(r['आयु (Age)'] || ''),
-                    gender: String(r['लिंग (Gender)'] || ''),
-                    area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
-                    booth: String(r['मतदान बूथ सं० व पता'] || pName)
-                }));
-
-                if (isFirebaseActive && db) {
-                    const pRef = db.collection("panchayats").doc(pName).collection("voters");
-                    
-                    // Upload in batches of 400 to avoid Firestore limits
-                    let batch = db.batch();
-                    let count = 0;
-                    let promises = [];
-
-                    loadedVoters.forEach((voter, index) => {
-                        const docRef = pRef.doc("voter_" + index);
-                        batch.set(docRef, voter);
-                        count++;
-                        if (count >= 400) {
-                            promises.push(batch.commit());
-                            batch = db.batch();
-                            count = 0;
-                        }
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
+                    let rows = [];
+                    wb.SheetNames.forEach(s => {
+                        const sheetRows = XLSX.utils.sheet_to_json(wb.Sheets[s]);
+                        rows = rows.concat(sheetRows);
                     });
-                    if (count > 0) {
-                        promises.push(batch.commit());
+                    
+                    if (rows.length === 0) {
+                        alert('एक्सेल फ़ाइल खाली है या डेटा नहीं पढ़ा जा सका!');
+                        return;
                     }
 
-                    Promise.all(promises).then(() => {
-                        // Update Panchayat Meta List in Firebase
-                        db.collection("panchayats_meta").doc("list").get().then(doc => {
-                            let list = [];
-                            if (doc.exists && doc.data().names) {
-                                list = doc.data().names;
+                    const loadedVoters = rows.map((r, i) => ({
+                        panchayat: pName,
+                        ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || '1'),
+                        sno: r['क्र० सं० (S.No.)'] || r['S.No.'] || (i + 1),
+                        epic: String(r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || ''),
+                        name: String(r['नाम (Name)'] || r['Name'] || ''),
+                        relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
+                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['Relative Name'] || ''),
+                        house: String(r['मकान संख्या (House No.)'] || r['House No.'] || ''),
+                        age: String(r['आयु (Age)'] || r['Age'] || ''),
+                        gender: String(r['लिंग (Gender)'] || r['Gender'] || ''),
+                        area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
+                        booth: String(r['मतदान बूथ सं० व पता'] || pName)
+                    }));
+
+                    if (isFirebaseActive && db) {
+                        const pRef = db.collection("panchayats").doc(pName).collection("voters");
+                        let batch = db.batch();
+                        let count = 0;
+                        let promises = [];
+
+                        loadedVoters.forEach((voter, index) => {
+                            const docRef = pRef.doc("voter_" + index);
+                            batch.set(docRef, voter);
+                            count++;
+                            if (count >= 400) {
+                                promises.push(batch.commit());
+                                batch = db.batch();
+                                count = 0;
                             }
-                            if (!list.includes(pName)) {
-                                list.push(pName);
-                            }
-                            db.collection("panchayats_meta").doc("list").set({ names: list }).then(() => {
-                                panchayatVotersMap[pName] = loadedVoters;
-                                alert(`✅ Gram Panchayat "${pName}" ke ${loadedVoters.length} voters Firebase par successfully save ho gaye!`);
-                                updateAdminExcelStats();
-                                renderPanchayatAdminTable();
-                                populatePanchayatDropdownInClients();
-                            });
                         });
-                    }).catch(e => {
-                        alert("Firebase Upload Error: " + e.message);
-                    });
-                } else {
-                    alert('⚠️ Firebase active nahi hai!');
+                        if (count > 0) {
+                            promises.push(batch.commit());
+                        }
+
+                        Promise.all(promises).then(() => {
+                            db.collection("panchayats_meta").doc("list").get().then(doc => {
+                                let list = [];
+                                if (doc.exists && doc.data().names) {
+                                    list = doc.data().names;
+                                }
+                                if (!list.includes(pName)) {
+                                    list.push(pName);
+                                }
+                                db.collection("panchayats_meta").doc("list").set({ names: list }).then(() => {
+                                    panchayatVotersMap[pName] = loadedVoters;
+                                    alert(`✅ Gram Panchayat "${pName}" ke ${loadedVoters.length} voters Firebase par successfully save ho gaye!`);
+                                    updateAdminExcelStats();
+                                    renderPanchayatAdminTable();
+                                    populatePanchayatDropdownInClients();
+                                });
+                            });
+                        }).catch(e => {
+                            alert("Firebase Upload Error: " + e.message);
+                        });
+                    } else {
+                        alert('⚠️ Firebase active nahi hai!');
+                    }
+                } catch (err) {
+                    alert('File parsing error: ' + err.message);
                 }
             };
             r.readAsArrayBuffer(file);
