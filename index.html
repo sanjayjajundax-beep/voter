@@ -742,41 +742,62 @@
         async function loadVotersDataForClient() {
             showAlert("मतदाता सूची लोड की जा रही है...", "info");
             try {
-                const snapshot = await db.collection('voters')
-                    .where('panchayat', '==', currentUser.panchayat)
-                    .get();
-
+                // strict query की जगह सभी voters लाएं ताकि हिंदी/इंग्लिश स्पेलिंग इश्यू न आए
+                const snapshot = await db.collection('voters').get();
+                
                 currentPanchayatVoters = [];
                 const wardsSet = new Set();
 
+                const userPanchayat = (currentUser.panchayat || '').trim().toLowerCase();
+
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    currentPanchayatVoters.push(data);
-                    if (data.ward) wardsSet.add(data.ward.toString());
+                    const voterPanchayat = (data.panchayat || '').trim().toLowerCase();
+                    
+                    // अगर पंचायत का नाम मैच हो या हिंदी/इंग्लिश में थोड़ा अंतर भी हो तो स्वीकार करे
+                    if (!userPanchayat || voterPanchayat === userPanchayat || voterPanchayat.includes(userPanchayat) || userPanchayat.includes(voterPanchayat)) {
+                        currentPanchayatVoters.push(data);
+                        if (data.ward !== undefined && data.ward !== null) {
+                            wardsSet.add(data.ward.toString().trim());
+                        }
+                    }
                 });
 
-                // Populate Ward Filter
-               // Populate Ward Filter (Updated for Ward Lock)
+                // Populate Ward Filter (Locked for Candidate Ward)
                 const wardSelect = document.getElementById('wardFilterSelect');
                 wardSelect.innerHTML = '';
 
-                // अगर क्लाइंट को विशिष्ट वार्ड दिया गया है (जैसे वार्ड 6):
                 if (currentUser.ward && currentUser.ward !== 'ALL') {
                     const opt = document.createElement('option');
                     opt.value = currentUser.ward;
                     opt.textContent = `वार्ड नंबर ${currentUser.ward}`;
                     wardSelect.appendChild(opt);
                     
-                    // ड्रॉपडाउन को केवल उसी वार्ड पर लॉक रखें
                     wardSelect.value = currentUser.ward;
-                    wardSelect.disabled = true; // यूज़र खुद 'सभी वार्ड' न चुन सके
+                    wardSelect.disabled = true;
                 } else {
-                    // अगर सरपंच उम्मीदवार है या ALL एक्सेस है:
                     wardSelect.disabled = false;
                     const optAll = document.createElement('option');
                     optAll.value = 'ALL';
                     optAll.textContent = 'सभी वार्ड (All Wards)';
                     wardSelect.appendChild(optAll);
+
+                    Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w;
+                        opt.textContent = `वार्ड नंबर ${w}`;
+                        wardSelect.appendChild(opt);
+                    });
+                }
+
+                performSearch();
+                showAlert("मतदाता डेटा सफलता से लोड हुआ!", "success");
+
+            } catch (error) {
+                console.error("Error loading voters:", error);
+                showAlert("मतदाता डेटा लोड करने में विफल!", "error");
+            }
+        }
 
                     Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
                         const opt = document.createElement('option');
