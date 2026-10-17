@@ -670,7 +670,7 @@
                     
                     <div class="form-group">
                         <label>ग्राम पंचायत का नाम लिखें:</label>
-                        <input type="text" id="uploadPanchayatName" class="form-control" placeholder="उदा० सुवाणा, कोटरी आदि...">
+                        <input type="text" id="uploadPanchayatName" class="form-control" value="सुवाणा" placeholder="उदा० सुवाणा, कोटरी आदि...">
                     </div>
 
                     <div class="form-group">
@@ -1107,25 +1107,24 @@
                 try {
                     const data = new Uint8Array(e.target.result);
                     const wb = XLSX.read(data, { type: 'array' });
-                    let rows = [];
-                    wb.SheetNames.forEach(s => {
-                        const sheetRows = XLSX.utils.sheet_to_json(wb.Sheets[s]);
-                        rows = rows.concat(sheetRows);
-                    });
+                    
+                    // 'मतदाता_सूची' sheet ko target karenge jo aapki file me hai
+                    const targetSheetName = wb.SheetNames.includes('मतदाता_सूची') ? 'मतदाता_सूची' : wb.SheetNames[0];
+                    const rows = XLSX.utils.sheet_to_json(wb.Sheets[targetSheetName]);
                     
                     if (rows.length === 0) { alert('एक्सेल फ़ाइल खाली है!'); return; }
 
                     const loadedVoters = rows.map((r, i) => ({
                         panchayat: pName,
-                        ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || '1'),
-                        sno: r['क्र० सं० (S.No.)'] || r['S.No.'] || (i + 1),
-                        epic: String(r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || ''),
-                        name: String(r['नाम (Name)'] || r['Name'] || ''),
+                        ward: String(r['Ward No.'] || '1'),
+                        sno: r['क्र० सं० (S.No.)'] || (i + 1),
+                        epic: String(r['ईपिक सं० (EPIC No.)'] || ''),
+                        name: String(r['नाम (Name)'] || ''),
                         relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['Relative Name'] || ''),
-                        house: String(r['मकान संख्या (House No.)'] || r['House No.'] || ''),
-                        age: String(r['आयु (Age)'] || r['Age'] || ''),
-                        gender: String(r['लिंग (Gender)'] || r['Gender'] || ''),
+                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || ''),
+                        house: String(r['मकान संख्या (House No.)'] || ''),
+                        age: String(r['आयु (Age)'] || ''),
+                        gender: String(r['लिंग (Gender)'] || ''),
                         area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || pName),
                         booth: String(r['मतदान बूथ सं० व पता'] || pName)
                     }));
