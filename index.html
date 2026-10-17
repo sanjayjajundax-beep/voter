@@ -734,16 +734,25 @@
             showAlert("मतदाता सूची लोड की जा रही है...", "info");
             try {
                 const snapshot = await db.collection('voters').get();
-
+                
                 currentPanchayatVoters = [];
                 const wardsSet = new Set();
+
                 const userPanchayat = (currentUser.panchayat || '').trim().toLowerCase();
+                const userWard = (currentUser.ward || '').toString().trim().toLowerCase();
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const voterPanchayat = (data.panchayat || '').trim().toLowerCase();
+                    const voterWard = (data.ward || '').toString().trim().toLowerCase();
                     
-                    if (!userPanchayat || voterPanchayat === userPanchayat || voterPanchayat.includes(userPanchayat) || userPanchayat.includes(voterPanchayat)) {
+                    const panchayatMatch = !userPanchayat || voterPanchayat === userPanchayat || voterPanchayat.includes(userPanchayat) || userPanchayat.includes(voterPanchayat);
+                    
+                    const cleanVoterWard = voterWard.replace('वार्ड', '').trim();
+                    const cleanUserWard = userWard.replace('वार्ड', '').trim();
+                    const wardMatch = userWard === 'all' || !cleanUserWard || cleanVoterWard === cleanUserWard;
+
+                    if (panchayatMatch && (currentUser.ward === 'ALL' || wardMatch)) {
                         currentPanchayatVoters.push(data);
                         if (data.ward !== undefined && data.ward !== null) {
                             wardsSet.add(data.ward.toString().trim());
@@ -752,6 +761,38 @@
                 });
 
                 const wardSelect = document.getElementById('wardFilterSelect');
+                wardSelect.innerHTML = '';
+
+                if (currentUser.ward && currentUser.ward !== 'ALL') {
+                    const opt = document.createElement('option');
+                    opt.value = currentUser.ward;
+                    opt.textContent = `वार्ड नंबर ${currentUser.ward}`;
+                    wardSelect.appendChild(opt);
+                    wardSelect.value = currentUser.ward;
+                    wardSelect.disabled = true;
+                } else {
+                    wardSelect.disabled = false;
+                    const optAll = document.createElement('option');
+                    optAll.value = 'ALL';
+                    optAll.textContent = 'सभी वार्ड (All Wards)';
+                    wardSelect.appendChild(optAll);
+
+                    Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w;
+                        opt.textContent = `वार्ड नंबर ${w}`;
+                        wardSelect.appendChild(opt);
+                    });
+                }
+
+                performSearch();
+                showAlert("मतदाता डेटा सफलता से लोड हुआ!", "success");
+
+            } catch (error) {
+                console.error("Error loading voters:", error);
+                showAlert("मतदाता डेटा लोड करने में विफल!", "error");
+            }
+        }
                 wardSelect.innerHTML = '';
 
                 if (currentUser.ward && currentUser.ward !== 'ALL') {
