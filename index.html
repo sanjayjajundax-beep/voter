@@ -756,15 +756,35 @@
                 });
 
                 // Populate Ward Filter
+               // Populate Ward Filter (Updated for Ward Lock)
                 const wardSelect = document.getElementById('wardFilterSelect');
-                wardSelect.innerHTML = '<option value="ALL">सभी वार्ड (All Wards)</option>';
-                
-                Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                wardSelect.innerHTML = '';
+
+                // अगर क्लाइंट को विशिष्ट वार्ड दिया गया है (जैसे वार्ड 6):
+                if (currentUser.ward && currentUser.ward !== 'ALL') {
                     const opt = document.createElement('option');
-                    opt.value = w;
-                    opt.textContent = `वार्ड नंबर ${w}`;
+                    opt.value = currentUser.ward;
+                    opt.textContent = `वार्ड नंबर ${currentUser.ward}`;
                     wardSelect.appendChild(opt);
-                });
+                    
+                    // ड्रॉपडाउन को केवल उसी वार्ड पर लॉक रखें
+                    wardSelect.value = currentUser.ward;
+                    wardSelect.disabled = true; // यूज़र खुद 'सभी वार्ड' न चुन सके
+                } else {
+                    // अगर सरपंच उम्मीदवार है या ALL एक्सेस है:
+                    wardSelect.disabled = false;
+                    const optAll = document.createElement('option');
+                    optAll.value = 'ALL';
+                    optAll.textContent = 'सभी वार्ड (All Wards)';
+                    wardSelect.appendChild(optAll);
+
+                    Array.from(wardsSet).sort((a,b) => a.localeCompare(b, undefined, {numeric: true})).forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w;
+                        opt.textContent = `वार्ड नंबर ${w}`;
+                        wardSelect.appendChild(opt);
+                    });
+                }
 
                 // Auto select client ward if specific
                 if (currentUser.ward !== 'ALL' && currentUser.ward) {
@@ -803,7 +823,13 @@
         }
 
         function performSearch() {
-            const selectedWard = document.getElementById('wardFilterSelect').value;
+            let selectedWard = document.getElementById('wardFilterSelect').value;
+            
+            // अगर क्लाइंट के पास ALL का एक्सेस नहीं है, तो उसका अलॉटेड वार्ड ही फ़िल्टर में सेट रखें
+            if (currentUser.ward && currentUser.ward !== 'ALL') {
+                selectedWard = currentUser.ward.toString();
+            }
+
             let results = [...currentPanchayatVoters];
 
             // Ward Filter
