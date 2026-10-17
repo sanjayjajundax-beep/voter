@@ -246,6 +246,7 @@
             margin-bottom: 10px;
             padding-bottom: 10px;
             border-bottom: 1px dashed var(--border);
+            flex-wrap: wrap;
         }
 
         .ward-select-control {
@@ -706,11 +707,16 @@
 
         <div class="content-wrap">
             <div class="search-card-main">
-                <div id="wardFilterContainer" class="ward-filter-row" style="display: none;">
-                    <label style="font-size: 0.88rem; font-weight: 700; color: #1e3a8a;"><i class="fa-solid fa-filter"></i> वार्ड चुनें:</label>
-                    <select id="selectWardFilter" class="ward-select-control" onchange="handleWardDropdownChange()">
-                        <option value="ALL">सभी वार्ड</option>
-                    </select>
+                <div id="wardFilterContainer" class="ward-filter-row">
+                    <div style="flex: 1; display: flex; align-items: center; gap: 8px; min-width: 220px;">
+                        <label style="font-size: 0.88rem; font-weight: 700; color: #1e3a8a;"><i class="fa-solid fa-filter"></i> वार्ड चुनें:</label>
+                        <select id="selectWardFilter" class="ward-select-control" onchange="handleWardDropdownChange()">
+                            <option value="ALL">सभी वार्ड</option>
+                        </select>
+                    </div>
+                    <button class="btn-main" style="width: auto; background: #16a34a; padding: 9px 14px; font-size: 0.88rem;" onclick="printEntireSelectedWard()">
+                        <i class="fa-solid fa-print"></i> पूरे वार्ड की लिस्ट प्रिंट करें (8 प्रति पेज)
+                    </button>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
@@ -1297,7 +1303,6 @@
 
         function setupClientWardView() {
             if (!loggedInClient) return;
-            const wardFilterContainer = document.getElementById('wardFilterContainer');
             const selectWardFilter = document.getElementById('selectWardFilter');
             const clientWardBadge = document.getElementById('clientWardBadge');
 
@@ -1306,14 +1311,13 @@
 
             if (loggedInClient.ward === 'ALL') {
                 clientWardBadge.innerText = `${gpDisplayName} • सभी वार्ड • ${loggedInClient.name}`;
-                wardFilterContainer.style.display = 'flex';
                 selectWardFilter.innerHTML = `<option value="ALL">🔍 सभी वार्ड</option>`;
                 for (let w = 1; w <= 17; w++) {
                     selectWardFilter.innerHTML += `<option value="${w}">वार्ड नंबर ${w}</option>`;
                 }
             } else {
                 clientWardBadge.innerText = `${gpDisplayName} • वार्ड ${loggedInClient.ward} • ${loggedInClient.name}`;
-                wardFilterContainer.style.display = 'none';
+                selectWardFilter.innerHTML = `<option value="${loggedInClient.ward}">वार्ड ${loggedInClient.ward}</option>`;
             }
         }
 
@@ -1513,6 +1517,28 @@
 
         function printDirectSingleVoter(voter) {
             printHouseMembers([voter]);
+        }
+
+        function printEntireSelectedWard() {
+            const targetWard = getActiveWardFilter();
+            const votersList = getCurrentClientVotersList();
+            
+            if (votersList.length === 0) {
+                alert('इस पंचायत का डेटा लोड नहीं है या खाली है!');
+                return;
+            }
+
+            let filteredList = votersList;
+            if (targetWard !== 'ALL') {
+                filteredList = votersList.filter(v => String(v.ward) === String(targetWard));
+            }
+
+            if (filteredList.length === 0) {
+                alert('चयनित वार्ड में कोई मतदाता नहीं मिला!');
+                return;
+            }
+
+            printHouseMembers(filteredList);
         }
 
         function printHouseMembers(membersList) {
