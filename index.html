@@ -1473,37 +1473,41 @@
             if (num && num.trim().length >= 10) dispatchWhatsApp(num.trim(), currentActiveVoter);
         }
 
-        // वन-क्लिक व्हाट्सएप सीधा ओपन करने का फंक्शन
-        function dispatchWhatsApp(phone, voter) {
-            let cleanPhone = phone.replace(/[^0-9]/g, '');
-            if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-            const camp = getActiveCampaign();
-            const lines = [
-                '🗳️ *मतदाता सूचना पर्ची (Voter Slip)* 🗳️',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *ग्राम पंचायत:* *' + loggedInClient.panchayat + '*',
-                '🚩 *वार्ड संख्या:* *वार्ड नं० ' + (voter.ward || '1') + '*',
-                '👤 *मतदाता का नाम:* ' + (voter.name || '-'),
-                '🔢 *क्रमांक संख्या (S.No.):* #' + voter.sno,
-                '🆔 *वोटर आईडी (EPIC):* ' + (voter.epic || 'उपलब्ध नहीं'),
-                '👨‍👩‍👦 *' + (voter.relation || 'संबंधी') + ' का नाम:* ' + (voter.rel_name || '-'),
-                '🏠 *मकान संख्या:* ' + (voter.house || '-'),
-                '📍 *मोहल्ला / क्षेत्र:* ' + (voter.area || loggedInClient.panchayat),
-                '━━━━━━━━━━━━━━━━━━',
-                '🏫 *मतदान केंद्र (वोटर सेंटर):*',
-                '📍 *' + (voter.booth || loggedInClient.panchayat) + '*',
-                '━━━━━━━━━━━━━━━━━━',
-                '🚩 *' + camp.postType + ' पद हेतु योग्य एवं संघर्षशील प्रत्याशी:*',
-                '⭐ *' + camp.name + '*',
-                '🗳️ *चुनाव चिन्ह:* *' + camp.symbolName + '*',
-                '💬 *संदेश:* ' + camp.slogan,
-                '📞 *संपर्क:* ' + camp.contact,
-                '━━━━━━━━━━━━━━━━━━',
-                '_कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।_'
-            ];
-            const msg = lines.join('\n');
-            window.open('https://api.whatsapp.com/send?phone=' + cleanPhone + '&text=' + encodeURIComponent(msg), '_blank');
-        }
+        // // वन-क्लिक व्हाट्सएप सीधा ऐप में ओपन करने का सही फंक्शन
+function dispatchWhatsApp(phone, voter) {
+    let cleanPhone = phone.replace(/[^0-9]/g, '');
+    if (cleanPhone.length === 10) {
+        cleanPhone = '91' + cleanPhone;
+    }
+    
+    const camp = getActiveCampaign();
+    const message = `🗳️ मतदाता सूचना पर्ची (Voter Slip)\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `🚩 ग्राम पंचायत: ${loggedInClient ? loggedInClient.panchayat : 'सुवाणा'}\n` +
+                    `🚩 वार्ड संख्या: वार्ड नं० ${voter.ward || '1'}\n` +
+                    `👤 मतदाता का नाम: ${voter.name || '-'}\n` +
+                    `🔢 क्रमांक संख्या: #${voter.sno}\n` +
+                    `🆔 वोटर आईडी (EPIC): ${voter.epic || 'उपलब्ध नहीं'}\n` +
+                    `👨‍👩‍👦 ${voter.relation || 'संबंधी'} का नाम: ${voter.rel_name || '-'}\n` +
+                    `🏠 मकान संख्या: ${voter.house || '-'}\n` +
+                    `📍 मोहल्ला / क्षेत्र: ${voter.area || '-'}\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `🏫 मतदान केंद्र:\n` +
+                    `📍 ${voter.booth || 'सुवाणा'}\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `🚩 ${camp.postType} पद हेतु प्रत्याशी:\n` +
+                    `⭐ ${camp.name}\n` +
+                    `🗳️ चुनाव चिन्ह: ${camp.symbolName}\n` +
+                    `💬 संदेश: ${camp.slogan}\n` +
+                    `📞 संपर्क: ${camp.contact}\n` +
+                    `━━━━━━━━━━━━━━━━━━\n` +
+                    `कृपया अपना बहुमूल्य वोट देकर सफल बनाएं।`;
+
+    // सीधा wa.me लिंक जो बिना किसी डाउनलोड या परमिशन के सीधा WhatsApp ऐप खोलेगा
+    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+
 
         function switchAdminTab(tabId, btn) {
             document.querySelectorAll('.admin-tab-pane').forEach(p => p.style.display = 'none');
