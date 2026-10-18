@@ -1199,8 +1199,9 @@
                         <td>${c.boundDevice ? '🔒 लॉक्ड' : '🟢 खुला'}</td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#2563eb;" onclick="editClient(${idx})">एडिट</button>
-                                <button class="btn-main" style="width:100%; padding:5px; font-size:0.75rem; background:#ef4444;" onclick="deleteClient(${idx})">हटाएं</button>
+                                ${c.boundDevice ? `<button class="btn-main" style="width:100%; padding:4px 8px; font-size:0.75rem; background:#d97706;" onclick="unlockClientDevice(${idx})">अनलॉक</button>` : ''}
+                                <button class="btn-main" style="width:100%; padding:4px 8px; font-size:0.75rem; background:#2563eb;" onclick="editClient(${idx})">एडिट</button>
+                                <button class="btn-main" style="width:100%; padding:4px 8px; font-size:0.75rem; background:#ef4444;" onclick="deleteClient(${idx})">हटाएं</button>
                             </div>
                         </td>
                     </tr>
