@@ -1,238 +1,39 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Voter Slip Portal | Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voter Slip Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 <style>
-:root{--blue:#174ea6;--teal:#087e8b;--bg:#f2f5fa;--ink:#243247;--muted:#64748b;--line:#e4eaf2;--red:#c62828;--green:#16834b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,'Tiro Devanagari Hindi',sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}.top{background:linear-gradient(120deg,#123c80,#087e8b);color:white;padding:15px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px}.top h1{font-size:19px;margin:0}.wrap{max-width:1200px;margin:24px auto;padding:0 15px}
-.login{max-width:430px;margin:65px auto;text-align:center}.card{background:#fff;padding:20px;border-radius:14px;box-shadow:0 4px 18px #15294b0c;margin-bottom:18px}.login .logo{font-size:48px;color:var(--blue)}
-h2{font-size:21px;margin:0 0 15px}h3{font-size:17px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}
-input,select{width:100%;padding:11px 12px;border:1px solid #d6deea;border-radius:8px;background:#fff;margin:6px 0 12px;outline:none}
-input:focus,select:focus{border-color:var(--blue)}label{font-size:13px;font-weight:600}
-.btn{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 15px;margin:3px}.btn:hover{filter:brightness(.94)}.green{background:var(--green)}.red{background:var(--red)}.gray{background:#64748b}.wide{width:100%}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.stat{background:#fff;padding:18px;border-radius:12px;border-left:4px solid var(--blue)}.stat strong{display:block;font-size:27px;color:var(--blue)}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:18px 0}.tab{background:white;color:var(--blue);border:1px solid var(--line)}.tab.active{background:var(--blue);color:white}
-.panel{display:none}.panel.active{display:block}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}th{background:#edf3fc}
-.notice{padding:11px;border-radius:8px;background:#eef5ff;color:#174ea6;font-size:13px;margin:10px 0}.error{background:#fff0f0;color:#a71919}.success{background:#eaf8ef;color:#126b3a}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions{display:flex;gap:5px;flex-wrap:wrap}.progress{height:9px;background:#e7edf5;border-radius:10px;overflow:hidden}.progress>div{height:100%;background:var(--teal);width:0}
-.hidden{display:none!important}.client{border:1px solid var(--line);padding:12px;border-radius:9px;margin:8px 0;display:flex;justify-content:space-between;gap:12px;align-items:center}
-footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
-@media(max-width:600px){.top h1{font-size:15px}.wrap{margin:12px auto;padding:0 9px}.card{padding:14px}.row{grid-template-columns:1fr}.client{align-items:flex-start;flex-direction:column}}
-</style>
-</head>
-<body>
-<header class="top"><h1><i class="fa-solid fa-id-card"></i> मतदाता पर्ची पोर्टल</h1><button id="logoutBtn" class="btn red hidden">लॉगआउट</button></header>
-
-<main id="loginView" class="wrap">
- <section class="card login">
-  <div class="logo"><i class="fa-solid fa-users-viewfinder"></i></div>
-  <h2>ADMIN LOGIN</h2><p class="muted">पंचायती राज चुनाव प्रबंधन पोर्टल</p>
-  <form id="loginForm">
-   <label>एडमिन ईमेल</label><input id="loginEmail" type="email" autocomplete="username" required>
-   <label>पासवर्ड</label><input id="loginPassword" type="password" autocomplete="current-password" required>
-   <button class="btn wide" type="submit"><i class="fa-solid fa-lock"></i> लॉगिन करें</button>
-  </form><div id="loginMsg" class="notice hidden"></div>
- </section>
-</main>
-
-<main id="adminView" class="wrap hidden">
- <h2><i class="fa-solid fa-gauge-high"></i> एडमिन डैशबोर्ड</h2>
- <div class="grid">
-  <div class="stat"><span class="muted">ग्राम पंचायतें</span><strong id="statPanchayats">0</strong></div>
-  <div class="stat"><span class="muted">प्रत्याशी अकाउंट</span><strong id="statClients">0</strong></div>
-  <div class="stat"><span class="muted">लॉगिन ईमेल</span><strong id="adminEmail" style="font-size:15px;overflow-wrap:anywhere">-</strong></div>
- </div>
- <nav class="tabs">
-  <button class="btn tab active" data-tab="panchayatPanel">पंचायत प्रबंधन</button>
-  <button class="btn tab" data-tab="excelPanel">Excel अपलोड</button>
-  <button class="btn tab" data-tab="clientPanel">प्रत्याशी प्रबंधन</button>
-  <button class="btn tab" data-tab="settingsPanel">सेटिंग</button>
- </nav>
-
- <section id="panchayatPanel" class="card panel active">
-  <h3>नई ग्राम पंचायत जोड़ें</h3>
-  <div class="row"><div><label>यूनिक पंचायत ID</label><input id="pId" placeholder="उदा. SUWANA01"></div><div><label>ग्राम पंचायत का नाम</label><input id="pName" placeholder="ग्राम पंचायत का नाम"></div></div>
-  <button id="addPanchayatBtn" class="btn"><i class="fa fa-plus"></i> पंचायत जोड़ें</button>
-  <div class="notice">हर पंचायत का डेटा अलग Firestore पाथ में रखा जाएगा। ID अंग्रेजी अक्षरों/अंकों में रखें।</div>
-  <h3 style="margin-top:22px">पंचायत सूची</h3><div class="table-wrap"><table><thead><tr><th>ID</th><th>पंचायत</th><th>मतदाता</th><th>कार्यवाही</th></tr></thead><tbody id="panchayatRows"><tr><td colspan="4">लोड हो रहा है...</td></tr></tbody></table></div>
- </section>
-
- <section id="excelPanel" class="card panel">
-  <h3>मतदाता सूची Excel अपलोड</h3>
-  <label>ग्राम पंचायत चुनें</label><select id="uploadPanchayat"><option value="">पहले पंचायत चुनें</option></select>
-  <label>Excel फाइल (.xlsx / .xls)</label><input id="excelFile" type="file" accept=".xlsx,.xls">
-  <div class="notice">पहली शीट पढ़ी जाएगी। प्रत्येक पंक्ति एक मतदाता होनी चाहिए। 300 रिकॉर्ड के बैच में अलग-अलग Firestore डॉक्यूमेंट बनेंगे। नया अपलोड सक्रिय होने तक पुरानी सूची बनी रहेगी।</div>
-  <button id="uploadBtn" class="btn green"><i class="fa fa-cloud-arrow-up"></i> अपलोड शुरू करें</button>
-  <div id="uploadStatus" class="notice hidden"></div><div class="progress"><div id="progressBar"></div></div>
- </section>
-
- <section id="clientPanel" class="card panel">
-  <h3>नया प्रत्याशी अकाउंट बनाएं</h3>
-  <div class="row"><div><label>प्रत्याशी का नाम</label><input id="cName" placeholder="पूरा नाम"></div><div><label>लॉगिन ईमेल / यूजर ID</label><input id="cEmail" type="email" placeholder="client@example.com"></div></div>
-  <div class="row"><div><label>अस्थायी पासवर्ड (कम से कम 8 अक्षर)</label><input id="cPassword" type="password"></div><div><label>ग्राम पंचायत</label><select id="cPanchayat"><option value="">पंचायत चुनें</option></select></div></div>
-  <div class="row"><div><label>पद</label><select id="cPosition"><option value="सरपंच">सरपंच प्रत्याशी</option><option value="वार्ड पंच">वार्ड पंच प्रत्याशी</option></select></div><div><label>वार्ड अनुमति (सरपंच के लिए ALL, वार्ड पंच के लिए वार्ड नंबर)</label><input id="cWard" value="ALL" placeholder="ALL या 1, 2, 3 ..."></div></div>
-  <div class="row"><div><label>प्रत्याशी फोटो का HTTPS URL</label><input id="cPhoto" type="url" placeholder="https://..."></div><div><label>चुनाव चिन्ह फोटो का HTTPS URL</label><input id="cSymbol" type="url" placeholder="https://..."></div></div>
-  <label>चुनाव चिन्ह का नाम</label><input id="cSymbolName" placeholder="उदा. कमल / हाथ">
-  <button id="createClientBtn" class="btn"><i class="fa fa-user-plus"></i> अकाउंट बनाएं</button>
-  <div class="notice">पासवर्ड केवल अकाउंट बनाते समय सर्वर को भेजा जाता है। इसे Firestore में सेव नहीं किया जाता।</div>
-  <h3 style="margin-top:22px">मौजूदा प्रत्याशी</h3><div id="clientRows">लोड हो रहा है...</div>
- </section>
-
- <section id="settingsPanel" class="card panel">
-  <h3>एडमिन पासवर्ड बदलें</h3>
-  <label>वर्तमान पासवर्ड (पुनः पुष्टि के लिए)</label><input id="currentPassword" type="password">
-  <label>नया पासवर्ड (कम से कम 8 अक्षर)</label><input id="newPassword" type="password">
-  <button id="changePasswordBtn" class="btn">पासवर्ड अपडेट करें</button>
-  <div class="notice">ईमेल बदलने के लिए Firebase Authentication में हालिया लॉगिन की पुष्टि आवश्यक होती है।</div>
- </section>
-</main>
-<footer>Voter Slip & Election Management Portal · Admin Module</footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+:root{--b:#174ea6;--t:#087e8b;--bg:#f3f6fb;--ink:#243247}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,'Tiro Devanagari Hindi',sans-serif}header{background:linear-gradient(120deg,#123c80,#087e8b);color:white;padding:14px;display:flex;justify-content:space-between}h1{font-size:18px;margin:0}.wrap{max-width:1050px;margin:18px auto;padding:0 12px}.card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 3px 15px #1234}.login{max-width:430px;margin:55px auto;text-align:center}label{display:block;font-size:13px;font-weight:600;margin-top:8px}input,select{width:100%;padding:11px;border:1px solid #ccd6e3;border-radius:8px;margin:5px 0 10px}button{background:var(--b);color:white;border:0;border-radius:8px;padding:10px 14px;margin:3px;cursor:pointer}.green{background:#16834b}.red{background:#b42318}.gray{background:#64748b}.wide{width:100%}.hidden{display:none!important}.muted{color:#64748b;font-size:13px}.notice{background:#eef5ff;color:#174ea6;padding:10px;border-radius:8px;margin:10px 0;font-size:13px}.error{background:#fff0f0;color:#a71919}.success{background:#eaf8ef;color:#126b3a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stat{background:white;padding:14px;border-left:4px solid var(--b);border-radius:9px}.stat strong{display:block;font-size:22px}.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{background:white;color:var(--b);border:1px solid #ddd}.tab.active{background:var(--b);color:white}.panel{display:none}.panel.active{display:block}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:450px}td,th{text-align:left;padding:9px;border-bottom:1px solid #e5eaf0;font-size:13px}.result{background:white;border:1px solid #e2e8f0;border-radius:9px;padding:12px;margin:8px 0}.slips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.slip{border:1px dashed #555;padding:10px;min-height:145px;color:#111;break-inside:avoid}.slip h4{text-align:center;margin:0 0 8px}.slip p{font-size:12px;margin:5px 0}.progress{height:8px;background:#ddd;border-radius:8px}.progress div{height:100%;width:0;background:var(--t)}@media(max-width:600px){.row{grid-template-columns:1fr}.slips{grid-template-columns:1fr}}@media print{@page{size:A4;margin:10mm}header,.no-print,footer{display:none!important}#printArea{display:block!important}.slips{grid-template-columns:repeat(2,1fr);gap:7mm}.slip{height:65mm}}
+</style></head><body>
+<header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
+<main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
+<main id="app" class="wrap hidden">
+<div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
+<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button></nav>
+<section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
+<section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
+<section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div></section>
+<section id="search" class="card panel active"><h3>मतदाता खोज</h3><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
+<section id="printArea" class="card hidden"><div class="no-print"><button onclick="window.print()">A4 प्रिंट करें</button></div><div id="slips" class="slips"></div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Firebase Spark Free</footer>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-/* Firebase Console > Project settings > Your apps से अपनी config भरें */
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",
-  authDomain: "voter-11766.firebaseapp.com",
-  projectId: "voter-11766",
-  storageBucket: "voter-11766.firebasestorage.app",
-  messagingSenderId: "1078819307357",
-  appId: "1:1078819307357:web:c8752d49751e34c037b2b4",
-  measurementId: "G-BHBYFENK2L"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(), db=firebase.firestore();
-const functions=firebase.app().functions("asia-south1");
-let currentUser=null, panchayats=[];
-
-const $=id=>document.getElementById(id);
-function message(el,text,type="notice"){el.textContent=text;el.className="notice "+type;el.classList.remove("hidden")}
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function safeUrl(v){try{const u=new URL(v);return u.protocol==="https:"?u.href:""}catch{return ""}}
-async function call(name,data){const fn=functions.httpsCallable(name);const r=await fn(data);return r.data}
-function showError(e){console.error(e);alert(e.message||"कुछ गलत हुआ।")}
-
-$("loginForm").addEventListener("submit",async e=>{
- e.preventDefault();const m=$("loginMsg");message(m,"लॉगिन हो रहा है...");
- try{await auth.signInWithEmailAndPassword($("loginEmail").value.trim(),$("loginPassword").value)}
- catch(err){message(m,"लॉगिन असफल: "+err.message,"error")}
-});
-$("logoutBtn").onclick=()=>auth.signOut();
-auth.onAuthStateChanged(async user=>{
- currentUser=user;
- if(!user){$("loginView").classList.remove("hidden");$("adminView").classList.add("hidden");$("logoutBtn").classList.add("hidden");return}
- try{
-  const token=await user.getIdTokenResult(true);
-  if(token.claims.role!=="admin")throw new Error("यह अकाउंट एडमिन के रूप में अधिकृत नहीं है।");
-  $("loginView").classList.add("hidden");$("adminView").classList.remove("hidden");$("logoutBtn").classList.remove("hidden");
-  $("adminEmail").textContent=user.email||"-";await refreshAll();
- }catch(e){alert(e.message);await auth.signOut()}
-});
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
- document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
- document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
- b.classList.add("active");$(b.dataset.tab).classList.add("active");
-});
-
-async function refreshAll(){await loadPanchayats();await loadClients()}
-async function loadPanchayats(){
- const snap=await db.collection("panchayats").orderBy("name").get();panchayats=snap.docs.map(d=>({id:d.id,...d.data()}));
- $("statPanchayats").textContent=panchayats.length;
- $("panchayatRows").innerHTML=panchayats.length?panchayats.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${Number(p.activeVoterCount||0).toLocaleString("en-IN")}</td><td><button class="btn red" onclick="deletePanchayat('${esc(p.id)}','${esc(p.name)}')">पूरी पंचायत हटाएं</button></td></tr>`).join(""):'<tr><td colspan="4">अभी कोई पंचायत नहीं है।</td></tr>';
- const opts='<option value="">पंचायत चुनें</option>'+panchayats.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.id)})</option>`).join("");
- $("uploadPanchayat").innerHTML=opts;$("cPanchayat").innerHTML=opts;
-}
-$("addPanchayatBtn").onclick=async()=>{
- const id=$("pId").value.trim().toUpperCase(),name=$("pName").value.trim();
- if(!/^[A-Z0-9_-]{3,40}$/.test(id))return alert("ID 3-40 अक्षर की हो और केवल A-Z, 0-9, _ या - इस्तेमाल करें।");
- if(!name)return alert("पंचायत का नाम लिखें");
- try{await call("createPanchayat",{panchayatId:id,name});$("pId").value="";$("pName").value="";await loadPanchayats();alert("पंचायत जोड़ दी गई।")}
- catch(e){showError(e)}
-};
-window.deletePanchayat=async(id,name)=>{
- if(!confirm(`क्या "${name}" की पूरी पंचायत, सक्रिय/पुराने अपलोड और मतदाता डेटा स्थायी रूप से हटाना है? यह वापस नहीं होगा।`))return;
- if(prompt("पुष्टि के लिए पंचायत ID लिखें:")!==id)return alert("ID मेल नहीं खाती।");
- try{await call("deletePanchayat",{panchayatId:id});await refreshAll();alert("पंचायत और उसका डेटा हटा दिया गया।")}catch(e){showError(e)}
-};
-
-$("uploadBtn").onclick=async()=>{
- const pid=$("uploadPanchayat").value,file=$("excelFile").files[0];
- if(!pid||!file)return alert("पंचायत और Excel फाइल चुनें।");
- if(!/\.(xlsx|xls)$/i.test(file.name))return alert("केवल .xlsx या .xls फाइल स्वीकार है।");
- const status=$("uploadStatus"),bar=$("progressBar");message(status,"Excel पढ़ी जा रही है...");
- $("uploadBtn").disabled=true;bar.style.width="0%";
- try{
-  const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:"array"});
-  const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});
-  if(!rows.length)throw new Error("Excel में कोई डेटा नहीं मिला।");
-  if(rows.length>100000)throw new Error("इस अपलोड में 1,00,000 से अधिक पंक्तियां हैं। इसे अलग-अलग फाइलों में बांटें।");
-  const uploadId=db.collection("_ids").doc().id;
-  await call("startVoterUpload",{panchayatId:pid,uploadId,totalRecords:rows.length});
-  const chunks=Math.ceil(rows.length/300);
-  for(let i=0;i<chunks;i++){
-   const part=rows.slice(i*300,(i+1)*300);
-   const clean=part.map((r,j)=>({rowNumber:i*300+j+2,data:r}));
-   await call("saveVoterChunk",{panchayatId:pid,uploadId,chunkNumber:i,records:clean});
-   const pct=Math.round((i+1)/chunks*100);bar.style.width=pct+"%";
-   message(status,`अपलोड हो रहा है: ${i+1}/${chunks} बैच (${pct}%)`);
-  }
-  await call("finishVoterUpload",{panchayatId:pid,uploadId,totalChunks:chunks,totalRecords:rows.length});
-  message(status,`सफल! ${rows.length.toLocaleString("en-IN")} मतदाता रिकॉर्ड अपलोड हुए।`,"success");
-  await loadPanchayats();
- }catch(e){message(status,"अपलोड में त्रुटि: "+(e.message||e),"error");showError(e)}
- finally{$("uploadBtn").disabled=false}
-};
-
-$("cPosition").onchange=()=>{
- $("cWard").value=$("cPosition").value==="सरपंच"?"ALL":"";
- $("cWard").placeholder=$("cPosition").value==="सरपंच"?"सरपंच के लिए ALL":"वार्ड नंबर लिखें, जैसे 3";
-};
-$("createClientBtn").onclick=async()=>{
- const payload={name:$("cName").value.trim(),email:$("cEmail").value.trim(),password:$("cPassword").value,
- panchayatId:$("cPanchayat").value,position:$("cPosition").value,ward:$("cWard").value.trim(),
- photo:safeUrl($("cPhoto").value.trim()),symbol:safeUrl($("cSymbol").value.trim()),symbolName:$("cSymbolName").value.trim()};
- if(!payload.name||!payload.email||payload.password.length<8||!payload.panchayatId)return alert("नाम, ईमेल, 8 अक्षर का पासवर्ड और पंचायत जरूरी हैं।");
- if(payload.position==="वार्ड पंच"&&!payload.ward)return alert("वार्ड पंच के लिए वार्ड चुनें।");
- try{const r=await call("createClient",payload);alert("प्रत्याशी अकाउंट बन गया। UID: "+r.uid);["cName","cEmail","cPassword","cPhoto","cSymbol","cSymbolName"].forEach(id=>$(id).value="");await loadClients()}
- catch(e){showError(e)}
-};
-async function loadClients(){
- const snap=await db.collection("users").where("role","==","client").orderBy("name").get();
- $("statClients").textContent=snap.size;
- $("clientRows").innerHTML=snap.empty?"अभी कोई प्रत्याशी नहीं है।":snap.docs.map(d=>{const c=d.data();return `<div class="client"><div><b>${esc(c.name)}</b><br><span class="muted">${esc(c.email)} · ${esc(c.position)} · वार्ड ${esc(c.ward)} · पंचायत ${esc(c.panchayatId)}</span></div><button class="btn red" onclick="resetLock('${esc(d.id)}','${esc(c.name)}')">डिवाइस अनलॉक</button></div>`}).join("");
-}
-window.resetLock=async(uid,name)=>{
- if(!confirm(`${name} का डिवाइस लॉक रीसेट करना है?`))return;
- try{await call("resetDeviceLock",{uid});alert("डिवाइस लॉक रीसेट कर दिया गया।")}catch(e){showError(e)}
-};
-$("changePasswordBtn").onclick=async()=>{
- const oldp=$("currentPassword").value,newp=$("newPassword").value;
- if(!oldp||newp.length<8)return alert("वर्तमान पासवर्ड और कम से कम 8 अक्षर का नया पासवर्ड लिखें।");
- try{const credential=firebase.auth.EmailAuthProvider.credential(currentUser.email,oldp);await currentUser.reauthenticateWithCredential(credential);await currentUser.updatePassword(newp);$("currentPassword").value="";$("newPassword").value="";alert("पासवर्ड बदल दिया गया।")}
- catch(e){showError(e)}
-};
-</script>
-</body>
-</html>
+const firebaseConfig={apiKey:"AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",authDomain:"voter-11766.firebaseapp.com",projectId:"voter-11766",storageBucket:"voter-11766.firebasestorage.app",messagingSenderId:"1078819307357",appId:"1:1078819307357:web:c8752d49751e34c037b2b4",measurementId:"G-BHBYFENK2L"};
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[];const $=x=>document.getElementById(x);
+const norm=x=>String(x??"").toLocaleLowerCase("hi").replace(/\s+/g," ").trim();
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function notice(el,s,kind="notice"){el.textContent=s;el.className="notice "+kind;el.classList.remove("hidden")}
+function field(o,keys){for(const k of keys)if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();return ""}
+function fields(r){return {name:field(r,["नाम","मतदाता का नाम","name","Name","voter_name"]),relative:field(r,["पिता/पति का नाम","पिता का नाम","पति का नाम","father_name","Father Name"]),house:field(r,["मकान नंबर","मकान नं","house_no","House No"]),ward:field(r,["वार्ड","वार्ड नंबर","ward","Ward","ward_no"]),serial:field(r,["क्रमांक","क्रम संख्या","serial","serial_no"]),epic:field(r,["EPIC","epic_no","Voter ID"])}}
+function isAdmin(){return profile?.role==="admin"}
+auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts()}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");places=[{id:p.id,...p.data()}];$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`}}catch(e){alert(e.message);await auth.signOut()}});
+$("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.id).classList.add("active")});
+async function loadPlaces(){const s=await db.collection("panchayats").orderBy("name").get();places=s.docs.map(d=>({id:d.id,...d.data()}));$("pCount").textContent=places.length;$("pRows").innerHTML=places.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td></tr>`).join("")||"<tr><td colspan='3'>कोई पंचायत नहीं</td></tr>";$("upP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("")}
+$("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!/^[A-Z0-9_-]{3,40}$/.test(id)||!name)return alert("सही ID और नाम भरें।");try{await db.collection("panchayats").doc(id).set({name,activeUploadId:null,activeVoterCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत जोड़ दी गई।")}catch(e){alert(e.message)}};
+$("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return alert("पंचायत और Excel चुनें।");$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});if(!rows.length||rows.length>20000)throw Error("1 से 20,000 रिकॉर्ड तक अपलोड करें।");let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;$("bar").style.width=Math.round((i+1)/rows.length*100)+"%";notice($("upMsg"),`अपलोड ${i+1}/${rows.length}`)}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),`${rows.length} रिकॉर्ड अपलोड हुए।`,"success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
+async function loadAccounts(){let s=await db.collection("users").where("role","==","client").get();$("accountList").innerHTML=s.docs.map(d=>{let x=d.data();return `<div class="result"><b>${esc(x.name||x.email||d.id)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}</div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।"}
+async function getVoters(){let p=places[0];if(!p?.activeUploadId)throw Error("सक्रिय वोटर सूची उपलब्ध नहीं।");let q=db.collection("panchayats").doc(p.id).collection("uploads").doc(p.activeUploadId).collection("voters");if(!isAdmin()&&profile.ward!=="ALL")q=q.where("ward","==",String(profile.ward));let s=await q.limit(5000).get();return s.docs.map(d=>({id:d.id,...d.data()}))}
+$("searchBtn").onclick=async()=>{try{notice($("searchMsg"),"खोज रहे हैं...");if(!cache.length)cache=await getVoters();let term=norm($("query").value),ward=$("ward").value;let found=cache.filter(v=>(!term||[v.name,v.relative,v.house,v.serial,v.epic].some(x=>norm(x).includes(term)))&&(!ward||String(v.ward)===ward)).slice(0,100);$("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)} · क्रमांक: ${esc(v.serial)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";notice($("searchMsg"),`परिणाम: ${found.length}${cache.length===5000?" (पहले 5,000 रिकॉर्ड तक)":""}`)}catch(e){notice($("searchMsg"),e.message,"error")}};
+$("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[]};
+window.makeSlip=id=>{let v=cache.find(x=>x.id===id);if(!v)return;$("printArea").classList.remove("hidden");$("slips").innerHTML=`<article class="slip"><h4>मतदाता पर्ची</h4><p><b>पंचायत:</b> ${esc(places[0]?.name||"")}</p><p><b>मतदाता:</b> ${esc(v.name)}</p><p><b>पिता/पति:</b> ${esc(v.relative)}</p><p><b>मकान:</b> ${esc(v.house)}</p><p><b>वार्ड:</b> ${esc(v.ward)}　<b>क्रमांक:</b> ${esc(v.serial)}</p><p><b>EPIC:</b> ${esc(v.epic)}</p></article>`;window.scrollTo(0,$("printArea").offsetTop)};
+</script></body></html>
