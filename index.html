@@ -716,6 +716,7 @@
 
             if (!u || !p) { alert('कृपया यूजर आईडी और पासवर्ड दोनों दर्ज करें!'); return; }
 
+            // एडमिन आईडी कभी भी लॉक/बाउंड नहीं होगी (यह हमेशा किसी भी डिवाइस से लॉगिन हो सकती है)
             if (u.toLowerCase() === currentAdminId.toLowerCase() && p === currentAdminPassword) {
                 showView('viewAdminDashboard');
                 return;
