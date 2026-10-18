@@ -741,7 +741,7 @@
             });
         }
 
-        // पूरी तरह से यूनिवर्सल और अडैप्टिव डेटा लोडर (छोटा डेटा हो या चंक्स वाला बड़ा डेटा, दोनों को ऑटोमैटिक उठाएगा)
+        // 100% यूनिवर्सल और सुरक्षित डेटा लोडर
         function loadVotersForClientGP(gpId, callback) {
             if (allPanchayatVoters[gpId] && allPanchayatVoters[gpId].length > 0) {
                 if (callback) callback();
@@ -752,14 +752,12 @@
                 gpRef.get().then(doc => {
                     if (doc.exists) {
                         let docData = doc.data();
-                        // यदि डेटा सीधे एरे के रूप में है (छोटी पंचायत जैसे सुवाणा)
                         if (docData.voters && Array.isArray(docData.voters) && docData.voters.length > 0) {
                             allPanchayatVoters[gpId] = docData.voters;
                             if (callback) callback();
                             return;
                         }
                     }
-                    // यदि डेटा चंक्स (Chunks) के रूप में है (बड़ी पंचायत जैसे बरण)
                     gpRef.collection("chunks").get().then(snapshot => {
                         if (!snapshot.empty) {
                             let chunkDocs = [];
@@ -930,7 +928,6 @@
                         batch.delete(gpRef);
                         return batch.commit();
                     }).then(() => {
-                        // साथ ही डायरेक्ट डॉक्यूमेंट को भी साफ करें
                         gpRef.delete().catch(e => {});
                         alert('✅ डेटा डिलीट हो गया!');
                     }).catch(e => alert('त्रुटि: ' + e.message));
@@ -1327,7 +1324,7 @@
             alert('✅ पासवर्ड अपडेट हो गया!');
         }
 
-        // यूनिवर्सल अपलोडर: यदि डेटा छोटा है तो सीधे सेव होगा, बड़ा है तो चंक्स में (बिल्कुल सुवाणा और बरण की तरह)
+        // यूनिवर्सल अपलोडर (सुवाणा और बरण दोनों के लिए एक समान और सुरक्षित)
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
             const selectedGp = document.getElementById('uploadGpSelect').value;
@@ -1364,7 +1361,6 @@
                     if (isFirebaseActive && db) {
                         const gpDocRef = db.collection("panchayats").doc(selectedGp);
                         
-                        // यदि डेटा 1500 से कम (छोटा) है, तो सुवाणा की तरह सीधे डॉक्यूमेंट में सेव करें
                         if (parsedVoters.length < 1500) {
                             gpDocRef.set({
                                 panchayatId: selectedGp,
@@ -1373,7 +1369,6 @@
                                 voters: parsedVoters,
                                 updatedAt: new Date().toISOString()
                             }).then(async () => {
-                                // पुराने चंक्स यदि हों तो साफ कर दें
                                 const oldChunksSnap = await gpDocRef.collection("chunks").get();
                                 let batch = db.batch();
                                 oldChunksSnap.forEach(doc => batch.delete(doc.ref));
@@ -1384,7 +1379,6 @@
                                 document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के ${parsedVoters.length} मतदाता सीधे अपलोड हो गए!</span>`;
                             });
                         } else {
-                            // यदि डेटा बड़ा है (जैसे बरण), तो चंक्स (Chunks) में बांटकर सेव करें
                             const CHUNK_SIZE = 300;
                             const chunks = [];
                             for (let i = 0; i < parsedVoters.length; i += CHUNK_SIZE) chunks.push(parsedVoters.slice(i, i + CHUNK_SIZE));
