@@ -746,7 +746,6 @@
                 return;
             }
             if (isFirebaseActive && db) {
-                // अब पाथ को 'panchayats' सेट कर दिया गया है ताकि यह सुवाना और बरण दोनों को सही से उठाए[span_2](start_span)[span_2](end_span)
                 db.collection("panchayats").doc(gpId).collection("chunks").get().then(snapshot => {
                     if (!snapshot.empty) {
                         let combinedVoters = [];
@@ -755,12 +754,15 @@
                             if (data.voters && Array.isArray(data.voters)) combinedVoters = combinedVoters.concat(data.voters);
                         });
                         allPanchayatVoters[gpId] = combinedVoters;
+                        if (callback) callback();
                     } else {
                         db.collection("panchayats").doc(gpId).get().then(doc => {
-                            if (doc.exists && doc.data().voters) allPanchayatVoters[gpId] = doc.data().voters;
-                        }).catch(e => {});
+                            if (doc.exists && doc.data().voters) {
+                                allPanchayatVoters[gpId] = doc.data().voters;
+                            }
+                            if (callback) callback();
+                        }).catch(e => { if (callback) callback(); });
                     }
-                    if (callback) callback();
                 }).catch(e => {
                     db.collection("panchayats").doc(gpId).get().then(doc => {
                         if (doc.exists && doc.data().voters) allPanchayatVoters[gpId] = doc.data().voters;
@@ -1319,7 +1321,7 @@
                         rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['संबंधी का नाम'] || ''),
                         house: String(r['मकान संख्या (House No.)'] || r['मकान संख्या'] || ''),
                         age: String(r['आयु (Age)'] || r['आयु'] || ''),
-                        gender: String(r['लिंग (Gender)'] || r['लिंग'] || ''),
+                        gender: String(r['लिंग (Gender)'] || r['Gender'] || ''),
                         area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || r['मोहल्ला क्षेत्र/एरिया लोकलिटी'] || gpName),
                         booth: String(r['मतदान बूथ सं० व पता'] || r['मतदान बूथ संख्या व पता'] || gpName)
                     }));
@@ -1331,7 +1333,6 @@
                         const chunks = [];
                         for (let i = 0; i < parsedVoters.length; i += CHUNK_SIZE) chunks.push(parsedVoters.slice(i, i + CHUNK_SIZE));
 
-                        // अब यह 'panchayats' कलेक्शन के अंदर सही डॉक्यूमेंट (सुवाना की तरह बरण) बनाएगा[span_3](start_span)[span_3](end_span)
                         const gpDocRef = db.collection("panchayats").doc(selectedGp);
                         gpDocRef.set({ panchayatId: selectedGp, panchayatName: gpName, totalVoters: parsedVoters.length, updatedAt: new Date().toISOString() }).then(async () => {
                             const oldChunksSnap = await gpDocRef.collection("chunks").get();
