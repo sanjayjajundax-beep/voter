@@ -747,30 +747,44 @@
                 return;
             }
             if (isFirebaseActive && db) {
-                db.collection("panchayats").doc(gpId).collection("chunks").get().then(snapshot => {
-                    if (!snapshot.empty) {
-                        let combinedVoters = [];
-                        snapshot.forEach(doc => {
-                            const data = doc.data();
-                            if (data.voters && Array.isArray(data.voters)) combinedVoters = combinedVoters.concat(data.voters);
-                        });
-                        allPanchayatVoters[gpId] = combinedVoters;
+                db.collection("panchayats").doc(gpId).get().then(doc => {
+                    if (doc.exists && doc.data().voters && Array.isArray(doc.data().voters)) {
+                        allPanchayatVoters[gpId] = doc.data().voters;
                         if (callback) callback();
                     } else {
-                        db.collection("panchayats").doc(gpId).get().then(doc => {
-                            if (doc.exists && doc.data().voters) {
-                                allPanchayatVoters[gpId] = doc.data().voters;
+                        db.collection("panchayats").doc(gpId).collection("chunks").get().then(snapshot => {
+                            if (!snapshot.empty) {
+                                let chunkDocs = [];
+                                snapshot.forEach(chunkDoc => {
+                                    chunkDocs.push({ id: chunkDoc.id, data: chunkDoc.data() });
+                                });
+                                
+                                // चंक्स को सही क्रम में सॉर्ट करें (chunk_0, chunk_1, chunk_2...)
+                                chunkDocs.sort((a, b) => {
+                                    let numA = parseInt(a.id.replace('chunk_', '')) || 0;
+                                    let numB = parseInt(b.id.replace('chunk_', '')) || 0;
+                                    return numA - numB;
+                                });
+
+                                let combinedVoters = [];
+                                chunkDocs.forEach(item => {
+                                    if (item.data.voters && Array.isArray(item.data.voters)) {
+                                        combinedVoters = combinedVoters.concat(item.data.voters);
+                                    }
+                                });
+                                allPanchayatVoters[gpId] = combinedVoters;
                             }
                             if (callback) callback();
-                        }).catch(e => { if (callback) callback(); });
+                        }).catch(err => {
+                            if (callback) callback();
+                        });
                     }
-                }).catch(e => {
-                    db.collection("panchayats").doc(gpId).get().then(doc => {
-                        if (doc.exists && doc.data().voters) allPanchayatVoters[gpId] = doc.data().voters;
-                        if (callback) callback();
-                    }).catch(err => { if (callback) callback(); });
+                }).catch(err => {
+                    if (callback) callback();
                 });
-            } else { if (callback) callback(); }
+            } else {
+                if (callback) callback();
+            }
         }
 
         function unlockClientDevice(idx) {
