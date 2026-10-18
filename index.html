@@ -526,8 +526,8 @@
                         <select id="uploadGpSelect" class="form-control" style="font-weight:600; color:var(--primary);"></select>
                     </div>
                     <div class="form-group">
-                        <label>एक्सेल फ़ाइल (.xlsx / .xls):</label>
-                        <input type="file" id="excelFileLoader" accept=".xlsx, .xls" class="form-control" style="padding: 11px;">
+                        <label>एक्सेल फ़ाइल (.xlsx / .xls / .csv):</label>
+                        <input type="file" id="excelFileLoader" accept=".xlsx, .xls, .csv" class="form-control" style="padding: 11px;">
                     </div>
                     <div id="uploadProgressBox" class="progress-box"><div id="uploadProgressBar" class="progress-bar-fill"></div></div>
                     <div id="excelMsg" style="margin-top: 10px; font-weight: 600; font-size: 0.95rem;"></div>
@@ -1308,22 +1308,23 @@
 
             r.onload = function(evt) {
                 try {
-                    const wb = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+                    const data = new Uint8Array(evt.target.result);
+                    const wb = XLSX.read(data, { type: 'array' });
                     let rows = [];
                     wb.SheetNames.forEach(s => rows = rows.concat(XLSX.utils.sheet_to_json(wb.Sheets[s])));
                     
                     const parsedVoters = rows.map((r, i) => ({
-                        ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || '1'),
-                        sno: r['क्र० सं० (S.No.)'] || r['S.No.'] || r['क्रम संख्या'] || (i + 1),
-                        epic: String(r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || r['ईपीआईसी नंबर'] || ''),
-                        name: String(r['नाम (Name)'] || r['Name'] || r['नेम'] || ''),
-                        relation: String(r['संबंध का प्रकार (Relation)'] || r['संबंध का प्रकार'] || 'पिता/पति'),
-                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['संबंधी का नाम'] || ''),
-                        house: String(r['मकान संख्या (House No.)'] || r['मकान संख्या'] || ''),
-                        age: String(r['आयु (Age)'] || r['आयु'] || ''),
-                        gender: String(r['लिंग (Gender)'] || r['Gender'] || ''),
-                        area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || r['मोहल्ला क्षेत्र/एरिया लोकलिटी'] || gpName),
-                        booth: String(r['मतदान बूथ सं० व पता'] || r['मतदान बूथ संख्या व पता'] || gpName)
+                        ward: String(r['WARD'] || r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || '1'),
+                        sno: r['क्रम संख्या'] || r['क्र० सं० (S.No.)'] || r['S.No.'] || (i + 1),
+                        epic: String(r['EPIC / पहचान पत्र संख्या'] || r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || r['ईपीआईसी नंबर'] || ''),
+                        name: String(r['मतदाता का नाम'] || r['नाम (Name)'] || r['Name'] || r['नेम'] || ''),
+                        relation: String(r['सम्बंध'] || r['संबंध का प्रकार (Relation)'] || r['संबंध का प्रकार'] || 'पिता/पति'),
+                        rel_name: String(r['पिता / पति का नाम'] || r['संबंधी का नाम (Relative Name)'] || r['संबंधी का नाम'] || ''),
+                        house: String(r['मकान संख्या'] || r['मकान संख्या (House No.)'] || r['House No'] || '-'),
+                        age: String(r['आयु'] || r['आयु (Age)'] || ''),
+                        gender: String(r['लिंग'] || r['लिंग (Gender)'] || r['Gender'] || ''),
+                        area: String(r['मोहल्ला / क्षेत्र'] || r['मोहल्ला क्षेत्र/एरिया लोकलिटी'] || gpName),
+                        booth: String(r['मतदान बूथ संख्या व पता'] || r['मतदान बूथ सं० व पता'] || gpName)
                     }));
 
                     document.getElementById('uploadProgressBar').style.width = '80%';
@@ -1345,10 +1346,10 @@
 
                             document.getElementById('uploadProgressBar').style.width = '100%';
                             setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
-                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता अपलोड हो गए!</span>`;
+                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता सफलतापूर्वक अपलोड हो गए!</span>`;
                         });
                     }
-                } catch(err) { alert('त्रुटि: ' + err.message); }
+                } catch(err) { alert('फाइल पढ़ने में त्रुटि: ' + err.message); }
             };
             r.readAsArrayBuffer(file);
         });
