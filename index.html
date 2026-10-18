@@ -723,7 +723,7 @@
                 <div class="admin-card">
                     <h3 style="font-size: 1.05rem; margin-bottom: 10px; color: #1e3a8a;"><i class="fa-solid fa-plus-circle"></i> नई ग्राम पंचायत बनाएं</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="form-group"><label>पंचायत कोड (Unique ID):</label><input type="text" id="newGpId" class="form-control" placeholder="उदा० suwana"></div>
+                        <div class="form-group"><label>पंचायत कोड (Unique ID):</label><input type="text" id="newGpId" class="form-control" placeholder="उदा० suwana या baran"></div>
                         <div class="form-group"><label>ग्राम पंचायत का नाम:</label><input type="text" id="newGpName" class="form-control" placeholder="उदा० ग्राम पंचायत सुवाणा"></div>
                     </div>
                     <button class="btn-main" onclick="addNewPanchayat()" style="margin-top: 10px;"><i class="fa-solid fa-plus"></i> पंचायत जोड़ें</button>
@@ -773,7 +773,7 @@
                 <div class="admin-card">
                     <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #1e3a8a;"><i class="fa-solid fa-user-plus"></i> नया सरपंच / वार्ड पंच प्रत्याशी जोड़ें (डायरेक्ट लिंक द्वारा)</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="form-group"><label>लॉगिन यूजर आईडी:</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० sarpanch1"></div>
+                        <div class="form-group"><label>लॉगिन यूजर आईडी:</label><input type="text" id="addClientId" class="form-control" placeholder="उदा० baran या suwana"></div>
                         <div class="form-group"><label>पासवर्ड:</label><input type="text" id="addClientPass" class="form-control" placeholder="पासवर्ड..."></div>
                         <div class="form-group"><label>प्रत्याशी का पूरा नाम:</label><input type="text" id="addClientCandName" class="form-control" placeholder="उदा० रमेश जाट"></div>
                         <div class="form-group">
@@ -916,7 +916,8 @@
         }
 
         let panchayatsList = JSON.parse(localStorage.getItem('election_panchayats_db') || JSON.stringify([
-            { id: "suwana", name: "ग्राम पंचायत सुवाणा" }
+            { id: "suwana", name: "ग्राम पंचायत सुवाणा" },
+            { id: "baran", name: "ग्राम पंचायत बरण" }
         ]));
 
         let allPanchayatVoters = {};
@@ -1207,16 +1208,33 @@
             const gpObj = panchayatsList.find(g => g.id === loggedInClient.gp);
             const gpDisplayName = gpObj ? gpObj.name : loggedIdClientGPName();
 
-            if (loggedInClient.ward === 'ALL') {
-                clientWardBadge.innerText = `${gpDisplayName} • सभी वार्ड • ${loggedInClient.name}`;
-                selectWardFilter.innerHTML = `<option value="ALL">🔍 सभी वार्ड</option>`;
-                for (let w = 1; w <= 17; w++) {
-                    selectWardFilter.innerHTML += `<option value="${w}">वार्ड नंबर ${w}</option>`;
+            // तुरंत डेटा लोड करवाएं ताकि वार्ड सही से मिल सकें
+            loadVotersForClientGP(loggedInClient.gp, () => {
+                const votersList = getCurrentClientVotersList();
+                let uniqueWards = [...new Set(votersList.map(v => String(v.ward).trim()))].filter(Boolean);
+                
+                uniqueWards.sort((a, b) => {
+                    return (isNaN(a) ? a : Number(a)) > (isNaN(b) ? b : Number(b)) ? 1 : -1;
+                });
+
+                if (loggedInClient.ward === 'ALL') {
+                    clientWardBadge.innerText = `${gpDisplayName} • सभी वार्ड • ${loggedInClient.name}`;
+                    selectWardFilter.innerHTML = `<option value="ALL">🔍 सभी वार्ड</option>`;
+                    
+                    if (uniqueWards.length > 0) {
+                        uniqueWards.forEach(w => {
+                            selectWardFilter.innerHTML += `<option value="${w}">वार्ड नंबर ${w}</option>`;
+                        });
+                    } else {
+                        for (let w = 1; w <= 9; w++) {
+                            selectWardFilter.innerHTML += `<option value="${w}">वार्ड नंबर ${w}</option>`;
+                        }
+                    }
+                } else {
+                    clientWardBadge.innerText = `${gpDisplayName} • वार्ड ${loggedInClient.ward} • ${loggedInClient.name}`;
+                    selectWardFilter.innerHTML = `<option value="${loggedInClient.ward}">वार्ड ${loggedInClient.ward}</option>`;
                 }
-            } else {
-                clientWardBadge.innerText = `${gpDisplayName} • वार्ड ${loggedInClient.ward} • ${loggedInClient.name}`;
-                selectWardFilter.innerHTML = `<option value="${loggedInClient.ward}">वार्ड ${loggedInClient.ward}</option>`;
-            }
+            });
         }
 
         function loggedIdClientGPName() {
