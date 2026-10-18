@@ -21,7 +21,7 @@ firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.fi
 const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\\u200b-\\u200d\\ufeff]/g,"").replace(/[.,;:|/\\\\_-]+/g," ").replace(/\\s+/g," ").trim();
 function matchesSearch(v,term){
   if(!term)return true;
-  const hay=norm([v.name,v.relative,v.house,v.ward,v.serial,v.epic].join(" "));
+  const hay=norm([v.name,v.relative,v.relationType,v.house,v.ward,v.serial,v.epic,v.age,v.gender,v.locality,v.booth].join(" "));
   const words=norm(term).split(" ").filter(Boolean);
   return words.every(word=>hay.includes(word));
 }
@@ -29,16 +29,33 @@ const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 function notice(el,s,kind="notice"){el.textContent=s;el.className="notice "+kind;el.classList.remove("hidden")}
 function field(o,keys){for(const k of keys)if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();return ""}
 function fields(r){
- const normalized={};for(const [k,v] of Object.entries(r)){const key=String(k).toLowerCase().replace(/[\\s_./()-]/g,"");normalized[key]=v}
- const pick=(keys)=>{for(const k of keys){const v=normalized[k.toLowerCase().replace(/[\\s_./()-]/g,"")];if(v!=null&&String(v).trim())return String(v).trim()}return ""};
+ const normalized={};
+ for(const [k,v] of Object.entries(r)){
+  const key=String(k).toLocaleLowerCase("hi").replace(/[\s_./()-]/g,"");
+  normalized[key]=v;
+ }
+ const pick=(keys)=>{
+  for(const k of keys){
+   const key=String(k).toLocaleLowerCase("hi").replace(/[\s_./()-]/g,"");
+   const v=normalized[key];
+   if(v!=null&&String(v).trim())return String(v).trim();
+  }
+  return "";
+ };
  return {
-  name:field(r,["नाम","मतदाता का नाम","मतदाता का पूरा नाम","निर्वाचक का नाम","name","Name","voter_name","Voter Name"])||pick(["नाम","मतदाता का नाम","मतदाता का पूरा नाम","निर्वाचक का नाम","name","voter_name"]),
-  relative:field(r,["पिता/पति का नाम","पिता का नाम","पति का नाम","पिता/पति/माता का नाम","father_name","Father Name","relative_name"])||pick(["पिता/पति का नाम","पिता का नाम","पति का नाम","पिता/पति/माता का नाम","father_name","fathername","relativename"]),
-  house:field(r,["मकान नंबर","मकान नं","मकान संख्या","house_no","House No"])||pick(["मकान नंबर","मकान नं","मकान संख्या","houseno","housenumber"]),
-  ward:field(r,["वार्ड","वार्ड नंबर","वार्ड संख्या","ward","Ward","ward_no"])||pick(["वार्ड","वार्ड नंबर","वार्ड संख्या","ward","wardno"]),
-  serial:field(r,["क्रमांक","क्रम संख्या","भाग क्रमांक","serial","serial_no"])||pick(["क्रमांक","क्रम संख्या","serial","serialno"]),
-  epic:field(r,["EPIC","epic_no","Voter ID","मतदाता पहचान पत्र"])||pick(["epic","epicno","voterid","मतदाता पहचान पत्र"])
- }}
+  ward:pick(["वार्ड नंबर","वार्ड संख्या","वार्ड","ward number","ward no","ward"]),
+  serial:pick(["क्रम संख्या","क्रमांक","serial number","serial no","serial"]),
+  epic:pick(["ईपीआईसी नंबर","epic number","epic no","epic","voter id"]),
+  name:pick(["नेम","नाम","मतदाता का नाम","मतदाता का पूरा नाम","निर्वाचक का नाम","name","voter name"]),
+  relationType:pick(["संबंध का प्रकार","संबंध प्रकार","relation type","relation"]),
+  relative:pick(["संबंधी का नाम","पिता/पति का नाम","पिता का नाम","पति का नाम","relative name","father name","husband name"]),
+  house:pick(["मकान संख्या","मकान नंबर","मकान नं","house number","house no"]),
+  age:pick(["आयु","उम्र","age"]),
+  gender:pick(["लिंग","gender","sex"]),
+  locality:pick(["मोहल्ला क्षेत्र/एरिया लोकलिटी","मोहल्ला","क्षेत्र","एरिया","लोकलिटी","locality","area"]),
+  booth:pick(["मतदान बूथ संख्या व पता","मतदान बूथ संख्या और पता","बूथ संख्या व पता","booth number and address","polling booth"])
+ };
+}
 function isAdmin(){return profile?.role==="admin"}
 auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
 try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");places=[{id:p.id,...p.data()}];$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`}}catch(e){alert(e.message);await auth.signOut()}});
@@ -51,5 +68,5 @@ async function loadAccounts(){let s=await db.collection("users").where("role","=
 async function getVoters(){let p=isAdmin()?places.find(x=>x.id===$("searchP").value):places[0];if(!p)throw Error("पंचायत चुनें।");activeSearchPlace=p;if(!p.activeUploadId)throw Error("इस पंचायत की सक्रिय वोटर सूची उपलब्ध नहीं।");let q=db.collection("panchayats").doc(p.id).collection("uploads").doc(p.activeUploadId).collection("voters");if(!isAdmin()&&profile.ward!=="ALL")q=q.where("ward","==",String(profile.ward));let s=await q.limit(5000).get();return s.docs.map(d=>({id:d.id,...d.data()}))}
 $("searchBtn").onclick=async()=>{try{notice($("searchMsg"),"खोज रहे हैं...");if(!cache.length)cache=await getVoters();if(isAdmin()){$("ward").innerHTML="<option value=''>सभी वार्ड</option>"+[...new Set(cache.map(v=>String(v.ward||"")).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"hi")).map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("")}let term=norm($("query").value),ward=$("ward").value;let found=cache.filter(v=>matchesSearch(v,term)&&(!ward||String(v.ward)===ward)).slice(0,100);$("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)} · क्रमांक: ${esc(v.serial)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";notice($("searchMsg"),`परिणाम: ${found.length}${cache.length===5000?" (पहले 5,000 रिकॉर्ड तक)":""}`)}catch(e){notice($("searchMsg"),e.message,"error")}};
 $("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[];$("ward").value=""};$("searchP").onchange=()=>{cache=[];$("results").innerHTML="";$("ward").innerHTML="<option value=''>सभी वार्ड</option>"};
-window.makeSlip=id=>{let v=cache.find(x=>x.id===id);if(!v)return;$("printArea").classList.remove("hidden");$("slips").innerHTML=`<article class="slip"><h4>मतदाता पर्ची</h4><p><b>पंचायत:</b> ${esc(activeSearchPlace?.name||places[0]?.name||"")}</p><p><b>मतदाता:</b> ${esc(v.name)}</p><p><b>पिता/पति:</b> ${esc(v.relative)}</p><p><b>मकान:</b> ${esc(v.house)}</p><p><b>वार्ड:</b> ${esc(v.ward)}　<b>क्रमांक:</b> ${esc(v.serial)}</p><p><b>EPIC:</b> ${esc(v.epic)}</p></article>`;window.scrollTo(0,$("printArea").offsetTop)};
+window.makeSlip=id=>{let v=cache.find(x=>x.id===id);if(!v)return;$("printArea").classList.remove("hidden");$("slips").innerHTML=`<article class="slip"><h4>मतदाता पर्ची</h4><p><b>पंचायत:</b> ${esc(activeSearchPlace?.name||places[0]?.name||"")}</p><p><b>मतदाता:</b> ${esc(v.name)}</p><p><b>संबंध का प्रकार:</b> ${esc(v.relationType)}　<b>संबंधी:</b> ${esc(v.relative)}</p><p><b>मकान संख्या:</b> ${esc(v.house)}　<b>आयु:</b> ${esc(v.age)}　<b>लिंग:</b> ${esc(v.gender)}</p><p><b>वार्ड:</b> ${esc(v.ward)}　<b>क्रम संख्या:</b> ${esc(v.serial)}</p><p><b>EPIC नंबर:</b> ${esc(v.epic)}</p><p><b>मोहल्ला/एरिया:</b> ${esc(v.locality)}</p><p><b>मतदान बूथ:</b> ${esc(v.booth)}</p></article>`;window.scrollTo(0,$("printArea").offsetTop)};
 </script></body></html>
