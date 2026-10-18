@@ -716,7 +716,7 @@
 
             if (!u || !p) { alert('कृपया यूजर आईडी और पासवर्ड दोनों दर्ज करें!'); return; }
 
-            // एडमिन आईडी कभी भी लॉक/बाउंड नहीं होगी (यह हमेशा किसी भी डिवाइस से लॉगिन हो सकती है)
+            // एडमिन आईडी कभी भी लॉक/बाउंड नहीं होगी
             if (u.toLowerCase() === currentAdminId.toLowerCase() && p === currentAdminPassword) {
                 showView('viewAdminDashboard');
                 return;
@@ -741,48 +741,59 @@
             });
         }
 
+        // पूरी तरह से यूनिवर्सल और अडैप्टिव डेटा लोडर (छोटा डेटा हो या चंक्स वाला बड़ा डेटा, दोनों को ऑटोमैटिक उठाएगा)
         function loadVotersForClientGP(gpId, callback) {
             if (allPanchayatVoters[gpId] && allPanchayatVoters[gpId].length > 0) {
                 if (callback) callback();
                 return;
             }
             if (isFirebaseActive && db) {
-                db.collection("panchayats").doc(gpId).get().then(doc => {
-                    if (doc.exists && doc.data().voters && Array.isArray(doc.data().voters)) {
-                        allPanchayatVoters[gpId] = doc.data().voters;
-                        if (callback) callback();
-                    } else {
-                        db.collection("panchayats").doc(gpId).collection("chunks").get().then(snapshot => {
-                            if (!snapshot.empty) {
-                                let chunkDocs = [];
-                                snapshot.forEach(chunkDoc => {
-                                    chunkDocs.push({ id: chunkDoc.id, data: chunkDoc.data() });
-                                });
-                                
-                                // चंक्स को सही क्रम में सॉर्ट करें (chunk_0, chunk_1, chunk_2...)
-                                chunkDocs.sort((a, b) => {
-                                    let numA = parseInt(a.id.replace('chunk_', '')) || 0;
-                                    let numB = parseInt(b.id.replace('chunk_', '')) || 0;
-                                    return numA - numB;
-                                });
-
-                                let combinedVoters = [];
-                                chunkDocs.forEach(item => {
-                                    if (item.data.voters && Array.isArray(item.data.voters)) {
-                                        combinedVoters = combinedVoters.concat(item.data.voters);
-                                    }
-                                });
-                                allPanchayatVoters[gpId] = combinedVoters;
-                            }
+                let gpRef = db.collection("panchayats").doc(gpId);
+                gpRef.get().then(doc => {
+                    if (doc.exists) {
+                        let docData = doc.data();
+                        // यदि डेटा सीधे एरे के रूप में है (छोटी पंचायत जैसे सुवाणा)
+                        if (docData.voters && Array.isArray(docData.voters) && docData.voters.length > 0) {
+                            allPanchayatVoters[gpId] = docData.voters;
                             if (callback) callback();
-                        }).catch(err => {
-                            if (callback) callback();
-                        });
+                            return;
+                        }
                     }
+                    // यदि डेटा चंक्स (Chunks) के रूप में है (बड़ी पंचायत जैसे बरण)
+                    gpRef.collection("chunks").get().then(snapshot => {
+                        if (!snapshot.empty) {
+                            let chunkDocs = [];
+                            snapshot.forEach(chunkDoc => {
+                                chunkDocs.push({ id: chunkDoc.id, data: chunkDoc.data() });
+                            });
+                            
+                            chunkDocs.sort((a, b) => {
+                                let numA = parseInt(a.id.replace('chunk_', '')) || 0;
+                                let numB = parseInt(b.id.replace('chunk_', '')) || 0;
+                                return numA - numB;
+                            });
+
+                            let combinedVoters = [];
+                            chunkDocs.forEach(item => {
+                                if (item.data.voters && Array.isArray(item.data.voters)) {
+                                    combinedVoters = combinedVoters.concat(item.data.voters);
+                                }
+                            });
+                            allPanchayatVoters[gpId] = combinedVoters;
+                        } else {
+                            allPanchayatVoters[gpId] = [];
+                        }
+                        if (callback) callback();
+                    }).catch(err => {
+                        allPanchayatVoters[gpId] = [];
+                        if (callback) callback();
+                    });
                 }).catch(err => {
+                    allPanchayatVoters[gpId] = [];
                     if (callback) callback();
                 });
             } else {
+                allPanchayatVoters[gpId] = [];
                 if (callback) callback();
             }
         }
@@ -918,7 +929,11 @@
                         snapshot.forEach(doc => batch.delete(doc.ref));
                         batch.delete(gpRef);
                         return batch.commit();
-                    }).then(() => alert('✅ डेटा डिलीट हो गया!')).catch(e => alert('त्रुटि: ' + e.message));
+                    }).then(() => {
+                        // साथ ही डायरेक्ट डॉक्यूमेंट को भी साफ करें
+                        gpRef.delete().catch(e => {});
+                        alert('✅ डेटा डिलीट हो गया!');
+                    }).catch(e => alert('त्रुटि: ' + e.message));
                 } else { alert('✅ स्थानीय डेटा हटा दिया गया!'); }
             }
         }
@@ -1312,6 +1327,7 @@
             alert('✅ पासवर्ड अपडेट हो गया!');
         }
 
+        // यूनिवर्सल अपलोडर: यदि डेटा छोटा है तो सीधे सेव होगा, बड़ा है तो चंक्स में (बिल्कुल सुवाणा और बरण की तरह)
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
             const selectedGp = document.getElementById('uploadGpSelect').value;
@@ -1346,24 +1362,52 @@
                     document.getElementById('uploadProgressBar').style.width = '80%';
 
                     if (isFirebaseActive && db) {
-                        const CHUNK_SIZE = 300;
-                        const chunks = [];
-                        for (let i = 0; i < parsedVoters.length; i += CHUNK_SIZE) chunks.push(parsedVoters.slice(i, i + CHUNK_SIZE));
-
                         const gpDocRef = db.collection("panchayats").doc(selectedGp);
-                        gpDocRef.set({ panchayatId: selectedGp, panchayatName: gpName, totalVoters: parsedVoters.length, updatedAt: new Date().toISOString() }).then(async () => {
-                            const oldChunksSnap = await gpDocRef.collection("chunks").get();
-                            let batch = db.batch();
-                            oldChunksSnap.forEach(doc => batch.delete(doc.ref));
-                            if (oldChunksSnap.size > 0) await batch.commit();
+                        
+                        // यदि डेटा 1500 से कम (छोटा) है, तो सुवाणा की तरह सीधे डॉक्यूमेंट में सेव करें
+                        if (parsedVoters.length < 1500) {
+                            gpDocRef.set({
+                                panchayatId: selectedGp,
+                                panchayatName: gpName,
+                                totalVoters: parsedVoters.length,
+                                voters: parsedVoters,
+                                updatedAt: new Date().toISOString()
+                            }).then(async () => {
+                                // पुराने चंक्स यदि हों तो साफ कर दें
+                                const oldChunksSnap = await gpDocRef.collection("chunks").get();
+                                let batch = db.batch();
+                                oldChunksSnap.forEach(doc => batch.delete(doc.ref));
+                                if (oldChunksSnap.size > 0) await batch.commit();
 
-                            let chunkPromises = chunks.map((chunkData, idx) => gpDocRef.collection("chunks").doc(`chunk_${idx}`).set({ voters: chunkData }));
-                            await Promise.all(chunkPromises);
+                                document.getElementById('uploadProgressBar').style.width = '100%';
+                                setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
+                                document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के ${parsedVoters.length} मतदाता सीधे अपलोड हो गए!</span>`;
+                            });
+                        } else {
+                            // यदि डेटा बड़ा है (जैसे बरण), तो चंक्स (Chunks) में बांटकर सेव करें
+                            const CHUNK_SIZE = 300;
+                            const chunks = [];
+                            for (let i = 0; i < parsedVoters.length; i += CHUNK_SIZE) chunks.push(parsedVoters.slice(i, i + CHUNK_SIZE));
 
-                            document.getElementById('uploadProgressBar').style.width = '100%';
-                            setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
-                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता सफलतापूर्वक अपलोड हो गए!</span>`;
-                        });
+                            gpDocRef.set({
+                                panchayatId: selectedGp,
+                                panchayatName: gpName,
+                                totalVoters: parsedVoters.length,
+                                updatedAt: new Date().toISOString()
+                            }).then(async () => {
+                                const oldChunksSnap = await gpDocRef.collection("chunks").get();
+                                let batch = db.batch();
+                                oldChunksSnap.forEach(doc => batch.delete(doc.ref));
+                                if (oldChunksSnap.size > 0) await batch.commit();
+
+                                let chunkPromises = chunks.map((chunkData, idx) => gpDocRef.collection("chunks").doc(`chunk_${idx}`).set({ voters: chunkData }));
+                                await Promise.all(chunkPromises);
+
+                                document.getElementById('uploadProgressBar').style.width = '100%';
+                                setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
+                                document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के ${parsedVoters.length} मतदाता Chunks में सफलतापूर्वक अपलोड हो गए!</span>`;
+                            });
+                        }
                     }
                 } catch(err) { alert('फाइल पढ़ने में त्रुटि: ' + err.message); }
             };
