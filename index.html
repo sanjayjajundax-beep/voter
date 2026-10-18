@@ -18,7 +18,7 @@
 <script>
 const firebaseConfig={apiKey:"AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",authDomain:"voter-11766.firebaseapp.com",projectId:"voter-11766",storageBucket:"voter-11766.firebasestorage.app",messagingSenderId:"1078819307357",appId:"1:1078819307357:web:c8752d49751e34c037b2b4",measurementId:"G-BHBYFENK2L"};
 firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[],activeSearchPlace=null;const $=x=>document.getElementById(x);
-const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
+const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[ईी]/g,"इ").replace(/[ऊू]/g,"उ").replace(/[ऐै]/g,"ए").replace(/[औौ]/g,"ओ").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
 function matchesSearch(v,term){
   if(!term)return true;
   const hay=norm([v.name,v.relative,v.relationType,v.house,v.ward,v.serial,v.epic,v.age,v.gender,v.locality,v.booth].join(" "));
