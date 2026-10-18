@@ -1709,16 +1709,16 @@
                     
                     const parsedVoters = rows.map((r, i) => ({
                         ward: String(r['Ward No.'] || r['वार्ड नंबर'] || r['Ward'] || '1'),
-                        sno: r['क्र० सं० (S.No.)'] || r['S.No.'] || (i + 1),
-                        epic: String(r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || ''),
-                        name: String(r['नाम (Name)'] || r['Name'] || ''),
-                        relation: String(r['संबंध का प्रकार (Relation)'] || 'पिता/पति'),
-                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['Relative Name'] || ''),
-                        house: String(r['मकान संख्या (House No.)'] || r['House No.'] || ''),
-                        age: String(r['आयु (Age)'] || r['Age'] || ''),
-                        gender: String(r['लिंग (Gender)'] || r['Gender'] || ''),
-                        area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || r['Area'] || gpName),
-                        booth: String(r['मतदान बूथ सं० व पता'] || r['Booth'] || gpName)
+                        sno: r['क्र० सं० (S.No.)'] || r['S.No.'] || r['क्रम संख्या'] || (i + 1),
+                        epic: String(r['ईपिक सं० (EPIC No.)'] || r['EPIC'] || r['ईपीआईसी नंबर'] || ''),
+                        name: String(r['नाम (Name)'] || r['Name'] || r['नेम'] || ''),
+                        relation: String(r['संबंध का प्रकार (Relation)'] || r['संबंध का प्रकार'] || 'पिता/पति'),
+                        rel_name: String(r['संबंधी का नाम (Relative Name)'] || r['संबंधी का नाम'] || ''),
+                        house: String(r['मकान संख्या (House No.)'] || r['मकान संख्या'] || ''),
+                        age: String(r['आयु (Age)'] || r['आयु'] || ''),
+                        gender: String(r['लिंग (Gender)'] || r['लिंग'] || ''),
+                        area: String(r['मोहल्ला / क्षेत्र (Area/Locality)'] || r['मोहल्ला क्षेत्र/एरिया लोकलिटी'] || gpName),
+                        booth: String(r['मतदान बूथ सं० व पता'] || r['मतदान बूथ संख्या व पता'] || gpName)
                     }));
 
                     document.getElementById('uploadProgressBar').style.width = '80%';
