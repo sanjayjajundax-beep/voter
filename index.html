@@ -1170,17 +1170,12 @@
             }
         }
 
-        // 🛡️ संशोधित सुरक्षित डिलीट फंक्शन (डेटा ओवरराइट व मिसमैच से मुक्त)
         function deletePanchayatVotersFromFirebase() {
-            const gpId = document.getElementById('deleteGpSelect').value.trim().toLowerCase();
-            if (!gpId) {
-                alert('❌ कृपया डिलीट करने के लिए सही ग्राम पंचायत चुनें!');
-                return;
-            }
+            const gpId = document.getElementById('deleteGpSelect').value;
             const gpObj = panchayatsList.find(g => g.id === gpId);
             const gpName = gpObj ? gpObj.name : gpId;
 
-            if (confirm(`⚠️ चेतावनी: क्या आप वाकई "${gpName}" (ID: ${gpId}) का सारा डेटा फायरबेस क्लाउड से हमेशा के लिए हटाना चाहते हैं?`)) {
+            if (confirm(`⚠️ क्या आप वाकई "${gpName}" (${gpId}) का सारा मतदाता डेटा फायरबेस क्लाउड से हमेशा के लिए डिलीट करना चाहते हैं?`)) {
                 if (allPanchayatVoters[gpId]) {
                     delete allPanchayatVoters[gpId];
                 }
@@ -1192,10 +1187,10 @@
                         batch.delete(gpRef);
                         return batch.commit();
                     }).then(() => {
-                        alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक हटा दिया गया है!`);
+                        alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक डिलीट कर दिया गया है!`);
                     }).catch(e => {
                         gpRef.delete().then(() => {
-                            alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक हटा दिया गया है!`);
+                            alert(`✅ "${gpName}" का डेटा फायरबेस से सफलतापूर्वक डिलीट कर दिया गया है!`);
                         }).catch(err => alert('डेटा हटाने में त्रुटि: ' + err.message));
                     });
                 } else {
@@ -1696,24 +1691,11 @@
             document.getElementById('currentAdminIdDisplay').value = currentAdminId;
         }
 
-        // 🛡️ संशोधित सुरक्षित एक्सेल अपलोड फंक्शन (जीरो-ओवरराइट लॉजिक के साथ)
         document.getElementById('excelFileLoader').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
-            
-            const selectedGp = document.getElementById('uploadGpSelect').value.trim().toLowerCase();
-            if (!selectedGp) {
-                alert('❌ त्रुटि: कृपया पहले अपलोड करने के लिए ग्राम पंचायत चुनें!');
-                this.value = '';
-                return;
-            }
-
+            const selectedGp = document.getElementById('uploadGpSelect').value;
             const gpObj = panchayatsList.find(g => g.id === selectedGp);
             const gpName = gpObj ? gpObj.name : selectedGp;
-
-            if (!confirm(`क्या आप "${gpName}" (ID: ${selectedGp}) के लिए मतदाता डेटा अपलोड करना चाहते हैं?`)) {
-                this.value = '';
-                return;
-            }
 
             const r = new FileReader();
             document.getElementById('uploadProgressBox').style.display = 'block';
@@ -1773,14 +1755,14 @@
                             document.getElementById('uploadProgressBar').style.width = '100%';
                             setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
 
-                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" (ID: ${selectedGp}) के ${parsedVoters.length} मतदाता फायरबेस पर सुरक्षित रूप से अपलोड हो गए!</span>`;
-                            document.getElementById('excelFileLoader').value = '';
+                            document.getElementById('excelMsg').innerHTML = `<span style="color:#16a34a;">✅ "${gpName}" के लिए ${parsedVoters.length} मतदाता फायरबेस क्लाउड पर सफलतापूर्वक अपलोड हो गए!</span>`;
                         }).catch(err => {
                             document.getElementById('uploadProgressBox').style.display = 'none';
                             document.getElementById('excelMsg').innerHTML = `<span style="color:#dc2626;">❌ फायरबेस अपलोड त्रुटि: ${err.message}</span>`;
                         });
                     } else {
-                        document.getElementById('uploadProgressBox').style.display = 'none';
+                        document.getElementById('uploadProgressBar').style.width = '100%';
+                        setTimeout(() => { document.getElementById('uploadProgressBox').style.display = 'none'; }, 1000);
                         document.getElementById('excelMsg').innerHTML = `<span style="color:#dc2626;">❌ फायरबेस कनेक्टेड नहीं है! डेटा सेव नहीं हो सका।</span>`;
                     }
                 } catch(err) {
