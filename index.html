@@ -101,14 +101,27 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* Firebase Console > Project settings > Your apps से अपनी config भरें */
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
- apiKey: "PASTE_API_KEY",
- authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
- projectId: "YOUR_PROJECT_ID",
- storageBucket: "YOUR_PROJECT_ID.appspot.com",
- messagingSenderId: "PASTE_SENDER_ID",
- appId: "PASTE_APP_ID"
+  apiKey: "AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",
+  authDomain: "voter-11766.firebaseapp.com",
+  projectId: "voter-11766",
+  storageBucket: "voter-11766.firebasestorage.app",
+  messagingSenderId: "1078819307357",
+  appId: "1:1078819307357:web:c8752d49751e34c037b2b4",
+  measurementId: "G-BHBYFENK2L"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth(), db=firebase.firestore();
 const functions=firebase.app().functions("asia-south1");
