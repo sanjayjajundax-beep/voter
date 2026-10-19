@@ -62,7 +62,29 @@
  .bulk-print-page .slip-field span{font-size:6.5px}
  .bulk-print-page .slip-field b{font-size:7.5px;line-height:1.1}
 }
-</style></head><body>
+</style>
+<style>
+/* Readable, space-filling voter details in the 3x3 A4 ward print layout */
+.bulk-print-page .slip{display:flex;flex-direction:column}
+.bulk-print-page .slip-body{display:flex;flex:1;flex-direction:column;padding:6px 7px 7px}
+.bulk-print-page .slip-panchayat{font-size:10px;padding:5px 6px;margin-bottom:6px;line-height:1.3}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;font-weight:700;line-height:1.25}
+.bulk-print-page .slip-name{font-size:15px;line-height:1.3;margin:3px 0 7px}
+.bulk-print-page .slip-fields{flex:1;align-content:space-between;gap:5px 7px;grid-auto-rows:minmax(22px,auto)}
+.bulk-print-page .slip-field{padding:3px 1px 4px;border-bottom:1.5px solid #cbd5e1}
+.bulk-print-page .slip-field span{font-size:8.5px;font-weight:700;line-height:1.25;color:#40536a}
+.bulk-print-page .slip-field b{font-size:10.5px;line-height:1.3;font-weight:700;color:#101827}
+@media print{
+ .bulk-print-page .slip-body{padding:5px 6px 6px}
+ .bulk-print-page .slip-panchayat{font-size:9.5px;padding:4px 5px;margin-bottom:5px}
+ .bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:8.5px!important}
+ .bulk-print-page .slip-name{font-size:13px;margin:2px 0 5px}
+ .bulk-print-page .slip-fields{gap:4px 6px;grid-auto-rows:minmax(19px,auto)}
+ .bulk-print-page .slip-field span{font-size:7.8px}
+ .bulk-print-page .slip-field b{font-size:9.5px;line-height:1.25}
+}
+</style>
+</head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
 <main id="app" class="wrap hidden">
