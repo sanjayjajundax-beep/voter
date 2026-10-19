@@ -22,6 +22,46 @@
 .bulk-print-page .candidate-symbol{width:100%;height:72px;padding:0!important;border:0!important}
 .bulk-print-page .symbol-name{font-size:7px;margin-top:1px}
 @media print{.candidate-banner{grid-template-columns:40% 60%;min-height:0;padding:6px}.candidate-photo{width:100%;height:105px;max-width:125px}.candidate-position{font-size:10px;padding:4px}.candidate-name{font-size:16px}.candidate-symbol{height:125px;border:0!important;padding:0!important}.symbol-name{font-size:13px}.bulk-print-page .candidate-banner{grid-template-columns:40% 60%;padding:3px}.bulk-print-page .candidate-photo{height:45px}.bulk-print-page .candidate-symbol{height:72px}.bulk-print-page .candidate-position{font-size:6px}.bulk-print-page .candidate-name{font-size:8px}.bulk-print-page .symbol-name{font-size:7px}}
+
+/* Larger, clearly readable voter details; use the available card height */
+.slip{min-height:560px;display:flex;flex-direction:column}
+.slip-body{padding:16px 18px 18px;display:flex;flex:1;flex-direction:column}
+.slip-panchayat{font-size:17px;padding:11px 13px;margin-bottom:14px;font-weight:600}
+.slip-body>div[style*="font-size:10px"]{font-size:15px!important;font-weight:600}
+.slip-name{font-size:27px;margin:6px 0 16px;line-height:1.3}
+.slip-fields{flex:1;align-content:space-between;gap:12px 16px;grid-auto-rows:minmax(48px,auto)}
+.slip-field{padding:7px 2px 8px;border-bottom:2px solid #dce4ed}
+.slip-field span{font-size:14px;font-weight:600;color:#53657b;line-height:1.35}
+.slip-field b{font-size:18px;line-height:1.4;font-weight:700;color:#101b2b}
+@media(max-width:600px){.slip{min-height:530px}.slip-body{padding:13px 14px 16px}.slip-panchayat{font-size:15px;padding:9px 10px}.slip-name{font-size:24px}.slip-fields{gap:10px 12px}.slip-field span{font-size:12px}.slip-field b{font-size:16px}}
+/* A4 single-slip print: readable type and fuller use of page space */
+@media print{
+ .slip{min-height:105mm;display:flex;flex-direction:column}
+ .slip-body{padding:11px 13px 13px;display:flex;flex:1;flex-direction:column}
+ .slip-panchayat{font-size:13px;padding:7px 9px;margin-bottom:9px}
+ .slip-body>div[style*="font-size:10px"]{font-size:11px!important}
+ .slip-name{font-size:20px;margin:4px 0 10px}
+ .slip-fields{flex:1;align-content:space-between;gap:7px 12px;grid-auto-rows:minmax(30px,auto)}
+ .slip-field{padding:4px 1px 5px;border-bottom:1.5px solid #dce4ed}
+ .slip-field span{font-size:10px;font-weight:600}
+ .slip-field b{font-size:13px;line-height:1.3}
+}
+/* Keep the 9-per-A4 layout, but make its text as readable as the space allows */
+.bulk-print-page .slip-body{display:flex;flex-direction:column;padding:5px 6px}
+.bulk-print-page .slip-panchayat{font-size:8px;padding:4px;margin-bottom:4px}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:7px!important}
+.bulk-print-page .slip-name{font-size:12px;line-height:1.2;margin:3px 0 5px}
+.bulk-print-page .slip-fields{gap:3px;align-content:start;grid-auto-rows:minmax(15px,auto)}
+.bulk-print-page .slip-field{padding:2px 0}
+.bulk-print-page .slip-field span{font-size:7px;font-weight:600;line-height:1.15}
+.bulk-print-page .slip-field b{font-size:8.5px;line-height:1.2}
+@media print{
+ .bulk-print-page .slip-body{padding:4px 5px}
+ .bulk-print-page .slip-panchayat{font-size:7.5px;padding:3px;margin-bottom:3px}
+ .bulk-print-page .slip-name{font-size:10px;margin:2px 0 3px}
+ .bulk-print-page .slip-field span{font-size:6.5px}
+ .bulk-print-page .slip-field b{font-size:7.5px;line-height:1.1}
+}
 </style></head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
