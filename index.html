@@ -66,7 +66,17 @@ async function loadPlaces(){const s=await db.collection("panchayats").orderBy("n
 $("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!/^[A-Z0-9_-]{3,40}$/.test(id)||!name)return alert("सही ID और नाम भरें।");try{await db.collection("panchayats").doc(id).set({name,activeUploadId:null,activeVoterCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत जोड़ दी गई।")}catch(e){alert(e.message)}};
 $("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return alert("पंचायत और Excel चुनें।");$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});if(!rows.length||rows.length>20000)throw Error("1 से 20,000 रिकॉर्ड तक अपलोड करें।");let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;$("bar").style.width=Math.round((i+1)/rows.length*100)+"%";notice($("upMsg"),`अपलोड ${i+1}/${rows.length}`)}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),`${rows.length} रिकॉर्ड अपलोड हुए।`,"success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
 let clientProfiles=[];
-async function loadAccounts(){let s=await db.collection("users").where("role","==","client").get();clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));$("accountList").innerHTML=clientProfiles.map(x=>`<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}</div>`).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";$("brandingCandidate").innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");}
+async function loadAccounts(){
+ let s=await db.collection("users").where("role","==","client").get();
+ clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));
+ $("accountList").innerHTML=clientProfiles.map(x=>`<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}</div>`).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
+ const select=$("brandingCandidate");
+ select.innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");
+ let rememberedUid="";try{rememberedUid=localStorage.getItem("voterSlipBrandingCandidateUid")||""}catch(e){}
+ if(rememberedUid&&clientProfiles.some(x=>x.uid===rememberedUid))select.value=rememberedUid;
+ else if(clientProfiles.length)select.value=clientProfiles[0].uid;
+ if(select.value)await loadBrandingEditor();
+}
 let brandingPhotoData="",brandingSymbolData="";
 function setImagePreview(which,data){
  const isPhoto=which==="photo",img=$(isPhoto?"brandingPhotoPreview":"brandingSymbolPreview"),file=$(isPhoto?"brandingPhotoFile":"brandingSymbolFile");
@@ -105,9 +115,9 @@ async function loadBrandingEditor(){
  try{
   const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();
   if(d.exists){const b=d.data();$("brandingName").value=b.name||$("brandingName").value;setImagePreview("photo",b.photoBase64||"");setImagePreview("symbol",b.symbolBase64||"")}
- }catch(e){notice($("brandingMsg"),"ब्रांडिंग पढ़ने में त्रुटि: "+e.message,"error")}
+ }catch(e){setImagePreview("photo","");setImagePreview("symbol","");notice($("brandingMsg"),"Firestore से फोटो/चिह्न लोड नहीं हो सके: "+e.message+"। Rules और नेटवर्क जाँचें।","error")}
 }
-$("brandingCandidate").onchange=loadBrandingEditor;
+$("brandingCandidate").onchange=async()=>{try{localStorage.setItem("voterSlipBrandingCandidateUid",$("brandingCandidate").value)}catch(e){}await loadBrandingEditor();};
 $("brandingPhotoFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"फोटो compress हो रही है...");setImagePreview("photo",await compressImage(f,"photo"));notice($("brandingMsg"),"फोटो तैयार है। सेव करना न भूलें।","success")}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value=""}};
 $("brandingSymbolFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"चुनाव चिह्न compress हो रहा है...");setImagePreview("symbol",await compressImage(f,"symbol"));notice($("brandingMsg"),"चुनाव चिह्न तैयार है। सेव करना न भूलें।","success")}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value=""}};
 $("removeBrandingPhoto").onclick=()=>{setImagePreview("photo","");notice($("brandingMsg"),"फोटो हटाने के लिए अब सेव करें।")};
