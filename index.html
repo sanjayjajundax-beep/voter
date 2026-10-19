@@ -83,6 +83,24 @@
  .bulk-print-page .slip-field span{font-size:7.8px}
  .bulk-print-page .slip-field b{font-size:9.5px;line-height:1.25}
 }
+
+/* Final 3x3 A4 layout: distribute all voter details down to the bottom edge */
+.bulk-print-page .slip{display:flex!important;flex-direction:column!important;height:100%!important;min-height:0!important}
+.bulk-print-page .slip-body{display:flex!important;flex:1 1 auto!important;min-height:0!important;flex-direction:column!important;padding:5px 6px 6px!important}
+.bulk-print-page .slip-panchayat{flex:none!important;font-size:10px!important;padding:5px 6px!important;margin-bottom:5px!important}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;line-height:1.3!important;font-weight:700!important;flex:none!important}
+.bulk-print-page .slip-name{font-size:15px!important;line-height:1.3!important;margin:3px 0 6px!important;flex:none!important}
+.bulk-print-page .slip-fields{display:grid!important;flex:1 1 auto!important;min-height:0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;align-content:stretch!important;gap:3px 7px!important}
+.bulk-print-page .slip-field{min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:2px 1px 3px!important;border-bottom:1.5px solid #cbd5e1!important;overflow-wrap:anywhere!important}
+.bulk-print-page .slip-field span{font-size:8.5px!important;line-height:1.2!important;font-weight:700!important}
+.bulk-print-page .slip-field b{font-size:10.5px!important;line-height:1.25!important;font-weight:700!important;overflow-wrap:anywhere!important}
+@media print{
+ .bulk-print-page .slip-body{padding:5px 6px 6px!important}
+ .bulk-print-page .slip-panchayat{font-size:9.5px!important}
+ .bulk-print-page .slip-name{font-size:14px!important}
+ .bulk-print-page .slip-field span{font-size:8px!important}
+ .bulk-print-page .slip-field b{font-size:9.8px!important}
+}
 </style>
 </head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
