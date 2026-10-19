@@ -22,8 +22,12 @@ firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.fi
 const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[ईी]/g,"इ").replace(/[ऊू]/g,"उ").replace(/[ऐै]/g,"ए").replace(/[औौ]/g,"ओ").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
 function matchesSearch(v,term){
   if(!term)return true;
+  const query=norm(term);
+  // केवल अंक लिखे हों तो मकान नंबर का सटीक मिलान करें।
+  // इससे 121 खोजने पर 12, 2121 या अन्य जगह मौजूद 1/2 वाले रिकॉर्ड नहीं आएँगे।
+  if(/^\d+$/.test(query)) return norm(v.house)===query;
   const hay=norm([v.name,v.relative,v.relationType,v.house,v.ward,v.serial,v.epic,v.age,v.gender,v.locality,v.booth].join(" "));
-  const words=norm(term).split(" ").filter(Boolean);
+  const words=query.split(" ").filter(Boolean);
   return words.every(word=>hay.includes(word));
 }
 const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
