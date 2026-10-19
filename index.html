@@ -9,7 +9,7 @@
 <main id="app" class="wrap hidden">
 <div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
 <nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button></nav>
-<section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
+<section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><div class="notice">Archive करने पर डेटा सुरक्षित रहेगा। स्थायी डिलीट से पहले बैकअप लें; Authentication खाते अलग से हटाने होंगे।</div><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति / प्रबंधन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
 <section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
 <div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">प्रत्याशी की फोटो और चुनाव चिह्न सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>पर्ची पर दिखने वाला नाम</label><input id="brandingName" placeholder="प्रत्याशी का नाम"><div class="row"><div><label>प्रत्याशी की फोटो (मोबाइल Gallery)</label><input id="brandingPhotoFile" class="file-input" type="file" accept="image/*"><img id="brandingPhotoPreview" class="image-preview" alt="प्रत्याशी फोटो Preview"><div class="image-tools"><button id="removeBrandingPhoto" class="red" type="button">फोटो हटाएँ</button></div></div><div><label>चुनाव चिह्न (मोबाइल Gallery)</label><input id="brandingSymbolFile" class="file-input" type="file" accept="image/*"><img id="brandingSymbolPreview" class="image-preview" alt="चुनाव चिह्न Preview"><div class="image-tools"><button id="removeBrandingSymbol" class="red" type="button">चिह्न हटाएँ</button></div></div></div><div class="muted">इमेज ब्राउज़र में ही resize/compress होकर Base64 के रूप में Firestore में सेव होगी। Firebase Storage या बाहरी image server का उपयोग नहीं होगा। दोनों इमेज का संयुक्त डेटा लगभग 500 KB से कम रखा जाएगा।</div><button id="saveBranding" class="green" type="button">फोटो और चिह्न सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
@@ -70,10 +70,55 @@ function renderCandidateBranding(){
  box.classList.remove("hidden");
 }
 auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
-try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().archived)throw Error("यह पंचायत Admin द्वारा अस्थायी रूप से बंद (Archive) की गई है।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
 $("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.id).classList.add("active")});
-async function loadPlaces(){const s=await db.collection("panchayats").orderBy("name").get();places=s.docs.map(d=>({id:d.id,...d.data()}));$("pCount").textContent=places.length;$("pRows").innerHTML=places.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td></tr>`).join("")||"<tr><td colspan='3'>कोई पंचायत नहीं</td></tr>";$("upP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");$("searchP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("")}
+async function loadPlaces(){
+ const s=await db.collection("panchayats").orderBy("name").get();
+ places=s.docs.map(d=>({id:d.id,...d.data()}));
+ const activePlaces=places.filter(p=>!p.archived);
+ $("pCount").textContent=activePlaces.length;
+ $("pRows").innerHTML=places.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td><td>${p.archived?'<b style="color:#b42318">Archive</b> <button class="green" onclick="restorePanchayat(\''+esc(p.id)+'\')">दोबारा चालू</button>':'<b style="color:#16834b">चालू</b> <button class="gray" onclick="archivePanchayat(\''+esc(p.id)+'\')">Archive</button>'} <button class="red" onclick="deletePanchayat(\''+esc(p.id)+'\')">स्थायी डिलीट</button></td></tr>`).join("")||"<tr><td colspan='4'>कोई पंचायत नहीं</td></tr>";
+ $("upP").innerHTML=activePlaces.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+ $("searchP").innerHTML=activePlaces.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+}
+
+window.archivePanchayat=async id=>{
+ const p=places.find(x=>x.id===id);if(!p)return;
+ if(!confirm(`क्या "${p.name}" (${id}) को Archive करना चाहते हैं? डेटा डिलीट नहीं होगा, लेकिन प्रत्याशी लॉगिन/खोज बंद हो जाएगी।`))return;
+ try{await db.collection("panchayats").doc(id).update({archived:true,archivedAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत Archive कर दी गई। डेटा सुरक्षित है।")}
+ catch(e){alert("Archive नहीं हुआ: "+e.message)}
+};
+window.restorePanchayat=async id=>{
+ const p=places.find(x=>x.id===id);if(!p)return;
+ if(!confirm(`क्या "${p.name}" को दोबारा चालू करना चाहते हैं?`))return;
+ try{await db.collection("panchayats").doc(id).update({archived:false,restoredAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत दोबारा चालू कर दी गई।")}
+ catch(e){alert("पंचायत चालू नहीं हुई: "+e.message)}
+};
+async function deleteCollectionInBatches(ref){
+ let total=0;
+ while(true){
+  const snap=await ref.limit(400).get();if(snap.empty)break;
+  const batch=db.batch();snap.docs.forEach(d=>batch.delete(d.ref));
+  await batch.commit();total+=snap.size;
+ }
+ return total;
+}
+window.deletePanchayat=async id=>{
+ const p=places.find(x=>x.id===id);if(!p)return;
+ const typed=prompt(`स्थायी डिलीट की पुष्टि के लिए पंचायत ID बिल्कुल ऐसे लिखें:\\n${id}`);
+ if(typed!==id)return alert("ID मेल नहीं खाई। डिलीट रद्द किया गया।");
+ if(!confirm(`अंतिम चेतावनी! "${p.name}" की सभी Uploads, Voters, Candidate Branding और संबंधित users प्रोफाइल Firestore से स्थायी रूप से हटेंगी। पहले बैकअप लिया है?`))return;
+ try{
+  const root=db.collection("panchayats").doc(id),uploads=await root.collection("uploads").get();let voterCount=0;
+  for(const upload of uploads.docs){voterCount+=await deleteCollectionInBatches(upload.ref.collection("voters"));await upload.ref.delete();}
+  const brandingCount=await deleteCollectionInBatches(root.collection("candidateBranding"));
+  const usersCount=await deleteCollectionInBatches(db.collection("users").where("panchayatId","==",id));
+  await root.delete();places=places.filter(x=>x.id!==id);await loadPlaces();
+  alert(`Firestore डेटा हटाया गया।\\nमतदाता रिकॉर्ड: ${voterCount}\\nफोटो/चिह्न रिकॉर्ड: ${brandingCount}\\nUsers प्रोफाइल: ${usersCount}\\n\\nप्रत्याशियों के Authentication खाते Firebase Console से अलग हटाने होंगे।`);
+ }catch(e){alert("डिलीट पूरा नहीं हो सका: "+e.message+"। Rules/नेटवर्क जाँचें। कुछ डेटा हट चुका हो सकता है; Console में जाँच करें।")}
+};
+
 $("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!/^[A-Z0-9_-]{3,40}$/.test(id)||!name)return alert("सही ID और नाम भरें।");try{await db.collection("panchayats").doc(id).set({name,activeUploadId:null,activeVoterCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत जोड़ दी गई।")}catch(e){alert(e.message)}};
 $("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return alert("पंचायत और Excel चुनें।");$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});if(!rows.length||rows.length>20000)throw Error("1 से 20,000 रिकॉर्ड तक अपलोड करें।");let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;$("bar").style.width=Math.round((i+1)/rows.length*100)+"%";notice($("upMsg"),`अपलोड ${i+1}/${rows.length}`)}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),`${rows.length} रिकॉर्ड अपलोड हुए।`,"success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
 let clientProfiles=[];
@@ -156,7 +201,9 @@ async function getVoters() {
 
   activeSearchPlace = p;
 
-  if (!p.activeUploadId) {
+  if (p.archived) throw new Error("यह पंचायत Archive है। Admin से संपर्क करें।");
+
+   if (!p.activeUploadId) {
     throw new Error("सक्रिय वोटर सूची उपलब्ध नहीं है।");
   }
 
