@@ -373,12 +373,23 @@
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
 <main id="app" class="wrap hidden">
 <div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
-<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button></nav>
+<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button><button id="boothTab" class="tab hidden" data-id="boothManage">बूथ मैनेजमेंट</button></nav>
 <section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
 <section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
 <div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">प्रत्याशी की फोटो और चुनाव चिह्न सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>पर्ची पर दिखने वाला नाम</label><input id="brandingName" placeholder="प्रत्याशी का नाम"><label>चुनाव चिन्ह का नाम</label><input id="brandingSymbolName" placeholder="जैसे: हाथ का निशान"><div class="row"><div><label>प्रत्याशी की फोटो (मोबाइल Gallery)</label><input id="brandingPhotoFile" class="file-input" type="file" accept="image/*"><img id="brandingPhotoPreview" class="image-preview" alt="प्रत्याशी फोटो Preview"><div class="image-tools"><button id="removeBrandingPhoto" class="red" type="button">फोटो हटाएँ</button></div></div><div><label>चुनाव चिह्न (मोबाइल Gallery)</label><input id="brandingSymbolFile" class="file-input" type="file" accept="image/*"><img id="brandingSymbolPreview" class="image-preview" alt="चुनाव चिह्न Preview"><div class="image-tools"><button id="removeBrandingSymbol" class="red" type="button">चिह्न हटाएँ</button></div></div></div><div class="muted">इमेज ब्राउज़र में ही resize/compress होकर Base64 के रूप में Firestore में सेव होगी। Firebase Storage या बाहरी image server का उपयोग नहीं होगा। दोनों इमेज का संयुक्त डेटा लगभग 500 KB से कम रखा जाएगा।</div><button id="saveBranding" class="green" type="button">फोटो और चिह्न सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
 <section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden candidate-branding-display"><div class="candidate-branding-identity"><img id="candidateLoginPhoto" class="candidate-photo" alt="प्रत्याशी फोटो"><div class="candidate-branding-name"><div class="muted">आपकी प्रत्याशी प्रोफाइल</div><b id="candidateLoginName">प्रत्याशी</b></div></div><div class="candidate-branding-symbol-wrap"><img id="candidateLoginSymbol" class="candidate-symbol" alt="चुनाव चिह्न"></div></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (8 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
+<section id="boothManage" class="card panel no-print">
+<h3>🗳️ बूथ मैनेजमेंट और संपर्क प्रगति</h3>
+<div class="notice">दोनों तरीके उपलब्ध हैं: Excel के बूथ नंबर/पते से अपने-आप बूथ बनाएं या अपना बूथ बनाकर मतदाता चुनें। संपर्क की स्थिति आपकी प्रत्याशी ID में अलग सेव होगी।</div>
+<div class="grid" id="boothStats"><div class="stat">कुल मतदाता<strong id="bmTotal">0</strong></div><div class="stat">बूथ में जोड़े<strong id="bmAssigned">0</strong></div><div class="stat">संपर्क पूरा<strong id="bmDone">0</strong></div><div class="stat">बाकी<strong id="bmLeft">0</strong></div></div>
+<div class="progress"><div id="bmProgress"></div></div><p id="bmProgressText" class="muted">0% संपर्क पूरा</p>
+<div class="row"><div><label>वार्ड चुनें</label><select id="bmWard"><option value="">वार्ड चुनें</option></select></div><div><label>बूथ चुनें</label><select id="bmBooth"><option value="">सभी बूथ</option></select></div></div>
+<button id="bmAuto" class="green" type="button">Excel से बूथ अपने-आप बनाएं</button>
+<div class="result"><h4 style="margin:0 0 8px">अपना बूथ बनाएं</h4><label>नया बूथ नाम / नंबर / पता</label><input id="bmNewName" placeholder="जैसे: बूथ 1 - राजकीय विद्यालय, सुवाणा"><button id="bmCreate" type="button">बूथ बनाएं</button></div>
+<div class="result"><h4 style="margin:0 0 8px">चुने हुए मतदाताओं को बूथ में जोड़ें</h4><label>मतदाता खोजें</label><input id="bmSearch" placeholder="नाम, क्रमांक या मकान नंबर"><div id="bmVoters" class="muted">पहले वार्ड चुनें।</div><button id="bmAssign" class="green" type="button">चुने मतदाता बूथ में जोड़ें</button></div>
+<h4>बूथवार संपर्क स्थिति</h4><div id="bmBoothSummary"></div><div id="bmMsg" class="notice hidden"></div>
+</section>
 <section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -439,7 +450,7 @@ function renderCandidateBranding(){
  box.classList.remove("hidden");
 }
 auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
-try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden");$("boothTab").classList.add("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("boothTab").classList.remove("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[];initBoothManager().catch(e=>notice($("bmMsg"),e.message,"error"))}}catch(e){alert(e.message);await auth.signOut()}});
 $("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.id).classList.add("active")});
 async function loadPlaces(){
@@ -678,5 +689,91 @@ $("bulkWardPrint").onclick=async()=>{
  }catch(e){notice($("searchMsg"),"वार्ड की पर्चियाँ तैयार नहीं हुईं: "+e.message,"error")}
 };
 window.closeSlip=()=>{$("printArea").classList.add("hidden");$("slips").innerHTML="";$ ("slips").className="slips"};
+
+
+// ---------------- Candidate Booth Management ----------------
+let bmBooths=[], bmContacts={}, bmSelected=new Set(), bmUploadId="";
+function bmRefs(){
+ const pid=profile?.panchayatId, uid=user?.uid;
+ if(!pid||!uid||!bmUploadId)throw Error("प्रत्याशी या सक्रिय वोटर सूची की जानकारी उपलब्ध नहीं है।");
+ const base=db.collection("panchayats").doc(pid).collection("candidateCampaigns").doc(uid).collection("uploads").doc(bmUploadId);
+ return {booths:base.collection("booths"),contacts:base.collection("contacts")};
+}
+async function initBoothManager(){
+ if(!profile||profile.role!=="client")return;
+ const p=places.find(x=>x.id===profile.panchayatId);if(!p?.activeUploadId){notice($("bmMsg"),"अभी सक्रिय वोटर सूची उपलब्ध नहीं है।","error");return;}
+ bmUploadId=p.activeUploadId;
+ if(!cache.length)cache=await getVoters();
+ const voters=cache;
+ const wards=[...new Set(voters.map(v=>String(v.ward||"").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"hi"));
+ $("bmWard").innerHTML='<option value="">वार्ड चुनें</option>'+wards.map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("");
+ if(profile.ward!=="ALL")$("bmWard").value=String(profile.ward);
+ await loadBoothData();
+}
+async function loadBoothData(){
+ if(!bmUploadId)return;
+ const refs=bmRefs();
+ const [bs,cs]=await Promise.all([refs.booths.get(),refs.contacts.get()]);
+ bmBooths=bs.docs.map(d=>({id:d.id,...d.data()}));
+ bmContacts={};cs.docs.forEach(d=>bmContacts[d.id]={id:d.id,...d.data()});
+ const old=$("bmBooth").value;
+ $("bmBooth").innerHTML='<option value="">सभी बूथ</option>'+bmBooths.map(b=>`<option value="${esc(b.id)}">${esc(b.name||b.id)} · वार्ड ${esc(b.ward||"—")}</option>`).join("");
+ if(bmBooths.some(b=>b.id===old))$("bmBooth").value=old;
+ renderBoothManager();
+}
+function renderBoothManager(){
+ const voters=cache||[],ward=$("bmWard").value,booth=$("bmBooth").value;
+ const inWard=voters.filter(v=>!ward||String(v.ward)===ward);
+ const assigned=inWard.filter(v=>bmContacts[v.id]?.boothId);
+ const done=assigned.filter(v=>bmContacts[v.id]?.done===true).length;
+ const total=inWard.length,pct=total?Math.round(done/total*100):0;
+ $("bmTotal").textContent=total;$("bmAssigned").textContent=assigned.length;$("bmDone").textContent=done;$("bmLeft").textContent=Math.max(0,total-done);
+ $("bmProgress").style.width=pct+"%";$("bmProgressText").textContent=`${pct}% संपर्क पूरा · ${done} / ${total} कुल मतदाता`;
+ const summaries=bmBooths.filter(b=>!ward||String(b.ward)===ward).map(b=>{
+  const members=inWard.filter(v=>bmContacts[v.id]?.boothId===b.id),complete=members.filter(v=>bmContacts[v.id]?.done===true).length;
+  return `<div class="result"><b>${esc(b.name||"बूथ")}</b> <span class="muted">· वार्ड ${esc(b.ward||"—")}</span><br>कुल ${members.length} · संपर्क ${complete} · बाकी ${members.length-complete}<div class="progress"><div style="width:${members.length?complete/members.length*100:0}%"></div></div></div>`;
+ }).join("");
+ $("bmBoothSummary").innerHTML=summaries||'<p class="muted">अभी इस वार्ड में कोई बूथ नहीं है। Excel से बूथ बनाएं या अपना बूथ बनाएं।</p>';
+ renderBoothVoters();
+}
+function renderBoothVoters(){
+ const ward=$("bmWard").value,booth=$("bmBooth").value,term=norm($("bmSearch").value||"");
+ if(!ward){$("bmVoters").innerHTML='<p class="muted">पहले वार्ड चुनें।</p>';return;}
+ const arr=(cache||[]).filter(v=>String(v.ward)===ward&&(!term||matchesSearch(v,term))).slice(0,300);
+ $("bmVoters").innerHTML=arr.map(v=>{const c=bmContacts[v.id]||{},assigned=!!c.boothId;return `<div class="result" style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" style="width:auto;margin-top:5px" data-bm-select="${esc(v.id)}" ${bmSelected.has(v.id)?"checked":""}><div style="flex:1;min-width:0"><b>${esc(v.name||"नाम नहीं")}</b><br><small>क्रमांक ${esc(v.serial||"—")} · मकान ${esc(v.house||"—")} · वार्ड ${esc(v.ward||"—")}</small><br><small>${assigned?"बूथ: "+esc(bmBooths.find(b=>b.id===c.boothId)?.name||c.boothId):"अभी किसी बूथ में नहीं"}</small><br><label style="display:flex;align-items:center;gap:7px;font-weight:600"><input type="checkbox" style="width:auto;margin:0" ${c.done?"checked":""} onchange="setContactDone('${esc(v.id)}',this.checked)"> संपर्क हो गया</label></div></div>`}).join("")||'<p class="muted">इस खोज में मतदाता नहीं मिले।</p>';
+ $("bmVoters").querySelectorAll('[data-bm-select]').forEach(el=>el.onchange=()=>{if(el.checked)bmSelected.add(el.dataset.bmSelect);else bmSelected.delete(el.dataset.bmSelect)});
+}
+window.setContactDone=async(voterId,done)=>{
+ try{const refs=bmRefs(),old=bmContacts[voterId]||{};if(!old.boothId)throw Error("पहले इस मतदाता को किसी बूथ में जोड़ें।");
+  await refs.contacts.doc(voterId).set({voterId,ward:old.ward||String((cache.find(v=>v.id===voterId)||{}).ward||""),boothId:old.boothId,done:!!done,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+  bmContacts[voterId]={...old,done:!!done};renderBoothManager();
+ }catch(e){alert("संपर्क स्थिति सेव नहीं हुई: "+e.message);renderBoothManager()}
+};
+$("bmWard").onchange=()=>{bmSelected.clear();$("bmBooth").value="";renderBoothManager()};
+$("bmBooth").onchange=()=>{bmSelected.clear();renderBoothVoters()};
+$("bmSearch").oninput=()=>renderBoothVoters();
+$("bmCreate").onclick=async()=>{
+ const name=$("bmNewName").value.trim(),ward=$("bmWard").value;if(!ward)return notice($("bmMsg"),"पहले वार्ड चुनें।","error");if(!name)return notice($("bmMsg"),"बूथ का नाम/नंबर लिखें।","error");
+ try{const refs=bmRefs(),id=db.collection("_ids").doc().id;await refs.booths.doc(id).set({name,ward,source:"manual",createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:user.uid});$("bmNewName").value="";await loadBoothData();$("bmBooth").value=id;renderBoothManager();notice($("bmMsg"),"आपका बूथ बन गया। अब मतदाता चुनकर इसमें जोड़ें।","success")}catch(e){notice($("bmMsg"),"बूथ नहीं बना: "+e.message,"error")}
+};
+$("bmAuto").onclick=async()=>{
+ const ward=$("bmWard").value;if(!ward)return notice($("bmMsg"),"पहले वार्ड चुनें।","error");
+ const voters=(cache||[]).filter(v=>String(v.ward)===ward&&String(v.booth||"").trim());if(!voters.length)return notice($("bmMsg"),"इस वार्ड के Excel रिकॉर्ड में बूथ संख्या/पता नहीं मिला।","error");
+ const groups=new Map();voters.forEach(v=>{const name=String(v.booth).trim();if(!groups.has(name))groups.set(name,[]);groups.get(name).push(v)});
+ const btn=$("bmAuto");btn.disabled=true;
+ try{const refs=bmRefs();let batch=db.batch(),n=0;
+  for(const [name,members] of groups){const found=bmBooths.find(b=>b.name===name&&b.ward===ward&&b.source==="excel");const id=found?.id||db.collection("_ids").doc().id;batch.set(refs.booths.doc(id),{name,ward,source:"excel",updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});n++;
+   for(const v of members){batch.set(refs.contacts.doc(v.id),{voterId:v.id,ward,boothId:id,done:bmContacts[v.id]?.done===true,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});n++;if(n>=400){await batch.commit();batch=db.batch();n=0}}
+  }
+  if(n)await batch.commit();await loadBoothData();notice($("bmMsg"),`${groups.size} Excel बूथ तैयार/अपडेट हुए और ${voters.length} मतदाता जोड़े गए। पहले से दर्ज संपर्क स्थिति सुरक्षित रखी गई।`,"success");
+ }catch(e){notice($("bmMsg"),"Excel बूथ नहीं बन सके: "+e.message,"error")}finally{btn.disabled=false}
+};
+$("bmAssign").onclick=async()=>{
+ const ward=$("bmWard").value,boothId=$("bmBooth").value;if(!ward)return notice($("bmMsg"),"पहले वार्ड चुनें।","error");if(!boothId)return notice($("bmMsg"),"पहले अपना बनाया हुआ बूथ चुनें।","error");if(!bmSelected.size)return notice($("bmMsg"),"कम से कम एक मतदाता चुनें।","error");
+ const btn=$("bmAssign");btn.disabled=true;
+ try{const refs=bmRefs(),ids=[...bmSelected];for(let i=0;i<ids.length;i+=400){const batch=db.batch();ids.slice(i,i+400).forEach(id=>{const old=bmContacts[id]||{};batch.set(refs.contacts.doc(id),{voterId:id,ward,boothId,done:old.done===true,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})});await batch.commit()}
+  bmSelected.clear();await loadBoothData();notice($("bmMsg"),`${ids.length} मतदाता चुने हुए बूथ में जोड़ दिए गए।`,"success");
+ }catch(e){notice($("bmMsg"),"मतदाता बूथ में नहीं जुड़े: "+e.message,"error")}finally{btn.disabled=false}
+};
 
 </script></body></html>
