@@ -383,7 +383,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",authDomain:"voter-11766.firebaseapp.com",projectId:"voter-11766",storageBucket:"voter-11766.firebasestorage.app",messagingSenderId:"1078819307357",appId:"1:1078819307357:web:c8752d49751e34c037b2b4",measurementId:"G-BHBYFENK2L"};
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[],activeSearchPlace=null,candidateBranding={};const $=x=>document.getElementById(x);
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[],activeSearchPlace=null,candidateBranding={},accountsLoaded=false,brandingReadCache={};const $=x=>document.getElementById(x);
 const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[ईी]/g,"इ").replace(/[ऊू]/g,"उ").replace(/[ऐै]/g,"ए").replace(/[औौ]/g,"ओ").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
 function matchesSearch(v,term){
   if(!term)return true;
@@ -439,9 +439,17 @@ function renderCandidateBranding(){
  box.classList.remove("hidden");
 }
 auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
-try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();await loadAccounts();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
 $("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));b.classList.add("active");$(b.dataset.id).classList.add("active")});
+document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
+ document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+ b.classList.add("active");$(b.dataset.id).classList.add("active");
+ if(b.dataset.id==="accounts"&&isAdmin()&&!accountsLoaded){
+  try{notice($("accountList"),"प्रत्याशी सूची लोड हो रही है...");await loadAccounts();}
+  catch(e){notice($("accountList"),"प्रत्याशी सूची नहीं खुली: "+e.message,"error");}
+ }
+});
 async function loadPlaces(){
  const s=await db.collection("panchayats").orderBy("name").get();
  places=s.docs.map(d=>({id:d.id,...d.data()}));
@@ -471,7 +479,7 @@ $("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0]
 let clientProfiles=[];
 async function loadAccounts(){
  let s=await db.collection("users").where("role","==","client").get();
- clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));
+ clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));accountsLoaded=true;
  $("accountList").innerHTML=clientProfiles.map(x=>{const active=x.active!==false;return `<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}<br><b style="color:${active?"#16834b":"#b42318"}">स्थिति: ${active?"चालू":"बंद"}</b><br><button type="button" class="${active?"red":"green"}" onclick="toggleCandidate('${esc(x.uid)}')">${active?"ID बंद करें":"ID चालू करें"}</button></div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
  const select=$("brandingCandidate");
  select.innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");
@@ -544,10 +552,77 @@ $("saveBranding").onclick=async()=>{
  const btn=$("saveBranding");btn.disabled=true;
  try{
   await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({name,symbolName,photoBase64:brandingPhotoData,symbolBase64:brandingSymbolData,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-  notice($("brandingMsg"),"प्रत्याशी की फोटो और चुनाव चिह्न Firestore में सेव हो गए।","success");if(user&&user.uid===uid){candidateBranding={name,symbolName,photoBase64:brandingPhotoData,symbolBase64:brandingSymbolData};renderCandidateBranding();}
+  brandingReadCache={};notice($("brandingMsg"),"प्रत्याशी की फोटो और चुनाव चिह्न Firestore में सेव हो गए।","success");if(user&&user.uid===uid){candidateBranding={name,symbolName,photoBase64:brandingPhotoData,symbolBase64:brandingSymbolData};renderCandidateBranding();}
  }catch(e){notice($("brandingMsg"),"सेव नहीं हुआ: "+e.message+" — मौजूदा Firestore Rules में candidateBranding की अनुमति जाँचें।","error")}
  finally{btn.disabled=false}
 };
+
+// स्थानीय IndexedDB कैश: एक ही मतदाता सूची को पेज रीफ्रेश पर दोबारा डाउनलोड करने से बचाएँ।
+const VOTER_CACHE_DB = "voter-slip-local-cache-v1";
+const VOTER_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 घंटे
+
+function openVoterCacheDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) return reject(new Error("IndexedDB उपलब्ध नहीं है"));
+    const request = indexedDB.open(VOTER_CACHE_DB, 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains("lists")) {
+        database.createObjectStore("lists", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("कैश डेटाबेस नहीं खुला"));
+  });
+}
+
+async function readLocalVoterCache(key) {
+  let database;
+  try {
+    database = await openVoterCacheDB();
+    return await new Promise((resolve) => {
+      const request = database.transaction("lists", "readonly")
+        .objectStore("lists").get(key);
+      request.onsuccess = () => {
+        const item = request.result;
+        if (!item || !Array.isArray(item.data) ||
+            Date.now() - item.savedAt > VOTER_CACHE_TTL) {
+          resolve(null);
+        } else {
+          resolve(item.data);
+        }
+      };
+      request.onerror = () => resolve(null);
+    });
+  } catch (_) {
+    return null;
+  } finally {
+    if (database) database.close();
+  }
+}
+
+async function writeLocalVoterCache(key, data) {
+  let database;
+  try {
+    database = await openVoterCacheDB();
+    await new Promise((resolve) => {
+      const transaction = database.transaction("lists", "readwrite");
+      transaction.objectStore("lists").put({
+        key,
+        savedAt: Date.now(),
+        data
+      });
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+      transaction.onabort = () => resolve();
+    });
+  } catch (_) {
+    // स्थानीय कैश न चलने पर सामान्य Firestore खोज जारी रहेगी।
+  } finally {
+    if (database) database.close();
+  }
+}
+
 async function getVoters() {
   const p = isAdmin()
     ? places.find(x => x.id === $("searchP").value)
@@ -580,6 +655,22 @@ async function getVoters() {
     throw new Error("सक्रिय वोटर सूची उपलब्ध नहीं है।");
   }
 
+  // कैश की पहचान पंचायत + अपलोड + यूजर/वार्ड से होगी।
+  // नया Excel अपलोड होने पर activeUploadId बदलता है, इसलिए पुराना कैश इस्तेमाल नहीं होगा।
+  const cacheScope = isAdmin() ? "admin" : String(profile.ward || "ALL");
+  const localCacheKey = [
+    user?.uid || "unknown",
+    p.id,
+    p.activeUploadId,
+    cacheScope
+  ].join("|");
+
+  const savedVoters = await readLocalVoterCache(localCacheKey);
+  if (savedVoters !== null) {
+    activeSearchPlace = p;
+    return savedVoters;
+  }
+
   let q = db
     .collection("panchayats")
     .doc(p.id)
@@ -594,18 +685,32 @@ async function getVoters() {
 
   const snapshot = await q.limit(5000).get();
 
-  return snapshot.docs.map(doc => ({
+  const voters = snapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
   }));
+
+  // सूची को इस डिवाइस पर 12 घंटे तक रखें; कैश फेल हो तो ऐप सामान्य रूप से चलेगा।
+  await writeLocalVoterCache(localCacheKey, voters);
+  return voters;
 }
 $("searchBtn").onclick=async()=>{try{notice($("searchMsg"),"खोज रहे हैं...");if(!cache.length)cache=await getVoters();if(isAdmin()||(profile?.role==="client"&&profile.ward==="ALL")){$("ward").innerHTML="<option value=''>सभी वार्ड</option>"+[...new Set(cache.map(v=>String(v.ward||"")).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"hi")).map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("")}let term=norm($("query").value),ward=$("ward").value;let found=cache.filter(v=>matchesSearch(v,term)&&(!ward||norm(v.ward)===norm(ward))).slice(0,100);$("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)} · क्रमांक: ${esc(v.serial)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";notice($("searchMsg"),`परिणाम: ${found.length}${cache.length===5000?" (पहले 5,000 रिकॉर्ड तक)":""}`)}catch(e){notice($("searchMsg"),e.message,"error")}};
 $("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[];$("ward").value=""};$("searchP").onchange=()=>{cache=[];$("results").innerHTML="";$("ward").innerHTML="<option value=''>सभी वार्ड</option>"};
 async function getBrandingForCurrentSearch(){
  let brand=candidateBranding||{};
  if(isAdmin()){
+  // एडमिन की एक ही प्रत्याशी की फोटो/चिह्न हर पर्ची पर दोबारा Firestore से न पढ़ें।
   const c=clientProfiles.find(x=>x.panchayatId===(activeSearchPlace?.id||""));
-  if(c){const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(c.uid).get();if(d.exists)brand={...d.data(),position:c.position||"प्रत्याशी"};else brand={position:c.position||"प्रत्याशी"};}
+  if(c){
+   const key=c.panchayatId+"|"+c.uid;
+   if(Object.prototype.hasOwnProperty.call(brandingReadCache,key)){
+    brand=brandingReadCache[key];
+   }else{
+    const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(c.uid).get();
+    brand=d.exists?{...d.data(),position:c.position||"प्रत्याशी"}:{position:c.position||"प्रत्याशी"};
+    brandingReadCache[key]=brand;
+   }
+  }
  }
  return brand;
 }
