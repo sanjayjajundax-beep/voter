@@ -202,6 +202,83 @@
 }
 
 </style>
+
+<style>
+/* Final voter slip print layout: 8 fuller, readable slips per A4 (2 × 4) */
+.bulk-print-page{
+  width:100%!important;
+  min-height:277mm!important;
+  max-height:277mm!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  gap:2.5mm!important;
+  overflow:hidden!important;
+}
+.bulk-print-page .sample-slip{
+  height:100%!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border:1.5px solid #20aabd!important;
+  border-radius:0!important;
+}
+.bulk-print-page .sample-banner{
+  height:42%!important;
+  min-height:0!important;
+  flex:0 0 42%!important;
+  grid-template-columns:62px minmax(0,1fr) 72px!important;
+  gap:4px!important;
+  padding:4px!important;
+}
+.bulk-print-page .sample-banner .candidate-symbol{
+  width:54px!important;height:61px!important;max-width:100%!important;
+  object-fit:contain!important;border:1px solid #333!important;
+  background:#fff!important;padding:2px!important;
+}
+.bulk-print-page .sample-banner .symbol-name{
+  font-size:8px!important;line-height:1.15!important;margin-top:2px!important;
+}
+.bulk-print-page .sample-banner .candidate-photo{
+  width:68px!important;height:82px!important;max-width:100%!important;
+  object-fit:cover!important;border:0!important;border-radius:0!important;
+}
+.bulk-print-page .sample-topline{font-size:8.5px!important;line-height:1.2!important}
+.bulk-print-page .sample-candidate-name{font-size:18px!important;line-height:1.15!important;margin:4px 0!important}
+.bulk-print-page .sample-slogan{font-size:9px!important;line-height:1.2!important}
+.bulk-print-page .sample-cutline{
+  flex:0 0 auto!important;font-size:8px!important;line-height:1.2!important;
+  padding:3px 4px!important;border-bottom:1.5px dashed #222!important;
+}
+.bulk-print-page .sample-voter-area{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 68px!important;
+  gap:4px!important;flex:1 1 auto!important;min-height:0!important;padding:5px!important;
+}
+.bulk-print-page .sample-idline{gap:5px!important;margin-bottom:3px!important}
+.bulk-print-page .sample-idline b{min-width:38px!important;font-size:10px!important;padding:2px 4px!important}
+.bulk-print-page .sample-idline strong{font-size:10px!important;line-height:1.15!important}
+.bulk-print-page .sample-detail{font-size:10.5px!important;line-height:1.28!important;margin:2px 0!important}
+.bulk-print-page .sample-booth{padding-left:4px!important;border-left:1.5px solid #39a9bc!important}
+.bulk-print-page .sample-booth-title{font-size:9px!important;line-height:1.2!important}
+.bulk-print-page .sample-ward{font-size:10px!important;padding:3px 0!important}
+.bulk-print-page .sample-booth-content{font-size:8.5px!important;line-height:1.25!important;padding-top:3px!important}
+.bulk-print-page .sample-time{flex:0 0 auto!important;font-size:8.5px!important;padding:3px!important}
+@media print{
+  @page{size:A4 portrait;margin:6mm}
+  .bulk-print-page{
+    min-height:277mm!important;max-height:277mm!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+    gap:2.5mm!important;
+  }
+  .bulk-print-page .sample-slip{
+    print-color-adjust:exact!important;
+    -webkit-print-color-adjust:exact!important;
+  }
+}
+</style>
+
 </head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
@@ -212,7 +289,7 @@
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
 <section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
 <div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">प्रत्याशी की फोटो और चुनाव चिह्न सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>पर्ची पर दिखने वाला नाम</label><input id="brandingName" placeholder="प्रत्याशी का नाम"><label>चुनाव चिन्ह का नाम</label><input id="brandingSymbolName" placeholder="जैसे: हाथ का निशान"><div class="row"><div><label>प्रत्याशी की फोटो (मोबाइल Gallery)</label><input id="brandingPhotoFile" class="file-input" type="file" accept="image/*"><img id="brandingPhotoPreview" class="image-preview" alt="प्रत्याशी फोटो Preview"><div class="image-tools"><button id="removeBrandingPhoto" class="red" type="button">फोटो हटाएँ</button></div></div><div><label>चुनाव चिह्न (मोबाइल Gallery)</label><input id="brandingSymbolFile" class="file-input" type="file" accept="image/*"><img id="brandingSymbolPreview" class="image-preview" alt="चुनाव चिह्न Preview"><div class="image-tools"><button id="removeBrandingSymbol" class="red" type="button">चिह्न हटाएँ</button></div></div></div><div class="muted">इमेज ब्राउज़र में ही resize/compress होकर Base64 के रूप में Firestore में सेव होगी। Firebase Storage या बाहरी image server का उपयोग नहीं होगा। दोनों इमेज का संयुक्त डेटा लगभग 500 KB से कम रखा जाएगा।</div><button id="saveBranding" class="green" type="button">फोटो और चिह्न सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
-<section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden candidate-branding-display"><div class="candidate-branding-identity"><img id="candidateLoginPhoto" class="candidate-photo" alt="प्रत्याशी फोटो"><div class="candidate-branding-name"><div class="muted">आपकी प्रत्याशी प्रोफाइल</div><b id="candidateLoginName">प्रत्याशी</b></div></div><div class="candidate-branding-symbol-wrap"><img id="candidateLoginSymbol" class="candidate-symbol" alt="चुनाव चिह्न"></div></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (9 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
+<section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden candidate-branding-display"><div class="candidate-branding-identity"><img id="candidateLoginPhoto" class="candidate-photo" alt="प्रत्याशी फोटो"><div class="candidate-branding-name"><div class="muted">आपकी प्रत्याशी प्रोफाइल</div><b id="candidateLoginName">प्रत्याशी</b></div></div><div class="candidate-branding-symbol-wrap"><img id="candidateLoginSymbol" class="candidate-symbol" alt="चुनाव चिह्न"></div></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (8 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
 <section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
