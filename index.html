@@ -113,6 +113,67 @@
  .bulk-print-page .slip-field b{font-size:9.8px!important}
 }
 </style>
+
+<style>
+/* नमूना पर्ची डिजाइन — मतदाता की फोटो नहीं, केवल Excel का विवरण */
+.sample-slip{display:flex;flex-direction:column;overflow:hidden;border:2px solid #24a9bd!important;border-radius:0!important;background:#fff;box-shadow:none!important;color:#111}
+.sample-banner{display:grid!important;grid-template-columns:76px minmax(0,1fr) 82px!important;align-items:center;gap:5px!important;min-height:112px!important;padding:5px!important;background:#ffeb00!important;border-bottom:2px solid #24a9bd!important}
+.sample-symbol-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.sample-banner .candidate-symbol{width:62px!important;height:62px!important;max-width:100%;object-fit:contain;border:1px solid #333!important;background:#fff!important;padding:2px!important}
+.sample-banner .symbol-name{font-size:10px;font-weight:700;color:#a11;text-align:center;line-height:1.15;margin-top:2px}
+.sample-candidate-info{text-align:center;min-width:0;color:#111;line-height:1.15}
+.sample-topline{font-size:10px;font-weight:700}
+.sample-candidate-name{font-size:20px;font-weight:800;color:#d52a72;text-shadow:1px 1px #fff;margin:4px 0;overflow-wrap:anywhere}
+.sample-slogan{font-size:11px;font-weight:700;line-height:1.2}
+.sample-photo-box{display:flex;align-items:center;justify-content:center;min-width:0}
+.sample-banner .candidate-photo{display:block;width:76px!important;height:91px!important;max-width:100%;object-fit:cover;border:0!important;border-radius:0!important;background:#fff}
+.sample-cutline{font-size:9px;font-weight:700;text-align:center;line-height:1.25;padding:3px 4px;border-bottom:2px dashed #333;background:#fff}
+.sample-voter-area{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:5px;flex:1;min-height:0;padding:5px}
+.sample-voter-main{min-width:0}
+.sample-idline{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
+.sample-idline b{display:inline-block;min-width:52px;padding:2px 5px;border:1.5px solid #111;text-align:center;font-size:12px}
+.sample-idline strong{font-size:12px;overflow-wrap:anywhere}
+.sample-detail{font-size:12px;line-height:1.35;margin:2px 0;overflow-wrap:anywhere}
+.sample-detail b{font-weight:800}
+.sample-booth{border-left:2px solid #39a9bc;padding-left:5px;min-width:0;display:flex;flex-direction:column}
+.sample-booth-title{text-align:center;color:#1683a1;font-size:11px;font-weight:800}
+.sample-ward{text-align:center;color:#b22;font-size:12px;font-weight:800;border-bottom:1px solid #aaa;padding:3px 0}
+.sample-booth-content{font-size:10px;font-weight:700;line-height:1.25;padding-top:4px;overflow-wrap:anywhere}
+.sample-time{background:#e91e63;color:#fff;text-align:center;font-size:10px;font-weight:700;padding:3px}
+@media(max-width:600px){
+ .sample-banner{grid-template-columns:58px minmax(0,1fr) 64px!important;min-height:96px!important}
+ .sample-banner .candidate-symbol{width:49px!important;height:52px!important}
+ .sample-banner .candidate-photo{width:60px!important;height:76px!important}
+ .sample-topline{font-size:8px}.sample-candidate-name{font-size:16px}.sample-slogan{font-size:9px}
+ .sample-voter-area{grid-template-columns:minmax(0,1fr) 72px}
+ .sample-detail{font-size:11px}
+}
+.bulk-print-page .sample-slip{height:100%!important;min-height:0!important;max-height:100%;border-width:1.5px!important}
+.bulk-print-page .sample-banner{grid-template-columns:47px minmax(0,1fr) 48px!important;min-height:0!important;height:29%!important;padding:3px!important;gap:2px!important}
+.bulk-print-page .sample-banner .candidate-symbol{width:39px!important;height:42px!important}
+.bulk-print-page .sample-banner .symbol-name{font-size:6px}
+.bulk-print-page .sample-banner .candidate-photo{width:45px!important;height:58px!important}
+.bulk-print-page .sample-topline{font-size:6.5px}
+.bulk-print-page .sample-candidate-name{font-size:13px;margin:2px 0}
+.bulk-print-page .sample-slogan{font-size:7px}
+.bulk-print-page .sample-cutline{font-size:6.5px;padding:2px}
+.bulk-print-page .sample-voter-area{grid-template-columns:minmax(0,1fr) 52px;gap:3px;padding:3px;min-height:0}
+.bulk-print-page .sample-idline{gap:3px;margin-bottom:2px}
+.bulk-print-page .sample-idline b{min-width:27px;font-size:7px;padding:1px}
+.bulk-print-page .sample-idline strong{font-size:7px}
+.bulk-print-page .sample-detail{font-size:7.5px;line-height:1.22;margin:1px 0}
+.bulk-print-page .sample-booth{padding-left:3px;border-left-width:1px}
+.bulk-print-page .sample-booth-title{font-size:7px}
+.bulk-print-page .sample-ward{font-size:8px;padding:2px 0}
+.bulk-print-page .sample-booth-content{font-size:6.5px;line-height:1.2;padding-top:2px}
+.bulk-print-page .sample-time{font-size:7px;padding:2px}
+@media print{
+ @page{size:A4 portrait;margin:6mm}
+ .sample-slip{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .bulk-print-page .sample-banner{height:29%!important}
+}
+</style>
+
 </head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
@@ -304,11 +365,43 @@ async function getBrandingForCurrentSearch(){
  return brand;
 }
 function slipHTML(v,panchayat,brand){
-  const candidateName=brand.name||profile?.name||"";
-  const candidatePosition=brand.position||profile?.position||"प्रत्याशी";
-  const photo=brand.photoBase64?`<img class="candidate-photo" src="${esc(brand.photoBase64)}" alt="प्रत्याशी फोटो">`:'<div class="candidate-photo placeholder">फोटो</div>';
-  const symbol=brand.symbolBase64?`<img class="candidate-symbol" src="${esc(brand.symbolBase64)}" alt="चुनाव चिह्न">`:'<div class="candidate-symbol placeholder">चुनाव चिह्न</div>';
-  return `<article class="slip">${(candidateName||brand.photoBase64||brand.symbolBase64)?`<div class="candidate-banner"><div class="candidate-left">${photo}<div class="candidate-position">${esc(candidatePosition)} प्रत्याशी</div><div class="candidate-name">${esc(candidateName||"प्रत्याशी")}</div></div><div class="candidate-right">${symbol}<div class="symbol-name">${esc(brand.symbolName||"")}</div></div></div>`:""}<div class="slip-body"><div class="slip-panchayat"><b>ग्राम पंचायत:</b> ${esc(panchayat)}</div><div style="font-size:10px;color:#64748b">मतदाता का नाम</div><div class="slip-name">${esc(v.name||"—")}</div><div class="slip-fields"><div class="slip-field"><span>पिता / पति का नाम</span><b>${esc([v.relationType,v.relative].filter(Boolean).join(" · ")||"—")}</b></div><div class="slip-field"><span>मकान संख्या</span><b>${esc(v.house||"—")}</b></div><div class="slip-field"><span>वार्ड</span><b>${esc(v.ward||"—")}</b></div><div class="slip-field"><span>क्रम संख्या</span><b>${esc(v.serial||"—")}</b></div><div class="slip-field"><span>आयु</span><b>${esc(v.age||"—")}</b></div><div class="slip-field"><span>लिंग</span><b>${esc(v.gender||"—")}</b></div><div class="slip-field full"><span>EPIC / मतदाता पहचान संख्या</span><b>${esc(v.epic||"—")}</b></div><div class="slip-field full"><span>मोहल्ला / क्षेत्र</span><b>${esc(v.locality||"—")}</b></div><div class="slip-field full"><span>मतदान बूथ संख्या व पता</span><b>${esc(v.booth||"—")}</b></div></div></div></article>`;
+  const candidateName=brand.name||profile?.name||"प्रत्याशी";
+  const candidatePosition=brand.position||profile?.position||"सरपंच";
+  const photo=brand.photoBase64
+    ? `<img class="candidate-photo" src="${esc(brand.photoBase64)}" alt="प्रत्याशी फोटो">`
+    : `<div class="candidate-photo placeholder">प्रत्याशी फोटो</div>`;
+  const symbol=brand.symbolBase64
+    ? `<img class="candidate-symbol" src="${esc(brand.symbolBase64)}" alt="चुनाव चिन्ह">`
+    : `<div class="candidate-symbol placeholder">चुनाव चिन्ह</div>`;
+  const boothText=v.booth||"—";
+  return `<article class="slip sample-slip">
+    <div class="candidate-banner sample-banner">
+      <div class="sample-symbol-box">${symbol}<div class="symbol-name">${esc(brand.symbolName||"चुनाव चिन्ह")}</div></div>
+      <div class="sample-candidate-info">
+        <div class="sample-topline">ग्राम पंचायत ${esc(panchayat||"")} से ${esc(candidatePosition)} पद के लिए<br>आपके अपने लोकप्रिय उम्मीदवार</div>
+        <div class="sample-candidate-name">${esc(candidateName)}</div>
+        <div class="sample-slogan">को ${esc(brand.symbolName||"चुनाव चिन्ह")} के निशान पर बटन दबाकर<br>भारी मतों से विजयी बनायें</div>
+      </div>
+      <div class="sample-photo-box">${photo}</div>
+    </div>
+    <div class="sample-cutline">✂ मतदान तिथि से पूर्व बांटी गयी पर्ची, मतदान केन्द्र में जाने से पहले ऊपर का हिस्सा फाड़ दें। ✂</div>
+    <div class="sample-voter-area">
+      <div class="sample-voter-main">
+        <div class="sample-idline"><b>${esc(v.serial||"—")}</b><strong>${esc(v.epic||"")}</strong></div>
+        <div class="sample-detail"><b>नाम:</b> ${esc(v.name||"—")}</div>
+        <div class="sample-detail"><b>${esc(v.relationType||"पिता / पति")} का नाम:</b> ${esc(v.relative||"—")}</div>
+        <div class="sample-detail"><b>मकान संख्या:</b> ${esc(v.house||"—")}</div>
+        <div class="sample-detail"><b>आयु:</b> ${esc(v.age||"—")}　<b>लिंग:</b> ${esc(v.gender||"—")}</div>
+        ${v.locality?`<div class="sample-detail"><b>मोहल्ला:</b> ${esc(v.locality)}</div>`:""}
+      </div>
+      <aside class="sample-booth">
+        <div class="sample-booth-title">${esc(panchayat||"ग्राम पंचायत")}</div>
+        <div class="sample-ward">वार्ड : ${esc(v.ward||"—")}</div>
+        <div class="sample-booth-content"><b>मतदान बूथ</b><br>${esc(boothText)}</div>
+      </aside>
+    </div>
+    <div class="sample-time">मतदान समय : प्रातः 7 से सायं 6 बजे तक</div>
+  </article>`;
 }
 window.makeSlip=async id=>{
  const v=cache.find(x=>x.id===id);if(!v)return;
