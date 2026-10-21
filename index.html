@@ -483,7 +483,7 @@ let clientProfiles=[];
 async function loadAccounts(){
  let s=await db.collection("users").where("role","==","client").get();
  clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));accountsLoaded=true;
- $("accountList").innerHTML=clientProfiles.map(x=>{const active=x.active!==false;return `<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}<br><b style="color:${active?"#16834b":"#b42318"}">स्थिति: ${active?"चालू":"बंद"}</b><br><label>इस प्रत्याशी की वोटर सूची (Upload ID)</label><input id="clientUpload-${esc(x.uid)}" value="${esc(x.uploadId||"")}" placeholder="Upload ID यहाँ डालें" autocomplete="off"><button type="button" class="green" onclick="saveClientUpload('${esc(x.uid)}')">Upload ID सेव करें</button><br><button type="button" class="${active?"red":"green"}" onclick="toggleCandidate('${esc(x.uid)}')">${active?"ID बंद करें":"ID चालू करें"}</button></div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
+ $("accountList").innerHTML=clientProfiles.map(x=>{const active=x.active!==false;return `<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}<br><b style="color:${active?"#16834b":"#b42318"}">स्थिति: ${active?"चालू":"बंद"}</b><br><button type="button" class="${active?"red":"green"}" onclick="toggleCandidate('${esc(x.uid)}')">${active?"ID बंद करें":"ID चालू करें"}</button></div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
  const select=$("brandingCandidate");
  select.innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");
  let rememberedUid="";try{rememberedUid=localStorage.getItem("voterSlipBrandingCandidateUid")||""}catch(e){}
@@ -491,17 +491,6 @@ async function loadAccounts(){
  else if(clientProfiles.length)select.value=clientProfiles[0].uid;
  if(select.value)await loadBrandingEditor();
 }
-
-window.saveClientUpload=async uid=>{
- if(!isAdmin())return alert("केवल एडमिन Upload ID सेट कर सकता है।");
- const c=clientProfiles.find(x=>x.uid===uid);if(!c)return alert("प्रत्याशी प्रोफाइल नहीं मिली।");
- const input=$("clientUpload-"+uid),uploadId=String(input?.value||"").trim();
- if(!uploadId)return alert("Upload ID खाली नहीं हो सकती।");
- if(!/^[A-Za-z0-9_-]{5,100}$/.test(uploadId))return alert("Upload ID में केवल अंग्रेजी अक्षर, अंक, _ और - होने चाहिए।");
- if(!confirm(`${c.name||c.email||uid} को Upload ${uploadId} देना है?`))return;
- try{await db.collection("users").doc(uid).update({uploadId,uploadUpdatedAt:firebase.firestore.FieldValue.serverTimestamp(),uploadUpdatedBy:user.uid});c.uploadId=uploadId;cache=[];alert("इस प्रत्याशी की अलग वोटर सूची सेट हो गई।");}
- catch(e){alert("Upload ID सेव नहीं हुई: "+e.message+"\nनया Firestore Rules पहले Publish करना होगा।");}
-};
 window.toggleCandidate=async uid=>{
  if(!isAdmin())return alert("केवल एडमिन प्रत्याशी ID की स्थिति बदल सकता है।");
  const c=clientProfiles.find(x=>x.uid===uid);if(!c)return alert("प्रत्याशी प्रोफाइल नहीं मिली।");
@@ -623,19 +612,17 @@ async function getVoters() {
   }
   activeSearchPlace = p;
 
-  // Admin पंचायत का वर्तमान activeUploadId इस्तेमाल करता है।
-  // हर Client अपनी users/{uid}.uploadId सूची इस्तेमाल करता है।
-  const selectedUploadId = isAdmin() ? p.activeUploadId : String(profile.uploadId || "").trim();
-  if (!selectedUploadId) {
-    throw new Error(isAdmin() ? "इस पंचायत की सक्रिय वोटर सूची उपलब्ध नहीं है।" : "आपकी ID के लिए अलग वोटर सूची सेट नहीं है। एडमिन से संपर्क करें।");
+  if (!p.activeUploadId) {
+    throw new Error("सक्रिय वोटर सूची उपलब्ध नहीं है।");
   }
 
-  // कैश की पहचान पंचायत + चुने हुए Upload + यूजर/वार्ड से होगी।
+  // कैश की पहचान पंचायत + अपलोड + यूजर/वार्ड से होगी।
+  // नया Excel अपलोड होने पर activeUploadId बदलता है, इसलिए पुराना कैश इस्तेमाल नहीं होगा।
   const cacheScope = isAdmin() ? "admin" : String(profile.ward || "ALL");
   const localCacheKey = [
     user?.uid || "unknown",
     p.id,
-    selectedUploadId,
+    p.activeUploadId,
     cacheScope
   ].join("|");
 
@@ -649,7 +636,7 @@ async function getVoters() {
     .collection("panchayats")
     .doc(p.id)
     .collection("uploads")
-    .doc(selectedUploadId)
+    .doc(p.activeUploadId)
     .collection("voters");
 
   // वार्ड-विशिष्ट प्रत्याशी के लिए Firestore पर ही फ़िल्टर करें
