@@ -1,92 +1,537 @@
 <!doctype html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Voter Slip Portal</title>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voter Slip Portal</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
 <style>
-:root{--b:#174ea6;--t:#087e8b;--bg:#f3f6fb;--ink:#243247}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,'Tiro Devanagari Hindi',sans-serif}
-header{background:linear-gradient(120deg,#123c80,#087e8b);color:white;padding:14px;display:flex;justify-content:space-between}
-h1{font-size:18px;margin:0}
-.wrap{max-width:1050px;margin:18px auto;padding:0 12px}
-.card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 3px 15px #1234}
-.login{max-width:430px;margin:55px auto;text-align:center}
-label{display:block;font-size:13px;font-weight:600;margin-top:8px}
-input,select{width:100%;padding:11px;border:1px solid #ccd6e3;border-radius:8px;margin:5px 0 10px}
-button{background:var(--b);color:white;border:0;border-radius:8px;padding:10px 14px;margin:3px;cursor:pointer}
-.green{background:#16834b}.red{background:#b42318}.gray{background:#64748b}
-.wide{width:100%}.hidden{display:none!important}
-.muted{color:#64748b;font-size:13px}
-.notice{background:#eef5ff;color:#174ea6;padding:10px;border-radius:8px;margin:10px 0;font-size:13px}
-.error{background:#fff0f0;color:#a71919}
-.success{background:#eaf8ef;color:#126b3a}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.stat{background:white;padding:14px;border-left:4px solid var(--b);border-radius:9px}
-.stat strong{display:block;font-size:22px}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tab{background:white;color:var(--b);border:1px solid #ddd}
-.tab.active{background:var(--b);color:white}
-.panel{display:none}.panel.active{display:block}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tablewrap{overflow:auto}
-table{border-collapse:collapse;width:100%;min-width:450px}
-td,th{text-align:left;padding:9px;border-bottom:1px solid #e5eaf0;font-size:13px}
-.result{background:white;border:1px solid #e2e8f0;border-radius:9px;padding:12px;margin:8px 0}
-#printArea{background:#fff}
-.slips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+:root{--b:#174ea6;--t:#087e8b;--bg:#f3f6fb;--ink:#243247}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,'Tiro Devanagari Hindi',sans-serif}header{background:linear-gradient(120deg,#123c80,#087e8b);color:white;padding:14px;display:flex;justify-content:space-between}h1{font-size:18px;margin:0}.wrap{max-width:1050px;margin:18px auto;padding:0 12px}.card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 3px 15px #1234}.login{max-width:430px;margin:55px auto;text-align:center}label{display:block;font-size:13px;font-weight:600;margin-top:8px}input,select{width:100%;padding:11px;border:1px solid #ccd6e3;border-radius:8px;margin:5px 0 10px}button{background:var(--b);color:white;border:0;border-radius:8px;padding:10px 14px;margin:3px;cursor:pointer}.green{background:#16834b}.red{background:#b42318}.gray{background:#64748b}.wide{width:100%}.hidden{display:none!important}.muted{color:#64748b;font-size:13px}.notice{background:#eef5ff;color:#174ea6;padding:10px;border-radius:8px;margin:10px 0;font-size:13px}.error{background:#fff0f0;color:#a71919}.success{background:#eaf8ef;color:#126b3a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stat{background:white;padding:14px;border-left:4px solid var(--b);border-radius:9px}.stat strong{display:block;font-size:22px}.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{background:white;color:var(--b);border:1px solid #ddd}.tab.active{background:var(--b);color:white}.panel{display:none}.panel.active{display:block}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:450px}td,th{text-align:left;padding:9px;border-bottom:1px solid #e5eaf0;font-size:13px}.result{background:white;border:1px solid #e2e8f0;border-radius:9px;padding:12px;margin:8px 0}#printArea{background:#fff}.slips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.slip{position:relative;overflow:visible;border:1.5px solid #174ea6;border-radius:12px;padding:0;color:#172033;background:#fff;break-inside:avoid;box-shadow:0 2px 8px #1232}.candidate-banner{display:grid;grid-template-columns:70px 1fr 70px;align-items:center;gap:9px;padding:9px 10px;background:linear-gradient(110deg,#eef7ff,#fff8e8);border-bottom:2px solid #174ea6}.placeholder{display:grid;place-items:center;font-size:9px;color:#64748b}.candidate-photo{width:68px;height:68px;object-fit:cover;border-radius:9px;border:2px solid #174ea6;background:#fff}.candidate-info{text-align:center;min-width:0}.candidate-info b{display:block;font-size:14px;color:#123c80;overflow-wrap:anywhere}.candidate-info small{font-size:9px;color:#64748b}.candidate-symbol{width:66px;height:66px;object-fit:contain;border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:3px}.image-preview{width:112px;height:112px;object-fit:contain;background:#f8fafc;border:1px dashed #94a3b8;border-radius:9px;padding:4px;display:block;margin:5px 0 8px}.image-tools{display:flex;gap:6px;flex-wrap:wrap}.image-tools button{margin:2px 0}.file-input{padding:8px;background:#f8fafc}.slip-head{background:linear-gradient(120deg,#123c80,#087e8b);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px}.slip-mark{width:42px;height:42px;border:1px solid #ffffffaa;border-radius:50%;display:grid;place-items:center;font-size:23px;flex:none}.slip-head h4{font-size:17px;margin:0;text-align:left;line-height:1.3}.slip-head small{display:block;font-size:10px;opacity:.9;margin-top:3px}.slip-body{padding:12px 14px}.slip-panchayat{font-size:12px;background:#eef5ff;border-left:3px solid #174ea6;border-radius:4px;padding:7px 9px;margin-bottom:10px}.slip-name{font-size:17px;font-weight:700;color:#123c80;margin:4px 0 10px;overflow-wrap:anywhere}.slip-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.slip-field{border-bottom:1px solid #e5eaf0;padding:3px 0;min-width:0}.slip-field span{display:block;font-size:10px;color:#64748b}.slip-field b{display:block;font-size:12px;overflow-wrap:anywhere}.slip-field.full{grid-column:1/-1}.slip-foot{border-top:1px dashed #cbd5e1;margin-top:10px;padding-top:7px;font-size:9px;color:#64748b;display:flex;justify-content:space-between;gap:8px}.slip-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.slip-actions button{margin:0}.progress{height:8px;background:#ddd;border-radius:8px}.progress div{height:100%;width:0;background:var(--t)}@media(max-width:600px){.candidate-banner{grid-template-columns:56px 1fr 56px;gap:6px;padding:7px}.candidate-photo{width:54px;height:54px}.candidate-symbol{width:52px;height:52px}.candidate-info b{font-size:12px}.row{grid-template-columns:1fr}.slips{grid-template-columns:1fr}.slip-fields{gap:6px}} .bulk-print-pages{display:block}.bulk-print-page{width:100%;page-break-after:always;break-after:page;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:1.5mm;min-height:277mm;max-height:277mm;overflow:hidden}.bulk-print-page:last-child{page-break-after:auto;break-after:auto}.bulk-print-page .slip{height:100%;min-height:0;overflow:hidden;border-radius:4px;box-shadow:none}.bulk-print-page .candidate-banner{grid-template-columns:35px 1fr 35px;padding:3px;gap:3px}.bulk-print-page .candidate-photo{width:33px;height:33px;border-width:1px;border-radius:4px}.bulk-print-page .candidate-symbol{width:32px;height:32px;padding:1px;border-radius:4px}.bulk-print-page .candidate-info b{font-size:8px;line-height:1.2}.bulk-print-page .candidate-info small{font-size:6px}.bulk-print-page .slip-head{padding:4px 5px;gap:4px}.bulk-print-page .slip-mark{width:19px;height:19px;font-size:11px}.bulk-print-page .slip-head h4{font-size:9px}.bulk-print-page .slip-head small{font-size:6px}.bulk-print-page .slip-body{padding:4px 5px}.bulk-print-page .slip-panchayat{font-size:7px;padding:3px;margin-bottom:3px}.bulk-print-page .slip-name{font-size:10px;margin:2px 0 4px}.bulk-print-page .slip-fields{gap:2px}.bulk-print-page .slip-field{padding:1px 0}.bulk-print-page .slip-field span{font-size:6px}.bulk-print-page .slip-field b{font-size:7px;line-height:1.15}.bulk-print-page .slip-foot{font-size:6px;margin-top:3px;padding-top:2px;gap:2px}@media print{@page{size:A4 portrait;margin:6mm}body{background:#fff!important;font-family:Arial,'Tiro Devanagari Hindi',sans-serif!important}.wrap{max-width:none;margin:0;padding:0}.card,#printArea{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important}header,.no-print,footer,#loginView,.grid,#adminTabs,#search{display:none!important}#app{display:block!important;margin:0!important;padding:0!important}#printArea{display:block!important;background:#fff!important}.slips{grid-template-columns:minmax(0,1fr);gap:7mm}.slip{height:auto;min-height:65mm;overflow:visible;border-radius:8px;box-shadow:none;break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}.candidate-banner{grid-template-columns:46px 1fr 46px;padding:5px;gap:5px}.candidate-photo{width:44px;height:44px}.candidate-symbol{width:42px;height:42px}.candidate-info b{font-size:10px}.candidate-info small{font-size:7px}.slip-head{padding:9px 10px}.slip-mark{width:34px;height:34px;font-size:19px}.slip-head h4{font-size:14px}.slip-body{padding:8px 10px}.slip-name{font-size:14px;margin:3px 0 6px}.slip-fields{gap:4px}.slip-field b{font-size:10px}.slip-field span{font-size:8px}.slip-panchayat{font-size:10px;padding:5px 7px;margin-bottom:6px}.slip-foot{font-size:8px;margin-top:6px;padding-top:5px}.bulk-print-page{width:100%;min-height:277mm;max-height:277mm;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:1.5mm}.bulk-print-page .slip{height:100%;min-height:0;overflow:hidden;break-inside:avoid}.bulk-print-page .candidate-banner{grid-template-columns:35px 1fr 35px;padding:3px;gap:3px}.bulk-print-page .candidate-photo{width:33px;height:33px}.bulk-print-page .candidate-symbol{width:32px;height:32px}.bulk-print-page .candidate-info b{font-size:8px}.bulk-print-page .candidate-info small{font-size:6px}.bulk-print-page .slip-head{padding:4px 5px;gap:4px}.bulk-print-page .slip-mark{width:19px;height:19px;font-size:11px}.bulk-print-page .slip-head h4{font-size:9px}.bulk-print-page .slip-head small{font-size:6px}.bulk-print-page .slip-body{padding:4px 5px}.bulk-print-page .slip-panchayat{font-size:7px;padding:3px;margin-bottom:3px}.bulk-print-page .slip-name{font-size:10px;margin:2px 0 4px}.bulk-print-page .slip-field span{font-size:6px}.bulk-print-page .slip-field b{font-size:7px}.bulk-print-page .slip-foot{font-size:6px;margin-top:3px;padding-top:2px}}
 
-/* PDF नमूने के अनुसार पर्ची और बैनर सेटिंग्स */
-.sample-slip{display:flex;flex-direction:column;overflow:hidden;border:1.5px solid #20aabd!important;border-radius:0!important;background:#fff;box-shadow:none!important;color:#111;width:100mm;height:50mm}
-.full-slip-banner-wrap{width:100%!important;height:38%!important;min-height:0!important;flex:0 0 38%!important;display:flex!important;align-items:stretch!important;justify-content:center!important;overflow:hidden!important;border-bottom:1px solid #333!important;background:#fff}
-.full-slip-banner{display:block!important;width:100%!important;height:100%!important;object-fit:fill!important;object-position:center}
-.banner-missing{width:100%;height:100%;display:grid;place-items:center;font-size:9px;color:#a11;background:#fff7f7}
-.sample-cutline{flex:0 0 auto!important;font-size:6.5px!important;line-height:1.1!important;padding:1px 2px!important;border-bottom:1px dashed #333!important;background:#fff;text-align:center}
-.sample-voter-area{display:grid!important;grid-template-columns:minmax(0,1fr) 27mm!important;gap:2px!important;flex:1 1 auto!important;min-height:0!important;padding:2px 3px 1px!important}
-.sample-voter-main{display:flex!important;flex-direction:column!important;justify-content:space-between!important;min-width:0!important;min-height:0!important}
-.sample-idline{display:flex!important;align-items:center!important;gap:3px!important;margin:0 0 1px!important;min-width:0!important}
-.sample-idline b{min-width:23px!important;font-size:7px!important;padding:1px 2px!important;border:1px solid #111;text-align:center}
-.sample-idline strong{font-size:7px!important;line-height:1.1!important;overflow-wrap:anywhere!important}
-.sample-detail{font-size:7.5px!important;line-height:1.15!important;margin:1px 0!important;padding:0!important;overflow-wrap:anywhere!important}
-.sample-booth{display:flex!important;flex-direction:column!important;justify-content:space-between!important;min-width:0!important;padding-left:3px!important;border-left:1px solid #39a9bc!important}
-.sample-booth-title{font-size:7.5px!important;line-height:1.1!important;text-align:center!important;font-weight:bold;color:#1683a1}
-.sample-ward{font-size:8px!important;line-height:1.1!important;padding:1px 0!important;text-align:center;font-weight:bold;color:#b22;border-bottom:1px solid #aaa}
-.sample-booth-content{font-size:6.8px!important;line-height:1.12!important;padding:1px 0!important;overflow-wrap:anywhere!important}
-.sample-time{flex:0 0 auto!important;font-size:7px!important;line-height:1.1!important;padding:2px!important;background:#e91e63;color:#fff;text-align:center;font-weight:bold}
+/* Candidate header: portrait and position/name below; large borderless symbol */
+.candidate-banner{display:grid;grid-template-columns:40% 60%;align-items:stretch;gap:0;padding:10px 12px;background:#fff;border-bottom:2px solid #174ea6;min-height:210px}
+.candidate-left{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px 8px;min-width:0}
+.candidate-photo{width:min(100%,170px);height:150px;object-fit:cover;border:2px solid #174ea6;border-radius:10px;background:#fff}
+.candidate-position{margin-top:7px;background:#e5252a;color:#fff;font-size:14px;font-weight:700;padding:5px 8px;border-radius:7px;width:100%;overflow-wrap:anywhere}
+.candidate-name{font-size:21px;font-weight:700;color:#174ea6;line-height:1.2;margin-top:6px;overflow-wrap:anywhere}
+.candidate-right{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:0 5px}
+.candidate-symbol{width:100%;height:165px;max-width:100%;object-fit:contain;border:0!important;border-radius:0!important;background:transparent;padding:0!important}
+.symbol-name{font-size:17px;font-weight:700;color:#111;text-align:center;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
+.candidate-photo.placeholder,.candidate-symbol.placeholder{display:grid;place-items:center;background:#f8fafc;color:#64748b}
+@media(max-width:600px){.candidate-banner{grid-template-columns:40% 60%;min-height:175px;padding:7px}.candidate-photo{height:115px}.candidate-position{font-size:11px;padding:4px}.candidate-name{font-size:16px}.candidate-symbol{height:135px}.symbol-name{font-size:13px}}
+.bulk-print-page .candidate-banner{grid-template-columns:40% 60%;min-height:0;padding:3px;gap:0}
+.bulk-print-page .candidate-photo{width:100%;height:45px;max-width:54px;border-width:1px}
+.bulk-print-page .candidate-position{font-size:6px;padding:2px 1px;margin-top:2px;border-radius:2px}
+.bulk-print-page .candidate-name{font-size:8px;margin-top:2px}
+.bulk-print-page .candidate-symbol{width:100%;height:72px;padding:0!important;border:0!important}
+.bulk-print-page .symbol-name{font-size:7px;margin-top:1px}
+@media print{.candidate-banner{grid-template-columns:40% 60%;min-height:0;padding:6px}.candidate-photo{width:100%;height:105px;max-width:125px}.candidate-position{font-size:10px;padding:4px}.candidate-name{font-size:16px}.candidate-symbol{height:125px;border:0!important;padding:0!important}.symbol-name{font-size:13px}.bulk-print-page .candidate-banner{grid-template-columns:40% 60%;padding:3px}.bulk-print-page .candidate-photo{height:45px}.bulk-print-page .candidate-symbol{height:72px}.bulk-print-page .candidate-position{font-size:6px}.bulk-print-page .candidate-name{font-size:8px}.bulk-print-page .symbol-name{font-size:7px}}
+
+/* Larger, clearly readable voter details; use the available card height */
+.slip{min-height:560px;display:flex;flex-direction:column}
+.slip-body{padding:16px 18px 18px;display:flex;flex:1;flex-direction:column}
+.slip-panchayat{font-size:17px;padding:11px 13px;margin-bottom:14px;font-weight:600}
+.slip-body>div[style*="font-size:10px"]{font-size:15px!important;font-weight:600}
+.slip-name{font-size:27px;margin:6px 0 16px;line-height:1.3}
+.slip-fields{flex:1;align-content:space-between;gap:12px 16px;grid-auto-rows:minmax(48px,auto)}
+.slip-field{padding:7px 2px 8px;border-bottom:2px solid #dce4ed}
+.slip-field span{font-size:14px;font-weight:600;color:#53657b;line-height:1.35}
+.slip-field b{font-size:18px;line-height:1.4;font-weight:700;color:#101b2b}
+@media(max-width:600px){.slip{min-height:530px}.slip-body{padding:13px 14px 16px}.slip-panchayat{font-size:15px;padding:9px 10px}.slip-name{font-size:24px}.slip-fields{gap:10px 12px}.slip-field span{font-size:12px}.slip-field b{font-size:16px}}
+/* A4 single-slip print: readable type and fuller use of page space */
+@media print{
+ .slip{min-height:105mm;display:flex;flex-direction:column}
+ .slip-body{padding:11px 13px 13px;display:flex;flex:1;flex-direction:column}
+ .slip-panchayat{font-size:13px;padding:7px 9px;margin-bottom:9px}
+ .slip-body>div[style*="font-size:10px"]{font-size:11px!important}
+ .slip-name{font-size:20px;margin:4px 0 10px}
+ .slip-fields{flex:1;align-content:space-between;gap:7px 12px;grid-auto-rows:minmax(30px,auto)}
+ .slip-field{padding:4px 1px 5px;border-bottom:1.5px solid #dce4ed}
+ .slip-field span{font-size:10px;font-weight:600}
+ .slip-field b{font-size:13px;line-height:1.3}
+}
+/* Keep the 9-per-A4 layout, but make its text as readable as the space allows */
+.bulk-print-page .slip-body{display:flex;flex-direction:column;padding:5px 6px}
+.bulk-print-page .slip-panchayat{font-size:8px;padding:4px;margin-bottom:4px}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:7px!important}
+.bulk-print-page .slip-name{font-size:12px;line-height:1.2;margin:3px 0 5px}
+.bulk-print-page .slip-fields{gap:3px;align-content:start;grid-auto-rows:minmax(15px,auto)}
+.bulk-print-page .slip-field{padding:2px 0}
+.bulk-print-page .slip-field span{font-size:7px;font-weight:600;line-height:1.15}
+.bulk-print-page .slip-field b{font-size:8.5px;line-height:1.2}
+@media print{
+ .bulk-print-page .slip-body{padding:4px 5px}
+ .bulk-print-page .slip-panchayat{font-size:7.5px;padding:3px;margin-bottom:3px}
+ .bulk-print-page .slip-name{font-size:10px;margin:2px 0 3px}
+ .bulk-print-page .slip-field span{font-size:6.5px}
+ .bulk-print-page .slip-field b{font-size:7.5px;line-height:1.1}
+}
+
+/* Candidate profile preview: desktop two-column layout; mobile stacked */
+.candidate-branding-display{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(180px,260px);align-items:center;gap:20px;padding:16px}
+.candidate-branding-identity{display:flex;align-items:center;gap:18px;min-width:0}
+#candidateLoginPhoto{display:block;flex:0 0 150px;width:150px;height:150px;max-width:150px;object-fit:cover;border:2px solid #174ea6;border-radius:10px}
+.candidate-branding-name{min-width:0;font-size:17px;overflow-wrap:anywhere}
+.candidate-branding-name .muted{font-size:14px}
+.candidate-branding-name b{display:block;font-size:20px;color:#123c80}
+.candidate-branding-symbol-wrap{display:flex;align-items:center;justify-content:center;min-width:0}
+#candidateLoginSymbol{display:block;flex:0 1 220px;width:220px;height:180px;max-width:100%;object-fit:contain;border:0!important;border-radius:0!important;background:transparent;padding:0!important}
+@media(max-width:600px){.candidate-branding-display{grid-template-columns:minmax(0,1fr);gap:10px}.candidate-branding-identity{gap:12px}#candidateLoginPhoto{flex-basis:112px;width:112px;height:112px;max-width:112px}.candidate-branding-name{font-size:14px}.candidate-branding-name b{font-size:16px}#candidateLoginSymbol{width:120px;height:120px;flex-basis:120px}}
+
+/* तैयार बैनर: हर पर्ची के ऊपर पूरी चौड़ाई */
 .banner-preview{display:block;width:100%;max-width:720px;max-height:220px;object-fit:contain;object-position:center;background:#fff;border:1px solid #d5dce5;border-radius:6px;margin:8px 0}
+.full-slip-banner-wrap{width:100%;height:29%;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;border-bottom:1px solid #333;background:#fff}
+.full-slip-banner{display:block;width:100%;height:100%;object-fit:fill;object-position:center}
+.banner-missing{width:100%;height:100%;display:grid;place-items:center;font-size:8px;color:#a11;background:#fff7f7}
+@media print{.full-slip-banner-wrap{height:29%;min-height:0}.full-slip-banner{width:100%;height:100%;object-fit:fill}}
+</style>
+<style>
+/* Readable, space-filling voter details in the 3x3 A4 ward print layout */
+.bulk-print-page .slip{display:flex;flex-direction:column}
+.bulk-print-page .slip-body{display:flex;flex:1;flex-direction:column;padding:6px 7px 7px}
+.bulk-print-page .slip-panchayat{font-size:10px;padding:5px 6px;margin-bottom:6px;line-height:1.3}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;font-weight:700;line-height:1.25}
+.bulk-print-page .slip-name{font-size:15px;line-height:1.3;margin:3px 0 7px}
+.bulk-print-page .slip-fields{flex:1;align-content:space-between;gap:5px 7px;grid-auto-rows:minmax(22px,auto)}
+.bulk-print-page .slip-field{padding:3px 1px 4px;border-bottom:1.5px solid #cbd5e1}
+.bulk-print-page .slip-field span{font-size:8.5px;font-weight:700;line-height:1.25;color:#40536a}
+.bulk-print-page .slip-field b{font-size:10.5px;line-height:1.3;font-weight:700;color:#101827}
+@media print{
+ .bulk-print-page .slip-body{padding:5px 6px 6px}
+ .bulk-print-page .slip-panchayat{font-size:9.5px;padding:4px 5px;margin-bottom:5px}
+ .bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:8.5px!important}
+ .bulk-print-page .slip-name{font-size:13px;margin:2px 0 5px}
+ .bulk-print-page .slip-fields{gap:4px 6px;grid-auto-rows:minmax(19px,auto)}
+ .bulk-print-page .slip-field span{font-size:7.8px}
+ .bulk-print-page .slip-field b{font-size:9.5px;line-height:1.25}
+}
 
-/* A4 प्रिंट लेआउट (6 पर्चियाँ प्रति पेज) */
+/* Final 3x3 A4 layout: distribute all voter details down to the bottom edge */
+.bulk-print-page .slip{display:flex!important;flex-direction:column!important;height:100%!important;min-height:0!important}
+.bulk-print-page .slip-body{display:flex!important;flex:1 1 auto!important;min-height:0!important;flex-direction:column!important;padding:5px 6px 6px!important}
+.bulk-print-page .slip-panchayat{flex:none!important;font-size:10px!important;padding:5px 6px!important;margin-bottom:5px!important}
+.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;line-height:1.3!important;font-weight:700!important;flex:none!important}
+.bulk-print-page .slip-name{font-size:15px!important;line-height:1.3!important;margin:3px 0 6px!important;flex:none!important}
+.bulk-print-page .slip-fields{display:grid!important;flex:1 1 auto!important;min-height:0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;align-content:stretch!important;gap:3px 7px!important}
+.bulk-print-page .slip-field{min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:2px 1px 3px!important;border-bottom:1.5px solid #cbd5e1!important;overflow-wrap:anywhere!important}
+.bulk-print-page .slip-field span{font-size:8.5px!important;line-height:1.2!important;font-weight:700!important}
+.bulk-print-page .slip-field b{font-size:10.5px!important;line-height:1.25!important;font-weight:700!important;overflow-wrap:anywhere!important}
+@media print{
+ .bulk-print-page .slip-body{padding:5px 6px 6px!important}
+ .bulk-print-page .slip-panchayat{font-size:9.5px!important}
+ .bulk-print-page .slip-name{font-size:14px!important}
+ .bulk-print-page .slip-field span{font-size:8px!important}
+ .bulk-print-page .slip-field b{font-size:9.8px!important}
+}
+</style>
+
+<style>
+/* नमूना पर्ची डिजाइन — मतदाता की फोटो नहीं, केवल Excel का विवरण */
+.sample-slip{display:flex;flex-direction:column;overflow:hidden;border:2px solid #24a9bd!important;border-radius:0!important;background:#fff;box-shadow:none!important;color:#111}
+.sample-banner{display:grid!important;grid-template-columns:76px minmax(0,1fr) 82px!important;align-items:center;gap:5px!important;min-height:112px!important;padding:5px!important;background:#ffeb00!important;border-bottom:2px solid #24a9bd!important}
+.sample-symbol-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+.sample-banner .candidate-symbol{width:62px!important;height:62px!important;max-width:100%;object-fit:contain;border:1px solid #333!important;background:#fff!important;padding:2px!important}
+.sample-banner .symbol-name{font-size:10px;font-weight:700;color:#a11;text-align:center;line-height:1.15;margin-top:2px}
+.sample-candidate-info{text-align:center;min-width:0;color:#111;line-height:1.15}
+.sample-topline{font-size:10px;font-weight:700}
+.sample-candidate-name{font-size:20px;font-weight:800;color:#d52a72;text-shadow:1px 1px #fff;margin:4px 0;overflow-wrap:anywhere}
+.sample-slogan{font-size:11px;font-weight:700;line-height:1.2}
+.sample-photo-box{display:flex;align-items:center;justify-content:center;min-width:0}
+.sample-banner .candidate-photo{display:block;width:76px!important;height:91px!important;max-width:100%;object-fit:cover;border:0!important;border-radius:0!important;background:#fff}
+.sample-cutline{font-size:9px;font-weight:700;text-align:center;line-height:1.25;padding:3px 4px;border-bottom:2px dashed #333;background:#fff}
+.sample-voter-area{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:5px;flex:1;min-height:0;padding:5px}
+.sample-voter-main{min-width:0}
+.sample-idline{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
+.sample-idline b{display:inline-block;min-width:52px;padding:2px 5px;border:1.5px solid #111;text-align:center;font-size:12px}
+.sample-idline strong{font-size:12px;overflow-wrap:anywhere}
+.sample-detail{font-size:12px;line-height:1.35;margin:2px 0;overflow-wrap:anywhere}
+.sample-detail b{font-weight:800}
+.sample-booth{border-left:2px solid #39a9bc;padding-left:5px;min-width:0;display:flex;flex-direction:column}
+.sample-booth-title{text-align:center;color:#1683a1;font-size:11px;font-weight:800}
+.sample-ward{text-align:center;color:#b22;font-size:12px;font-weight:800;border-bottom:1px solid #aaa;padding:3px 0}
+.sample-booth-content{font-size:10px;font-weight:700;line-height:1.25;padding-top:4px;overflow-wrap:anywhere}
+.sample-time{background:#e91e63;color:#fff;text-align:center;font-size:10px;font-weight:700;padding:3px}
+@media(max-width:600px){
+ .sample-banner{grid-template-columns:58px minmax(0,1fr) 64px!important;min-height:96px!important}
+ .sample-banner .candidate-symbol{width:49px!important;height:52px!important}
+ .sample-banner .candidate-photo{width:60px!important;height:76px!important}
+ .sample-topline{font-size:8px}.sample-candidate-name{font-size:16px}.sample-slogan{font-size:9px}
+ .sample-voter-area{grid-template-columns:minmax(0,1fr) 72px}
+ .sample-detail{font-size:11px}
+}
+.bulk-print-page .sample-slip{height:100%!important;min-height:0!important;max-height:100%;border-width:1.5px!important}
+.bulk-print-page .sample-banner{grid-template-columns:47px minmax(0,1fr) 48px!important;min-height:0!important;height:29%!important;padding:3px!important;gap:2px!important}
+.bulk-print-page .sample-banner .candidate-symbol{width:39px!important;height:42px!important}
+.bulk-print-page .sample-banner .symbol-name{font-size:6px}
+.bulk-print-page .sample-banner .candidate-photo{width:45px!important;height:58px!important}
+.bulk-print-page .sample-topline{font-size:6.5px}
+.bulk-print-page .sample-candidate-name{font-size:13px;margin:2px 0}
+.bulk-print-page .sample-slogan{font-size:7px}
+.bulk-print-page .sample-cutline{font-size:6.5px;padding:2px}
+.bulk-print-page .sample-voter-area{grid-template-columns:minmax(0,1fr) 52px;gap:3px;padding:3px;min-height:0}
+.bulk-print-page .sample-idline{gap:3px;margin-bottom:2px}
+.bulk-print-page .sample-idline b{min-width:27px;font-size:7px;padding:1px}
+.bulk-print-page .sample-idline strong{font-size:7px}
+.bulk-print-page .sample-detail{font-size:7.5px;line-height:1.22;margin:1px 0}
+.bulk-print-page .sample-booth{padding-left:3px;border-left-width:1px}
+.bulk-print-page .sample-booth-title{font-size:7px}
+.bulk-print-page .sample-ward{font-size:8px;padding:2px 0}
+.bulk-print-page .sample-booth-content{font-size:6.5px;line-height:1.2;padding-top:2px}
+.bulk-print-page .sample-time{font-size:7px;padding:2px}
+@media print{
+ @page{size:A4 portrait;margin:6mm}
+ .sample-slip{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+ .bulk-print-page .sample-banner{height:29%!important}
+}
+</style>
+
+<style>
+
+/* 18 voter slips per A4 page: 3 columns × 6 rows */
+.bulk-print-page{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;gap:1.5mm!important}
+.bulk-print-page .sample-slip{min-height:0!important;height:100%!important}
+.bulk-print-page .sample-banner{height:25%!important;grid-template-columns:38px minmax(0,1fr) 40px!important;padding:2px!important}
+.bulk-print-page .sample-banner .candidate-symbol{width:32px!important;height:34px!important}
+.bulk-print-page .sample-banner .candidate-photo{width:37px!important;height:43px!important}
+.bulk-print-page .sample-banner .symbol-name{font-size:5px!important}
+.bulk-print-page .sample-topline{font-size:5.2px!important}
+.bulk-print-page .sample-candidate-name{font-size:10px!important;margin:1px 0!important}
+.bulk-print-page .sample-slogan{font-size:5.5px!important}
+.bulk-print-page .sample-cutline{font-size:5px!important;padding:1px!important}
+.bulk-print-page .sample-voter-area{grid-template-columns:minmax(0,1fr) 43px!important;gap:2px!important;padding:2px!important}
+.bulk-print-page .sample-idline{gap:2px!important;margin-bottom:1px!important}
+.bulk-print-page .sample-idline b{min-width:22px!important;font-size:5.5px!important;padding:0 2px!important}
+.bulk-print-page .sample-idline strong{font-size:5.5px!important}
+.bulk-print-page .sample-detail{font-size:6px!important;line-height:1.12!important;margin:0!important}
+.bulk-print-page .sample-booth{padding-left:2px!important}
+.bulk-print-page .sample-booth-title{font-size:5.5px!important}
+.bulk-print-page .sample-ward{font-size:6px!important;padding:1px 0!important}
+.bulk-print-page .sample-booth-content{font-size:5px!important;line-height:1.1!important;padding-top:1px!important}
+.bulk-print-page .sample-time{font-size:5.5px!important;padding:1px!important}
+@media print{
+ .bulk-print-page{grid-template-rows:repeat(6,minmax(0,1fr))!important;gap:1.5mm!important;min-height:277mm!important;max-height:277mm!important}
+}
+
+</style>
+
+<style>
+/* Final voter slip print layout: 8 fuller, readable slips per A4 (2 × 4) */
+.bulk-print-page{
+  width:100%!important;
+  min-height:277mm!important;
+  max-height:277mm!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  gap:2.5mm!important;
+  overflow:hidden!important;
+}
+.bulk-print-page .sample-slip{
+  height:100%!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  overflow:hidden!important;
+  border:1.5px solid #20aabd!important;
+  border-radius:0!important;
+}
+.bulk-print-page .sample-banner{
+  height:42%!important;
+  min-height:0!important;
+  flex:0 0 42%!important;
+  grid-template-columns:62px minmax(0,1fr) 72px!important;
+  gap:4px!important;
+  padding:4px!important;
+}
+.bulk-print-page .sample-banner .candidate-symbol{
+  width:54px!important;height:61px!important;max-width:100%!important;
+  object-fit:contain!important;border:1px solid #333!important;
+  background:#fff!important;padding:2px!important;
+}
+.bulk-print-page .sample-banner .symbol-name{
+  font-size:8px!important;line-height:1.15!important;margin-top:2px!important;
+}
+.bulk-print-page .sample-banner .candidate-photo{
+  width:68px!important;height:82px!important;max-width:100%!important;
+  object-fit:cover!important;border:0!important;border-radius:0!important;
+}
+.bulk-print-page .sample-topline{font-size:8.5px!important;line-height:1.2!important}
+.bulk-print-page .sample-candidate-name{font-size:18px!important;line-height:1.15!important;margin:4px 0!important}
+.bulk-print-page .sample-slogan{font-size:9px!important;line-height:1.2!important}
+.bulk-print-page .sample-cutline{
+  flex:0 0 auto!important;font-size:8px!important;line-height:1.2!important;
+  padding:3px 4px!important;border-bottom:1.5px dashed #222!important;
+}
+.bulk-print-page .sample-voter-area{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 68px!important;
+  gap:4px!important;flex:1 1 auto!important;min-height:0!important;padding:5px!important;
+}
+.bulk-print-page .sample-idline{gap:5px!important;margin-bottom:3px!important}
+.bulk-print-page .sample-idline b{min-width:38px!important;font-size:10px!important;padding:2px 4px!important}
+.bulk-print-page .sample-idline strong{font-size:10px!important;line-height:1.15!important}
+.bulk-print-page .sample-detail{font-size:10.5px!important;line-height:1.28!important;margin:2px 0!important}
+.bulk-print-page .sample-booth{padding-left:4px!important;border-left:1.5px solid #39a9bc!important}
+.bulk-print-page .sample-booth-title{font-size:9px!important;line-height:1.2!important}
+.bulk-print-page .sample-ward{font-size:10px!important;padding:3px 0!important}
+.bulk-print-page .sample-booth-content{font-size:8.5px!important;line-height:1.25!important;padding-top:3px!important}
+.bulk-print-page .sample-time{flex:0 0 auto!important;font-size:8.5px!important;padding:3px!important}
+@media print{
+  @page{size:A4 portrait;margin:6mm}
+  .bulk-print-page{
+    min-height:277mm!important;max-height:277mm!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+    gap:2.5mm!important;
+  }
+  .bulk-print-page .sample-slip{
+    print-color-adjust:exact!important;
+    -webkit-print-color-adjust:exact!important;
+  }
+}
+</style>
+
+
+<style>
+/* FINAL FIX: exactly 6 slips per A4 page (2 columns × 3 rows), no clipped text */
+.bulk-print-pages{display:block!important;width:100%!important}
+.bulk-print-page{
+  width:100%!important;
+  height:277mm!important;
+  min-height:277mm!important;
+  max-height:277mm!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
+  gap:2.2mm!important;
+  overflow:hidden!important;
+  page-break-after:always!important;
+  break-after:page!important;
+}
+.bulk-print-page:last-child{page-break-after:auto!important;break-after:auto!important}
+.bulk-print-page .sample-slip{
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  box-sizing:border-box!important;border:1.5px solid #20aabd!important;border-radius:0!important;
+}
+.bulk-print-page .sample-banner{
+  display:grid!important;flex:0 0 37%!important;height:37%!important;min-height:0!important;
+  grid-template-columns:58px minmax(0,1fr) 66px!important;
+  align-items:center!important;gap:4px!important;padding:4px!important;
+}
+.bulk-print-page .sample-banner .candidate-symbol{
+  width:50px!important;height:56px!important;max-width:100%!important;
+  object-fit:contain!important;padding:2px!important;background:#fff!important;
+}
+.bulk-print-page .sample-banner .symbol-name{font-size:7.5px!important;line-height:1.15!important}
+.bulk-print-page .sample-banner .candidate-photo{
+  display:block!important;width:62px!important;height:76px!important;max-width:100%!important;
+  object-fit:cover!important;border:0!important;border-radius:0!important;
+}
+.bulk-print-page .sample-topline{font-size:8px!important;line-height:1.2!important}
+.bulk-print-page .sample-candidate-name{font-size:17px!important;line-height:1.12!important;margin:3px 0!important}
+.bulk-print-page .sample-slogan{font-size:8.5px!important;line-height:1.2!important}
+.bulk-print-page .sample-cutline{
+  flex:0 0 auto!important;white-space:normal!important;
+  font-size:7.5px!important;line-height:1.2!important;padding:3px 4px!important;
+  border-bottom:1.5px dashed #222!important;
+}
+.bulk-print-page .sample-voter-area{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 66px!important;
+  gap:4px!important;flex:1 1 auto!important;min-height:0!important;
+  padding:3px 4px 2px!important;align-items:stretch!important;
+}
+.bulk-print-page .sample-voter-main{
+  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
+  min-width:0!important;min-height:0!important;padding:0 0 1px!important;
+}
+.bulk-print-page .sample-idline{display:flex!important;align-items:center!important;gap:5px!important;margin:0 0 2px!important;min-width:0!important}
+.bulk-print-page .sample-idline b{min-width:34px!important;font-size:9.5px!important;padding:2px 4px!important}
+.bulk-print-page .sample-idline strong{font-size:9.5px!important;line-height:1.15!important;overflow-wrap:anywhere!important}
+.bulk-print-page .sample-detail{
+  font-size:10px!important;line-height:1.2!important;margin:1px 0!important;
+  padding:0!important;overflow-wrap:anywhere!important;word-break:normal!important;
+}
+.bulk-print-page .sample-booth{
+  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
+  min-width:0!important;padding-left:4px!important;border-left:1.5px solid #39a9bc!important;
+}
+.bulk-print-page .sample-booth-title{font-size:8.5px!important;line-height:1.2!important;text-align:center!important}
+.bulk-print-page .sample-ward{font-size:9.5px!important;line-height:1.2!important;padding:2px 0!important}
+.bulk-print-page .sample-booth-content{font-size:8px!important;line-height:1.2!important;padding:2px 0 1px!important;overflow-wrap:anywhere!important}
+.bulk-print-page .sample-time{
+  flex:0 0 auto!important;min-height:0!important;font-size:8px!important;
+  line-height:1.2!important;padding:3px 2px!important;
+}
+@media print{
+  @page{size:A4 portrait;margin:6mm}
+  html,body{margin:0!important;padding:0!important}
+  .bulk-print-pages{display:block!important}
+  .bulk-print-page{
+    height:277mm!important;min-height:277mm!important;max-height:277mm!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+    gap:2.2mm!important;overflow:hidden!important;
+  }
+  .bulk-print-page .sample-slip{
+    print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important;
+  }
+}
+</style>
+
+
+<style>
+/* अंतिम सुधार: बैनर थोड़ा ऊँचा और मतदाता विवरण अधिक स्पष्ट */
+.bulk-print-page .sample-banner{
+  flex:0 0 42%!important;
+  height:42%!important;
+  grid-template-columns:64px minmax(0,1fr) 72px!important;
+  gap:4px!important;
+  padding:5px!important;
+}
+.bulk-print-page .sample-banner .candidate-symbol{
+  width:58px!important;
+  height:64px!important;
+}
+.bulk-print-page .sample-banner .candidate-photo{
+  width:68px!important;
+  height:82px!important;
+}
+.bulk-print-page .sample-banner .symbol-name{
+  font-size:8.5px!important;
+}
+.bulk-print-page .sample-topline{font-size:8.8px!important}
+.bulk-print-page .sample-candidate-name{
+  font-size:18px!important;
+  line-height:1.15!important;
+  margin:4px 0!important;
+}
+.bulk-print-page .sample-slogan{font-size:9.2px!important}
+.bulk-print-page .sample-cutline{
+  font-size:8px!important;
+  line-height:1.25!important;
+  padding:3px 4px!important;
+}
+.bulk-print-page .sample-voter-area{
+  grid-template-columns:minmax(0,1fr) 68px!important;
+  gap:4px!important;
+  padding:4px 5px 3px!important;
+}
+.bulk-print-page .sample-idline b{font-size:10px!important}
+.bulk-print-page .sample-idline strong{font-size:10px!important}
+.bulk-print-page .sample-detail{
+  font-size:10.8px!important;
+  line-height:1.24!important;
+  margin:1.5px 0!important;
+}
+.bulk-print-page .sample-booth-title{font-size:9px!important}
+.bulk-print-page .sample-ward{font-size:10px!important}
+.bulk-print-page .sample-booth-content{
+  font-size:8.5px!important;
+  line-height:1.22!important;
+}
+.bulk-print-page .sample-time{font-size:8.8px!important}
+@media print{
+  .bulk-print-page .sample-banner{
+    flex:0 0 42%!important;
+    height:42%!important;
+  }
+  .bulk-print-page .sample-detail{
+    font-size:10.5px!important;
+  }
+}
+</style>
+
+
+<style>
+/* PDF नमूने के अनुसार: लगभग 100 × 50 mm की पर्ची, 8 पर्चियाँ प्रति A4 */
 .bulk-print-pages{display:block!important;width:100%!important}
 .bulk-print-page{
   width:100%!important;height:277mm!important;min-height:277mm!important;max-height:277mm!important;
   box-sizing:border-box!important;display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(3,minmax(0,1fr))!important;
-  gap:2mm!important;
+  grid-template-rows:repeat(4,50mm)!important;
+  column-gap:2mm!important;row-gap:15mm!important;
   align-content:center!important;justify-content:stretch!important;
   overflow:hidden!important;page-break-after:always!important;break-after:page!important;
 }
 .bulk-print-page:last-child{page-break-after:auto!important;break-after:auto!important}
-.bulk-print-page .sample-slip{width:100%!important;height:100%!important;min-height:0!important}
-
+.bulk-print-page .sample-slip{
+  width:100%!important;height:50mm!important;min-height:50mm!important;max-height:50mm!important;
+  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
+  overflow:hidden!important;border:1px solid #20aabd!important;border-radius:0!important;
+}
+.bulk-print-page .full-slip-banner-wrap{
+  width:100%!important;height:38%!important;min-height:0!important;flex:0 0 38%!important;
+  display:flex!important;align-items:stretch!important;justify-content:center!important;
+  overflow:hidden!important;border-bottom:1px solid #333!important;
+}
+.bulk-print-page .full-slip-banner{
+  display:block!important;width:100%!important;height:100%!important;object-fit:fill!important;
+}
+.bulk-print-page .banner-missing{font-size:9px!important;text-align:center!important}
+.bulk-print-page .sample-cutline{
+  flex:0 0 auto!important;font-size:6.5px!important;line-height:1.1!important;
+  padding:1px 2px!important;border-bottom:1px dashed #333!important;
+}
+.bulk-print-page .sample-voter-area{
+  display:grid!important;grid-template-columns:minmax(0,1fr) 27mm!important;
+  gap:2px!important;flex:1 1 auto!important;min-height:0!important;padding:2px 3px 1px!important;
+}
+.bulk-print-page .sample-voter-main{
+  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
+  min-width:0!important;min-height:0!important;
+}
+.bulk-print-page .sample-idline{display:flex!important;align-items:center!important;gap:3px!important;margin:0 0 1px!important;min-width:0!important}
+.bulk-print-page .sample-idline b{min-width:23px!important;font-size:7px!important;padding:1px 2px!important}
+.bulk-print-page .sample-idline strong{font-size:7px!important;line-height:1.1!important;overflow-wrap:anywhere!important}
+.bulk-print-page .sample-detail{font-size:7.5px!important;line-height:1.15!important;margin:1px 0!important;padding:0!important;overflow-wrap:anywhere!important}
+.bulk-print-page .sample-booth{
+  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
+  min-width:0!important;padding-left:3px!important;border-left:1px solid #39a9bc!important;
+}
+.bulk-print-page .sample-booth-title{font-size:7.5px!important;line-height:1.1!important;text-align:center!important}
+.bulk-print-page .sample-ward{font-size:8px!important;line-height:1.1!important;padding:1px 0!important}
+.bulk-print-page .sample-booth-content{font-size:6.8px!important;line-height:1.12!important;padding:1px 0!important;overflow-wrap:anywhere!important}
+.bulk-print-page .sample-time{flex:0 0 auto!important;font-size:7px!important;line-height:1.1!important;padding:2px!important}
 @media print{
   @page{size:A4 portrait;margin:6mm}
   html,body{margin:0!important;padding:0!important}
-  header,.no-print,footer,#loginView,.grid,#adminTabs,#search{display:none!important}
-  #app,#printArea{display:block!important;margin:0!important;padding:0!important;box-shadow:none!important;border:0!important}
+  .bulk-print-pages{display:block!important}
   .bulk-print-page{
     height:277mm!important;min-height:277mm!important;max-height:277mm!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(3,minmax(0,1fr))!important;
+    grid-template-rows:repeat(4,50mm)!important;
+    column-gap:2mm!important;row-gap:15mm!important;align-content:center!important;
     overflow:hidden!important;
   }
-  .sample-slip{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
+  .bulk-print-page .sample-slip{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
+  #slips.slips .sample-slip{width:100mm!important;height:50mm!important;min-height:50mm!important}
 }
 </style>
-</head>
-<body>
+
+
+<style>
+/* FINAL PDF FIX: A4 पर शून्य पेज मार्जिन और नाम/पिता-पति का नाम बोल्ड */
+@media print {
+  @page { size: A4 portrait; margin: 0 !important; }
+  html, body { margin: 0 !important; padding: 0 !important; width: 210mm !important; }
+  .bulk-print-pages { width: 210mm !important; margin: 0 !important; padding: 0 !important; }
+  .bulk-print-page {
+    width: 210mm !important; height: 297mm !important;
+    min-height: 297mm !important; max-height: 297mm !important;
+    margin: 0 !important; padding: 0 !important; box-sizing: border-box !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(4, 50mm) !important;
+    column-gap: 2mm !important; row-gap: 15mm !important;
+    align-content: center !important; justify-content: stretch !important;
+    overflow: hidden !important;
+  }
+  .bulk-print-page .sample-detail .voter-value {
+    font-weight: 900 !important; color: #000 !important;
+  }
+}
+/* स्क्रीन पर भी मतदाता के नाम स्पष्ट बोल्ड */
+.sample-detail .voter-value { font-weight: 900; color: #000; }
+</style>
+
+</head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
 <main id="app" class="wrap hidden">
@@ -94,28 +539,20 @@ td,th{text-align:left;padding:9px;border-bottom:1px solid #e5eaf0;font-size:13px
 <nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button></nav>
 <section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
-<section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
-<div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">पूरी पर्ची का बैनर सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>तैयार बैनर इमेज (JPG / PNG)</label><input id="brandingBannerFile" class="file-input" type="file" accept="image/*"><img id="brandingBannerPreview" class="banner-preview hidden" alt="बैनर Preview"><div class="image-tools"><button id="removeBrandingBanner" class="red" type="button">बैनर हटाएँ</button></div><div class="muted">एक ही तैयार बैनर अपलोड करें। उसमें प्रत्याशी की फोटो, नाम और चुनाव चिन्ह पहले से जोड़ लें। पोर्टल इसे हर पर्ची के ऊपर पूरी चौड़ाई में लगाएगा।</div><button id="saveBranding" class="green" type="button">बैनर सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
+<section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
+<div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">पूरी पर्ची का बैनर सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>तैयार बैनर इमेज (JPG / PNG)</label><input id="brandingBannerFile" class="file-input" type="file" accept="image/*"><img id="brandingBannerPreview" class="banner-preview hidden" alt="बैनर Preview"><div class="image-tools"><button id="removeBrandingBanner" class="red" type="button">बैनर हटाएँ</button></div><div class="muted">एक ही तैयार बैनर अपलोड करें। उसमें प्रत्याशी की फोटो, नाम और चुनाव चिन्ह पहले से जोड़ लें। पोर्टल इसे हर पर्ची के ऊपर पूरी चौड़ाई में लगाएगा। इमेज compress होकर Firestore में सेव होगी।</div><button id="saveBranding" class="green" type="button">बैनर सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
 <section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden"><img id="candidateLoginBanner" class="banner-preview" alt="आपका प्रत्याशी बैनर"></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (6 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
-<section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div></section></main>
-<footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const firebaseConfig={apiKey:"AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",authDomain:"voter-11766.firebaseapp.com",projectId:"voter-11766",storageBucket:"voter-11766.firebasestorage.app",messagingSenderId:"1078819307357",appId:"1:1078819307357:web:c8752d49751e34c037b2b4",measurementId:"G-BHBYFENK2L"};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth(),db=firebase.firestore();
-let user=null,profile=null,places=[],cache=[],activeSearchPlace=null,candidateBranding={},accountsLoaded=false,brandingReadCache={};
-const $=x=>document.getElementById(x);
+firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[],activeSearchPlace=null,candidateBranding={},accountsLoaded=false,brandingReadCache={};const $=x=>document.getElementById(x);
 const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[ईी]/g,"इ").replace(/[ऊू]/g,"उ").replace(/[ऐै]/g,"ए").replace(/[औौ]/g,"ओ").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
-
 function matchesSearch(v,term){
   if(!term)return true;
   const query=norm(term);
+  // केवल अंक लिखे हों तो मकान नंबर का सटीक मिलान करें।
+  // इससे 121 खोजने पर 12, 2121 या अन्य जगह मौजूद 1/2 वाले रिकॉर्ड नहीं आएँगे।
   if(/^\d+$/.test(query)) return norm(v.house)===query;
   const hay=norm([v.name,v.relative,v.relationType,v.house,v.ward,v.serial,v.epic,v.age,v.gender,v.locality,v.booth].join(" "));
   const words=query.split(" ").filter(Boolean);
@@ -160,142 +597,259 @@ function renderCandidateBranding(){
  if(candidateBranding?.bannerBase64){banner.src=candidateBranding.bannerBase64;box.classList.remove("hidden");}
  else{banner.removeAttribute("src");box.classList.add("hidden");}
 }
-auth.onAuthStateChanged(async u=>{
- user=u;cache=[];activeSearchPlace=null;
- if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
- try{
-  const d=await db.collection("users").doc(u.uid).get();
-  if(!d.exists)throw Error("users प्रोफाइल नहीं मिली।");
-  profile=d.data();
-  if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");
-  if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID बंद की गई है।");
-  $("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
-  $("who").textContent=profile.name\vert{}\vert{}u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";
-  $("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());
-  ["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));
-  if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}
-  else{
-   const p=await db.collection("panchayats").doc(profile.panchayatId).get();
-   if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");
-   places=[{id:p.id,...p.data()}];
-   try{
-    const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();
-    candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();
-   }catch(e){candidateBranding={};renderCandidateBranding();}
-   $("searchPWrap").classList.add("hidden");
-   $("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;
-   document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-   $("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]
-  }
- }catch(e){alert(e.message);await auth.signOut()}
-});
-$("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};
-$("logout").onclick=()=>auth.signOut();
+auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
+$("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
 document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
  b.classList.add("active");$(b.dataset.id).classList.add("active");
- if(b.dataset.id==="accounts"&&isAdmin()&&!accountsLoaded){try{await loadAccounts();}catch(e){}}
+ if(b.dataset.id==="accounts"&&isAdmin()&&!accountsLoaded){
+  try{notice($("accountList"),"प्रत्याशी सूची लोड हो रही है...");await loadAccounts();}
+  catch(e){notice($("accountList"),"प्रत्याशी सूची नहीं खुली: "+e.message,"error");}
+ }
 });
 async function loadPlaces(){
  const s=await db.collection("panchayats").orderBy("name").get();
  places=s.docs.map(d=>({id:d.id,...d.data()}));
  $("pCount").textContent=places.length;
- $("pRows").innerHTML=places.map(p=>`<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td><td><b>${p.active!==false?"चालू":"बंद"}</b></td><td><button class="${p.active!==false?"red":"green"}" onclick="togglePanchayat('${esc(p.id)}')">${p.active!==false?"बंद करें":"चालू करें"}</button></td></tr>`).join("")||"<tr><td colspan='5'>कोई पंचायत नहीं</td></tr>";
- $("upP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
- $("searchP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+ $("pRows").innerHTML=places.map(p=>{
+  const active=p.active!==false;
+  return `<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td><td><b style="color:${active?"#16834b":"#b42318"}">${active?"चालू":"बंद"}</b></td><td><button class="${active?"red":"green"}" onclick="togglePanchayat('${esc(p.id)}')">${active?"बंद करें":"चालू करें"}</button></td></tr>`;
+ }).join("")||"<tr><td colspan='5'>कोई पंचायत नहीं</td></tr>";
+ $("upP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.active===false?" (बंद)":""}</option>`).join("");
+ $("searchP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.active===false?" (बंद)":""}</option>`).join("");
 }
 window.togglePanchayat=async id=>{
- if(!isAdmin())return;
- const p=places.find(x=>x.id===id);if(!p)return;
+ if(!isAdmin())return alert("केवल एडमिन पंचायत की स्थिति बदल सकता है।");
+ const p=places.find(x=>x.id===id);if(!p)return alert("पंचायत नहीं मिली।");
  const next=p.active===false;
- try{await db.collection("panchayats").doc(id).update({active:next});await loadPlaces();alert("स्थिति बदल गई।");}catch(e){alert(e.message)}
+ const action=next?"चालू":"बंद";
+ if(!confirm(`क्या आप "${p.name}" पंचायत को ${action} करना चाहते हैं?\n\nइससे कोई डेटा या प्रत्याशी अकाउंट डिलीट नहीं होगा।`))return;
+ try{
+  await db.collection("panchayats").doc(id).update({active:next,activeUpdatedAt:firebase.firestore.FieldValue.serverTimestamp(),activeUpdatedBy:user.uid});
+  cache=[];$("results").innerHTML="";$("printArea").classList.add("hidden");
+  await loadPlaces();
+  alert(`पंचायत ${next?"चालू":"बंद"} कर दी गई। कोई डेटा डिलीट नहीं हुआ।`);
+ }catch(e){alert("पंचायत की स्थिति नहीं बदली जा सकी: "+e.message)}
 };
-$("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!id||!name)return;try{await db.collection("panchayats").doc(id).set({name,active:true,activeUploadId:null,activeVoterCount:0});await loadPlaces();alert("पंचायत जोड़ी गई।")}catch(e){alert(e.message)}};
-$("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return;$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),"अपलोड सफल!","success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
+$("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!/^[A-Z0-9_-]{3,40}$/.test(id)||!name)return alert("सही ID और नाम भरें।");try{await db.collection("panchayats").doc(id).set({name,active:true,activeUploadId:null,activeVoterCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत जोड़ दी गई।")}catch(e){alert(e.message)}};
+$("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return alert("पंचायत और Excel चुनें।");$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});if(!rows.length||rows.length>20000)throw Error("1 से 20,000 रिकॉर्ड तक अपलोड करें।");let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;$("bar").style.width=Math.round((i+1)/rows.length*100)+"%";notice($("upMsg"),`अपलोड ${i+1}/${rows.length}`)}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),`${rows.length} रिकॉर्ड अपलोड हुए।`,"success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
 let clientProfiles=[];
 async function loadAccounts(){
  let s=await db.collection("users").where("role","==","client").get();
  clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));accountsLoaded=true;
- $("accountList").innerHTML=clientProfiles.map(x=>`<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</div>`).join("")||"कोई प्रत्याशी नहीं।";
- $("brandingCandidate").innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)}</option>`).join("");
+ $("accountList").innerHTML=clientProfiles.map(x=>{const active=x.active!==false;return `<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}<br><b style="color:${active?"#16834b":"#b42318"}">स्थिति: ${active?"चालू":"बंद"}</b><br><button type="button" class="${active?"red":"green"}" onclick="toggleCandidate('${esc(x.uid)}')">${active?"ID बंद करें":"ID चालू करें"}</button></div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
+ const select=$("brandingCandidate");
+ select.innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");
+ let rememberedUid="";try{rememberedUid=localStorage.getItem("voterSlipBrandingCandidateUid")||""}catch(e){}
+ if(rememberedUid&&clientProfiles.some(x=>x.uid===rememberedUid))select.value=rememberedUid;
+ else if(clientProfiles.length)select.value=clientProfiles[0].uid;
+ if(select.value)await loadBrandingEditor();
 }
-let brandingBannerData="";
-function setBannerPreview(data){const img=$("brandingBannerPreview");if(data){img.src=data;img.classList.remove("hidden");}else{img.removeAttribute("src");img.classList.add("hidden");}brandingBannerData=data\vert{}\vert{}"";$("brandingBannerFile").value="";}
-async function compressBanner(file){
- const url=URL.createObjectURL(file);
- try{const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=url;});const c=document.createElement("canvas");c.width=800;c.height=Math.round(800*(img.naturalHeight/img.naturalWidth));c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c.toDataURL("image/jpeg",0.75);}finally{URL.revokeObjectURL(url);}
-}
-$("brandingCandidate").onchange=async()=>{
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);setBannerPreview("");if(!c)return;
- const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();if(d.exists)setBannerPreview(d.data().bannerBase64||"");
+window.toggleCandidate=async uid=>{
+ if(!isAdmin())return alert("केवल एडमिन प्रत्याशी ID की स्थिति बदल सकता है।");
+ const c=clientProfiles.find(x=>x.uid===uid);if(!c)return alert("प्रत्याशी प्रोफाइल नहीं मिली।");
+ const next=c.active===false;
+ if(!confirm(`क्या आप "${c.name||c.email||uid}" की ID ${next?"चालू":"बंद"} करना चाहते हैं?`))return;
+ try{
+  await db.collection("users").doc(uid).update({active:next,activeUpdatedAt:firebase.firestore.FieldValue.serverTimestamp(),activeUpdatedBy:user.uid});
+  await loadAccounts();
+  alert(`प्रत्याशी की ID ${next?"चालू":"बंद"} कर दी गई।`);
+ }catch(e){alert("प्रत्याशी ID की स्थिति नहीं बदली जा सकी: "+e.message+"\\nFirestore Rules में users दस्तावेज़ का active field अपडेट करने की अनुमति जाँचें।")}
 };
-$("brandingBannerFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;setBannerPreview(await compressBanner(f));};
-$("removeBrandingBanner").onclick=()=>setBannerPreview("");
+let brandingBannerData="";
+function setBannerPreview(data){const img=$("brandingBannerPreview");if(data){img.src=data;img.classList.remove("hidden");}else{img.removeAttribute("src");img.classList.add("hidden");}brandingBannerData=data||"";$("brandingBannerFile").value="";}
+async function compressBanner(file){
+ if(!file||!file.type.startsWith("image/"))throw Error("कृपया JPG, PNG या WebP बैनर चुनें।");
+ if(file.size>15*1024*1024)throw Error("मूल बैनर 15 MB से बड़ा है।");
+ const url=URL.createObjectURL(file);
+ try{const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=()=>j(Error("बैनर पढ़ा नहीं जा सका।"));img.src=url;});
+ let max=1600,last="";
+ for(let n=0;n<7;n++){const scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);for(const q of [.82,.72,.62,.52,.42,.32]){last=c.toDataURL("image/jpeg",q);if(last.length<=520*1024)return last;}max=Math.round(max*.78);}
+ if(last.length<=650*1024)return last;throw Error("बैनर छोटा नहीं हो पा रहा। कम आकार की इमेज चुनें।");
+ }finally{URL.revokeObjectURL(url);}
+}
+async function loadBrandingEditor(){
+ const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);setBannerPreview("");$("brandingMsg").classList.add("hidden");if(!c)return;
+ try{const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();if(d.exists)setBannerPreview(d.data().bannerBase64||"");}
+ catch(e){notice($("brandingMsg"),"Firestore से बैनर लोड नहीं हुआ: "+e.message,"error");}
+}
+$("brandingCandidate").onchange=loadBrandingEditor;
+$("brandingBannerFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"बैनर compress हो रहा है...");setBannerPreview(await compressBanner(f));notice($("brandingMsg"),"बैनर तैयार है। अब सेव करें।","success");}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value="";}};
+$("removeBrandingBanner").onclick=()=>{setBannerPreview("");notice($("brandingMsg"),"बैनर हटाने के लिए अब सेव करें।");};
 $("saveBranding").onclick=async()=>{
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);if(!c)return alert("प्रत्याशी चुनें।");
- await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({bannerBase64:brandingBannerData},{merge:true});
- alert("बैनर सेव हो गया!");
+ const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);if(!c)return notice($("brandingMsg"),"पहले प्रत्याशी चुनें।","error");if(!c.panchayatId)return notice($("brandingMsg"),"प्रत्याशी प्रोफाइल में panchayatId नहीं है।","error");if(brandingBannerData.length>700*1024)return notice($("brandingMsg"),"बैनर बहुत बड़ा है। छोटी इमेज चुनें।","error");
+ const btn=$("saveBranding");btn.disabled=true;try{await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({bannerBase64:brandingBannerData,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});brandingReadCache={};notice($("brandingMsg"),"बैनर Firestore में सेव हो गया।","success");if(user&&user.uid===uid){candidateBranding={...candidateBranding,bannerBase64:brandingBannerData};renderCandidateBranding();}}
+ catch(e){notice($("brandingMsg"),"सेव नहीं हुआ: "+e.message+" — Firestore Rules में candidateBranding की अनुमति जाँचें।","error");}finally{btn.disabled=false;}
 };
 
-const VOTER_CACHE_DB="voter-slip-local-cache-v2";
-function openVoterCacheDB(){
-  return new Promise((res,rej)=>{
-    const req=indexedDB.open(VOTER_CACHE_DB,1);
-    req.onupgradeneeded=()=>req.result.createObjectStore("lists",{keyPath:"key"});
-    req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);
+// स्थानीय IndexedDB कैश: एक ही मतदाता सूची को पेज रीफ्रेश पर दोबारा डाउनलोड करने से बचाएँ।
+const VOTER_CACHE_DB = "voter-slip-local-cache-v2";
+// स्थायी कैश: कोई समय-सीमा नहीं। नया Excel अपलोड होने पर activeUploadId
+// बदलता है और नई सूची अपने आप डाउनलोड होकर अलग कैश में सेव होगी।
+
+function openVoterCacheDB() {
+  return new Promise((resolve, reject) => {
+    if (!("indexedDB" in window)) return reject(new Error("IndexedDB उपलब्ध नहीं है"));
+    const request = indexedDB.open(VOTER_CACHE_DB, 1);
+    request.onupgradeneeded = () => {
+      const database = request.result;
+      if (!database.objectStoreNames.contains("lists")) {
+        database.createObjectStore("lists", { keyPath: "key" });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("कैश डेटाबेस नहीं खुला"));
   });
 }
-async function getVoters(){
-  const p=isAdmin()?places.find(x=>x.id===$("searchP").value):places.find(x=>x.id===profile.panchayatId);
-  if(!p)throw new Error("पंचायत नहीं मिली।");
-  activeSearchPlace=p;
-  let q=db.collection("panchayats").doc(p.id).collection("uploads").doc(p.activeUploadId).collection("voters");
-  if(!isAdmin()&&profile.ward!=="ALL")q=q.where("ward","==",profile.ward);
-  const snap=await q.limit(5000).get();
-  return snap.docs.map(doc=>({id:doc.id,...doc.data()}));
-}
-$("searchBtn").onclick=async()=>{
-  try{
-    notice($("searchMsg"),"खोज रहे हैं...");
-    if(!cache.length)cache=await getVoters();
-    if(isAdmin()||profile?.ward==="ALL"){$("ward").innerHTML="<option value=''>सभी वार्ड</option>"+[...new Set(cache.map(v=>String(v.ward||"")).filter(Boolean))].map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("")}
-    let term=norm($("query").value),ward=$("ward").value;
-    let found=cache.filter(v=>matchesSearch(v,term)&&(!ward||norm(v.ward)===norm(ward))).slice(0,100);
-    $("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";
-    notice($("searchMsg"),`परिणाम: ${found.length}`,"success");
-  }catch(e){notice($("searchMsg"),e.message,"error")}
-};
-$("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[];$("ward").value=""};
 
+async function readLocalVoterCache(key) {
+  let database;
+  try {
+    database = await openVoterCacheDB();
+    return await new Promise((resolve) => {
+      const request = database.transaction("lists", "readonly")
+        .objectStore("lists").get(key);
+      request.onsuccess = () => {
+        const item = request.result;
+        if (!item || !Array.isArray(item.data)) {
+          resolve(null);
+        } else {
+          resolve(item.data);
+        }
+      };
+      request.onerror = () => resolve(null);
+    });
+  } catch (_) {
+    return null;
+  } finally {
+    if (database) database.close();
+  }
+}
+
+async function writeLocalVoterCache(key, data) {
+  let database;
+  try {
+    database = await openVoterCacheDB();
+    await new Promise((resolve) => {
+      const transaction = database.transaction("lists", "readwrite");
+      transaction.objectStore("lists").put({
+        key,
+        savedAt: Date.now(),
+        data
+      });
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => resolve();
+      transaction.onabort = () => resolve();
+    });
+  } catch (_) {
+    // स्थानीय कैश न चलने पर सामान्य Firestore खोज जारी रहेगी।
+  } finally {
+    if (database) database.close();
+  }
+}
+
+async function getVoters() {
+  const p = isAdmin()
+    ? places.find(x => x.id === $("searchP").value)
+    : places.find(x => x.id === profile.panchayatId);
+
+  if (!p) {
+    throw new Error("प्रत्याशी की पंचायत नहीं मिली।");
+  }
+
+  // यूजर प्रोफाइल और पंचायत की सक्रिय स्थिति लॉगिन के समय जाँची जाती है।
+  // हर खोज पर दो अतिरिक्त Firestore reads करने की जरूरत नहीं है।
+  // activeUploadId लॉगिन पर मिली पंचायत जानकारी से कैश को version करता है।
+  if (!isAdmin() && p.active === false) {
+    cache=[];
+    throw new Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। कृपया दोबारा लॉगिन करें।");
+  }
+  activeSearchPlace = p;
+
+  if (!p.activeUploadId) {
+    throw new Error("सक्रिय वोटर सूची उपलब्ध नहीं है।");
+  }
+
+  // कैश की पहचान पंचायत + अपलोड + यूजर/वार्ड से होगी।
+  // नया Excel अपलोड होने पर activeUploadId बदलता है, इसलिए पुराना कैश इस्तेमाल नहीं होगा।
+  const cacheScope = isAdmin() ? "admin" : String(profile.ward || "ALL");
+  const localCacheKey = [
+    user?.uid || "unknown",
+    p.id,
+    p.activeUploadId,
+    cacheScope
+  ].join("|");
+
+  const savedVoters = await readLocalVoterCache(localCacheKey);
+  if (savedVoters !== null) {
+    activeSearchPlace = p;
+    return savedVoters;
+  }
+
+  let q = db
+    .collection("panchayats")
+    .doc(p.id)
+    .collection("uploads")
+    .doc(p.activeUploadId)
+    .collection("voters");
+
+  // वार्ड-विशिष्ट प्रत्याशी के लिए Firestore पर ही फ़िल्टर करें
+  if (!isAdmin() && profile.ward !== "ALL") {
+    q = q.where("ward", "==", profile.ward);
+  }
+
+  const snapshot = await q.limit(5000).get();
+
+  const voters = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  // सूची इस ब्राउज़र में स्थायी रूप से रखें; कैश फेल हो तो Firestore से पढ़ें।
+  await writeLocalVoterCache(localCacheKey, voters);
+  return voters;
+}
+$("searchBtn").onclick=async()=>{try{notice($("searchMsg"),"खोज रहे हैं...");if(!cache.length)cache=await getVoters();if(isAdmin()||(profile?.role==="client"&&profile.ward==="ALL")){$("ward").innerHTML="<option value=''>सभी वार्ड</option>"+[...new Set(cache.map(v=>String(v.ward||"")).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"hi")).map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("")}let term=norm($("query").value),ward=$("ward").value;let found=cache.filter(v=>matchesSearch(v,term)&&(!ward||norm(v.ward)===norm(ward))).slice(0,100);$("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)} · क्रमांक: ${esc(v.serial)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";notice($("searchMsg"),`परिणाम: ${found.length}${cache.length===5000?" (पहले 5,000 रिकॉर्ड तक)":""}`)}catch(e){notice($("searchMsg"),e.message,"error")}};
+$("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[];$("ward").value=""};$("searchP").onchange=()=>{cache=[];$("results").innerHTML="";$("ward").innerHTML="<option value=''>सभी वार्ड</option>"};
 async function getBrandingForCurrentSearch(){
  let brand=candidateBranding||{};
  if(isAdmin()){
+  // एडमिन की एक ही प्रत्याशी की फोटो/चिह्न हर पर्ची पर दोबारा Firestore से न पढ़ें।
   const c=clientProfiles.find(x=>x.panchayatId===(activeSearchPlace?.id||""));
   if(c){
-   const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(c.uid).get();
-   if(d.exists)brand=d.data();
+   const key=c.panchayatId+"|"+c.uid;
+   if(Object.prototype.hasOwnProperty.call(brandingReadCache,key)){
+    brand=brandingReadCache[key];
+   }else{
+    const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(c.uid).get();
+    brand=d.exists?{...d.data(),position:c.position||"प्रत्याशी"}:{position:c.position||"प्रत्याशी"};
+    brandingReadCache[key]=brand;
+   }
   }
  }
  return brand;
 }
 function slipHTML(v,panchayat,brand){
-  const banner=brand.bannerBase64?`<img class="full-slip-banner" src="${esc(brand.bannerBase64)}" alt="बैनर">`:`<div class="banner-missing">प्रत्याशी का बैनर सेट करें</div>`;
+  const banner=brand.bannerBase64?`<img class="full-slip-banner" src="${esc(brand.bannerBase64)}" alt="प्रत्याशी बैनर">`:`<div class="banner-missing">एडमिन से प्रत्याशी का बैनर सेट करवाएँ</div>`;
+  const boothText=v.booth||"—";
   return `<article class="slip sample-slip">
     <div class="full-slip-banner-wrap">${banner}</div>
     <div class="sample-cutline">✂ मतदान तिथि से पूर्व बांटी गयी पर्ची, मतदान केन्द्र में जाने से पहले ऊपर का हिस्सा फाड़ दें। ✂</div>
     <div class="sample-voter-area">
       <div class="sample-voter-main">
         <div class="sample-idline"><b>${esc(v.serial||"—")}</b><strong>${esc(v.epic||"")}</strong></div>
-        <div class="sample-detail"><b>नाम:</b> ${esc(v.name||"—")}</div>
-        <div class="sample-detail"><b>${esc(v.relationType||"पिता / पति")} का नाम:</b> ${esc(v.relative||"—")}</div>
+        <div class="sample-detail"><b>नाम:</b> <strong class="voter-value">${esc(v.name||"—")}</strong></div>
+        <div class="sample-detail"><b>${esc(v.relationType||"पिता / पति")} का नाम:</b> <strong class="voter-value">${esc(v.relative||"—")}</strong></div>
         <div class="sample-detail"><b>मकान संख्या:</b> ${esc(v.house||"—")}</div>
         <div class="sample-detail"><b>आयु:</b> ${esc(v.age||"—")}　<b>लिंग:</b> ${esc(v.gender||"—")}</div>
+        ${v.locality?`<div class="sample-detail"><b>मोहल्ला:</b> ${esc(v.locality)}</div>`:""}
       </div>
       <aside class="sample-booth">
         <div class="sample-booth-title">${esc(panchayat||"ग्राम पंचायत")}</div>
         <div class="sample-ward">वार्ड : ${esc(v.ward||"—")}</div>
-        <div class="sample-booth-content"><b>मतदान बूथ</b><br>${esc(v.booth||"—")}</div>
+        <div class="sample-booth-content"><b>मतदान बूथ</b><br>${esc(boothText)}</div>
       </aside>
     </div>
     <div class="sample-time">मतदान समय : प्रातः 7 से सायं 6 बजे तक</div>
@@ -303,26 +857,33 @@ function slipHTML(v,panchayat,brand){
 }
 window.makeSlip=async id=>{
  const v=cache.find(x=>x.id===id);if(!v)return;
- try{const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||"";
+ try{const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
   $("printArea").classList.remove("hidden");$("slips").className="slips";$("slips").innerHTML=slipHTML(v,panchayat,brand);
-  window.scrollTo({top:$("printArea").offsetTop,behavior:"smooth"});
- }catch(e){alert(e.message)}
+  await waitForSlipImages();window.scrollTo({top:$("printArea").offsetTop,behavior:"smooth"});
+ }catch(e){notice($("searchMsg"),"पर्ची तैयार नहीं हुई: "+e.message,"error")}
 };
+function waitForSlipImages(){return Promise.all([...$("slips").querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,5000)})));}
+window.saveSlipPNG=async()=>{
+ const slip=$("slips").querySelector(".slip");if(!slip)return alert("पहले एक मतदाता की पर्ची खोलें।");
+ if(typeof html2canvas!=="function")return alert("PNG सुविधा लोड नहीं हुई। इंटरनेट कनेक्शन जाँचें और पेज रीफ्रेश करें।");
+ try{await waitForSlipImages();const canvas=await html2canvas(slip,{scale:3,backgroundColor:"#ffffff",useCORS:true,logging:false});const a=document.createElement("a");a.download="voter-slip-"+Date.now()+".png";a.href=canvas.toDataURL("image/png");a.click();}
+ catch(e){alert("PNG सेव नहीं हो सकी: "+e.message)}
+};
+window.printCurrentSlip=()=>{const pages=$("slips");if(!pages.querySelector(".slip"))return alert("पहले पर्ची खोलें।");document.body.classList.remove("bulk-print-mode");window.print()};
 $("bulkWardPrint").onclick=async()=>{
  try{
   if(!cache.length)cache=await getVoters();
   let ward=$("ward").value;
   if(!isAdmin()&&profile.ward!=="ALL")ward=String(profile.ward);
-  if(!ward)return alert("पहले वार्ड चुनें।");
+  if(!ward){return notice($("searchMsg"),"पहले वार्ड चुनें। Ward ALL प्रत्याशी को एक निश्चित वार्ड चुनना होगा।","error")}
   const voters=cache.filter(v=>norm(v.ward)===norm(ward));
-  if(!voters.length)return alert("इस वार्ड में मतदाता नहीं मिले।");
-  const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||"";
-  const pages=[];for(let i=0;i<voters.length;i+=6){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+6).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
-  $("printArea").classList.remove("hidden");$("slips").className="bulk-print-pages";$("slips").innerHTML=pages.join("");
-  window.print();
- }catch(e){alert(e.message)}
+  if(!voters.length)return notice($("searchMsg"),"इस वार्ड में मतदाता नहीं मिले। पहले खोजें बटन दबाकर सूची लोड करें।","error");
+  const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
+  const pages=[];for(let i=0;i<voters.length;i+=8){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+8).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
+  $("printArea").classList.remove("hidden");$("slips").className="bulk-print-pages";$("slips").innerHTML=pages.join("");await waitForSlipImages();
+  notice($("searchMsg"),`वार्ड ${ward}: ${voters.length} पर्चियाँ तैयार हैं। प्रिंट संवाद में A4 और Scale 100% रखें।`,"success");window.print();
+ }catch(e){notice($("searchMsg"),"वार्ड की पर्चियाँ तैयार नहीं हुईं: "+e.message,"error")}
 };
-window.closeSlip=()=>{$("printArea").classList.add("hidden");$("slips").innerHTML=""};
-</script>
-</body>
-</html>
+window.closeSlip=()=>{$("printArea").classList.add("hidden");$("slips").innerHTML="";$ ("slips").className="slips"};
+
+</script></body></html>
