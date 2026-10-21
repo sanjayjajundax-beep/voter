@@ -73,6 +73,13 @@
 .candidate-branding-symbol-wrap{display:flex;align-items:center;justify-content:center;min-width:0}
 #candidateLoginSymbol{display:block;flex:0 1 220px;width:220px;height:180px;max-width:100%;object-fit:contain;border:0!important;border-radius:0!important;background:transparent;padding:0!important}
 @media(max-width:600px){.candidate-branding-display{grid-template-columns:minmax(0,1fr);gap:10px}.candidate-branding-identity{gap:12px}#candidateLoginPhoto{flex-basis:112px;width:112px;height:112px;max-width:112px}.candidate-branding-name{font-size:14px}.candidate-branding-name b{font-size:16px}#candidateLoginSymbol{width:120px;height:120px;flex-basis:120px}}
+
+/* तैयार बैनर: हर पर्ची के ऊपर पूरी चौड़ाई */
+.banner-preview{display:block;width:100%;max-width:720px;max-height:220px;object-fit:contain;object-position:center;background:#fff;border:1px solid #d5dce5;border-radius:6px;margin:8px 0}
+.full-slip-banner-wrap{width:100%;height:29%;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;border-bottom:1px solid #333;background:#fff}
+.full-slip-banner{display:block;width:100%;height:100%;object-fit:fill;object-position:center}
+.banner-missing{width:100%;height:100%;display:grid;place-items:center;font-size:8px;color:#a11;background:#fff7f7}
+@media print{.full-slip-banner-wrap{height:29%;min-height:0}.full-slip-banner{width:100%;height:100%;object-fit:fill}}
 </style>
 <style>
 /* Readable, space-filling voter details in the 3x3 A4 ward print layout */
@@ -211,7 +218,7 @@
   max-height:277mm!important;
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
   gap:2.5mm!important;
   overflow:hidden!important;
 }
@@ -269,7 +276,7 @@
   .bulk-print-page{
     min-height:277mm!important;max-height:277mm!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
     gap:2.5mm!important;
   }
   .bulk-print-page .sample-slip{
@@ -281,7 +288,7 @@
 
 
 <style>
-/* FINAL FIX: exactly 8 slips per A4 page (2 columns × 4 rows), no clipped text */
+/* FINAL FIX: exactly 6 slips per A4 page (2 columns × 3 rows), no clipped text */
 .bulk-print-pages{display:block!important;width:100%!important}
 .bulk-print-page{
   width:100%!important;
@@ -291,7 +298,7 @@
   box-sizing:border-box!important;
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(4,minmax(0,1fr))!important;
+  grid-template-rows:repeat(3,minmax(0,1fr))!important;
   gap:2.2mm!important;
   overflow:hidden!important;
   page-break-after:always!important;
@@ -359,7 +366,7 @@
   .bulk-print-page{
     height:277mm!important;min-height:277mm!important;max-height:277mm!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+    grid-template-rows:repeat(3,minmax(0,1fr))!important;
     gap:2.2mm!important;overflow:hidden!important;
   }
   .bulk-print-page .sample-slip{
@@ -377,8 +384,8 @@
 <section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
 <section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
-<div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">प्रत्याशी की फोटो और चुनाव चिह्न सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>पर्ची पर दिखने वाला नाम</label><input id="brandingName" placeholder="प्रत्याशी का नाम"><label>चुनाव चिन्ह का नाम</label><input id="brandingSymbolName" placeholder="जैसे: हाथ का निशान"><div class="row"><div><label>प्रत्याशी की फोटो (मोबाइल Gallery)</label><input id="brandingPhotoFile" class="file-input" type="file" accept="image/*"><img id="brandingPhotoPreview" class="image-preview" alt="प्रत्याशी फोटो Preview"><div class="image-tools"><button id="removeBrandingPhoto" class="red" type="button">फोटो हटाएँ</button></div></div><div><label>चुनाव चिह्न (मोबाइल Gallery)</label><input id="brandingSymbolFile" class="file-input" type="file" accept="image/*"><img id="brandingSymbolPreview" class="image-preview" alt="चुनाव चिह्न Preview"><div class="image-tools"><button id="removeBrandingSymbol" class="red" type="button">चिह्न हटाएँ</button></div></div></div><div class="muted">इमेज ब्राउज़र में ही resize/compress होकर Base64 के रूप में Firestore में सेव होगी। Firebase Storage या बाहरी image server का उपयोग नहीं होगा। दोनों इमेज का संयुक्त डेटा लगभग 500 KB से कम रखा जाएगा।</div><button id="saveBranding" class="green" type="button">फोटो और चिह्न सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
-<section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden candidate-branding-display"><div class="candidate-branding-identity"><img id="candidateLoginPhoto" class="candidate-photo" alt="प्रत्याशी फोटो"><div class="candidate-branding-name"><div class="muted">आपकी प्रत्याशी प्रोफाइल</div><b id="candidateLoginName">प्रत्याशी</b></div></div><div class="candidate-branding-symbol-wrap"><img id="candidateLoginSymbol" class="candidate-symbol" alt="चुनाव चिह्न"></div></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (8 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
+<div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">पूरी पर्ची का बैनर सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>तैयार बैनर इमेज (JPG / PNG)</label><input id="brandingBannerFile" class="file-input" type="file" accept="image/*"><img id="brandingBannerPreview" class="banner-preview hidden" alt="बैनर Preview"><div class="image-tools"><button id="removeBrandingBanner" class="red" type="button">बैनर हटाएँ</button></div><div class="muted">एक ही तैयार बैनर अपलोड करें। उसमें प्रत्याशी की फोटो, नाम और चुनाव चिन्ह पहले से जोड़ लें। पोर्टल इसे हर पर्ची के ऊपर पूरी चौड़ाई में लगाएगा। इमेज compress होकर Firestore में सेव होगी।</div><button id="saveBranding" class="green" type="button">बैनर सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
+<section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden"><img id="candidateLoginBanner" class="banner-preview" alt="आपका प्रत्याशी बैनर"></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (6 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
 <section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
@@ -428,15 +435,11 @@ function fields(r){
 }
 function isAdmin(){return profile?.role==="admin"}
 function renderCandidateBranding(){
- const box=$("candidateBrandingDisplay");
- if(!box)return;
+ const box=$("candidateBrandingDisplay");if(!box)return;
  if(!profile||profile.role!=="client"){box.classList.add("hidden");return;}
- const brand=candidateBranding||{};
- $("candidateLoginName").textContent=brand.name||profile.name||profile.position||"प्रत्याशी";
- const photo=$("candidateLoginPhoto"),symbol=$("candidateLoginSymbol");
- photo.src=brand.photoBase64||"";photo.style.visibility=brand.photoBase64?"visible":"hidden";
- symbol.src=brand.symbolBase64||"";symbol.style.visibility=brand.symbolBase64?"visible":"hidden";
- box.classList.remove("hidden");
+ const banner=$("candidateLoginBanner");
+ if(candidateBranding?.bannerBase64){banner.src=candidateBranding.bannerBase64;box.classList.remove("hidden");}
+ else{banner.removeAttribute("src");box.classList.add("hidden");}
 }
 auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
 try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
@@ -499,62 +502,30 @@ window.toggleCandidate=async uid=>{
   alert(`प्रत्याशी की ID ${next?"चालू":"बंद"} कर दी गई।`);
  }catch(e){alert("प्रत्याशी ID की स्थिति नहीं बदली जा सकी: "+e.message+"\\nFirestore Rules में users दस्तावेज़ का active field अपडेट करने की अनुमति जाँचें।")}
 };
-let brandingPhotoData="",brandingSymbolData="";
-function setImagePreview(which,data){
- const isPhoto=which==="photo",img=$(isPhoto?"brandingPhotoPreview":"brandingSymbolPreview"),file=$(isPhoto?"brandingPhotoFile":"brandingSymbolFile");
- if(data){img.src=data;img.classList.remove("hidden")}else{img.removeAttribute("src");img.classList.remove("hidden");img.alt=isPhoto?"फोटो उपलब्ध नहीं":"चिह्न उपलब्ध नहीं"}
- if(isPhoto)brandingPhotoData=data||"";else brandingSymbolData=data||"";
- if(file)file.value="";
-}
-async function compressImage(file,kind){
- if(!file||!file.type.startsWith("image/"))throw Error("कृपया JPG, PNG या WebP इमेज चुनें।");
- if(file.size>15*1024*1024)throw Error("मूल इमेज 15 MB से बड़ी है। छोटी इमेज चुनें।");
- const sourceUrl=URL.createObjectURL(file);
- try{
-  const img=new Image();
-  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error("इमेज पढ़ी नहीं जा सकी। दूसरी इमेज चुनें।"));img.src=sourceUrl});
-  let maxSide=kind==="photo"?600:450,last="";
-  for(let resize=0;resize<6;resize++){
-   const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
-   const canvas=document.createElement("canvas");
-   canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
-   const ctx=canvas.getContext("2d");ctx.fillStyle="#ffffff";ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);
-   for(const q of [.82,.72,.62,.52,.42,.32]){
-    const data=canvas.toDataURL("image/jpeg",q);last=data;
-    if(data.length<=230*1024)return data;
-   }
-   maxSide=Math.round(maxSide*.75);
-  }
-  if(last&&last.length<=230*1024)return last;
-  throw Error("इमेज को पर्याप्त छोटा नहीं किया जा सका। कम रिज़ॉल्यूशन वाली इमेज चुनें।");
- }finally{URL.revokeObjectURL(sourceUrl)}
+let brandingBannerData="";
+function setBannerPreview(data){const img=$("brandingBannerPreview");if(data){img.src=data;img.classList.remove("hidden");}else{img.removeAttribute("src");img.classList.add("hidden");}brandingBannerData=data||"";$("brandingBannerFile").value="";}
+async function compressBanner(file){
+ if(!file||!file.type.startsWith("image/"))throw Error("कृपया JPG, PNG या WebP बैनर चुनें।");
+ if(file.size>15*1024*1024)throw Error("मूल बैनर 15 MB से बड़ा है।");
+ const url=URL.createObjectURL(file);
+ try{const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=()=>j(Error("बैनर पढ़ा नहीं जा सका।"));img.src=url;});
+ let max=1600,last="";
+ for(let n=0;n<7;n++){const scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);for(const q of [.82,.72,.62,.52,.42,.32]){last=c.toDataURL("image/jpeg",q);if(last.length<=520*1024)return last;}max=Math.round(max*.78);}
+ if(last.length<=650*1024)return last;throw Error("बैनर छोटा नहीं हो पा रहा। कम आकार की इमेज चुनें।");
+ }finally{URL.revokeObjectURL(url);}
 }
 async function loadBrandingEditor(){
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);
- $("brandingName").value=c?(c.name||c.position||""):"";
- setImagePreview("photo","");setImagePreview("symbol","");$("brandingMsg").classList.add("hidden");
- if(!c)return;
- try{
-  const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();
-  if(d.exists){const b=d.data();$("brandingName").value=b.name||$("brandingName").value;$("brandingSymbolName").value=b.symbolName||"";setImagePreview("photo",b.photoBase64||"");setImagePreview("symbol",b.symbolBase64||"")}else{$("brandingSymbolName").value=""}
- }catch(e){setImagePreview("photo","");setImagePreview("symbol","");notice($("brandingMsg"),"Firestore से फोटो/चिह्न लोड नहीं हो सके: "+e.message+"। Rules और नेटवर्क जाँचें।","error")}
+ const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);setBannerPreview("");$("brandingMsg").classList.add("hidden");if(!c)return;
+ try{const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();if(d.exists)setBannerPreview(d.data().bannerBase64||"");}
+ catch(e){notice($("brandingMsg"),"Firestore से बैनर लोड नहीं हुआ: "+e.message,"error");}
 }
-$("brandingCandidate").onchange=async()=>{try{localStorage.setItem("voterSlipBrandingCandidateUid",$("brandingCandidate").value)}catch(e){}await loadBrandingEditor();};
-$("brandingPhotoFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"फोटो compress हो रही है...");setImagePreview("photo",await compressImage(f,"photo"));notice($("brandingMsg"),"फोटो तैयार है। सेव करना न भूलें।","success")}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value=""}};
-$("brandingSymbolFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"चुनाव चिह्न compress हो रहा है...");setImagePreview("symbol",await compressImage(f,"symbol"));notice($("brandingMsg"),"चुनाव चिह्न तैयार है। सेव करना न भूलें।","success")}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value=""}};
-$("removeBrandingPhoto").onclick=()=>{setImagePreview("photo","");notice($("brandingMsg"),"फोटो हटाने के लिए अब सेव करें।")};
-$("removeBrandingSymbol").onclick=()=>{setImagePreview("symbol","");notice($("brandingMsg"),"चिह्न हटाने के लिए अब सेव करें।")};
+$("brandingCandidate").onchange=loadBrandingEditor;
+$("brandingBannerFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"बैनर compress हो रहा है...");setBannerPreview(await compressBanner(f));notice($("brandingMsg"),"बैनर तैयार है। अब सेव करें।","success");}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value="";}};
+$("removeBrandingBanner").onclick=()=>{setBannerPreview("");notice($("brandingMsg"),"बैनर हटाने के लिए अब सेव करें।");};
 $("saveBranding").onclick=async()=>{
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid),name=$("brandingName").value.trim(),symbolName=$("brandingSymbolName").value.trim();
- if(!c)return notice($("brandingMsg"),"पहले प्रत्याशी चुनें।","error");
- if(!c.panchayatId)return notice($("brandingMsg"),"प्रत्याशी प्रोफाइल में panchayatId नहीं है।","error");
- if(brandingPhotoData.length+brandingSymbolData.length>500*1024)return notice($("brandingMsg"),"दोनों इमेज का संयुक्त डेटा 500 KB से अधिक है। छोटी इमेज चुनें।","error");
- const btn=$("saveBranding");btn.disabled=true;
- try{
-  await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({name,symbolName,photoBase64:brandingPhotoData,symbolBase64:brandingSymbolData,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
-  brandingReadCache={};notice($("brandingMsg"),"प्रत्याशी की फोटो और चुनाव चिह्न Firestore में सेव हो गए।","success");if(user&&user.uid===uid){candidateBranding={name,symbolName,photoBase64:brandingPhotoData,symbolBase64:brandingSymbolData};renderCandidateBranding();}
- }catch(e){notice($("brandingMsg"),"सेव नहीं हुआ: "+e.message+" — मौजूदा Firestore Rules में candidateBranding की अनुमति जाँचें।","error")}
- finally{btn.disabled=false}
+ const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);if(!c)return notice($("brandingMsg"),"पहले प्रत्याशी चुनें।","error");if(!c.panchayatId)return notice($("brandingMsg"),"प्रत्याशी प्रोफाइल में panchayatId नहीं है।","error");if(brandingBannerData.length>700*1024)return notice($("brandingMsg"),"बैनर बहुत बड़ा है। छोटी इमेज चुनें।","error");
+ const btn=$("saveBranding");btn.disabled=true;try{await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({bannerBase64:brandingBannerData,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});brandingReadCache={};notice($("brandingMsg"),"बैनर Firestore में सेव हो गया।","success");if(user&&user.uid===uid){candidateBranding={...candidateBranding,bannerBase64:brandingBannerData};renderCandidateBranding();}}
+ catch(e){notice($("brandingMsg"),"सेव नहीं हुआ: "+e.message+" — Firestore Rules में candidateBranding की अनुमति जाँचें।","error");}finally{btn.disabled=false;}
 };
 
 // स्थानीय IndexedDB कैश: एक ही मतदाता सूची को पेज रीफ्रेश पर दोबारा डाउनलोड करने से बचाएँ।
@@ -705,25 +676,10 @@ async function getBrandingForCurrentSearch(){
  return brand;
 }
 function slipHTML(v,panchayat,brand){
-  const candidateName=brand.name||profile?.name||"प्रत्याशी";
-  const candidatePosition=brand.position||profile?.position||"सरपंच";
-  const photo=brand.photoBase64
-    ? `<img class="candidate-photo" src="${esc(brand.photoBase64)}" alt="प्रत्याशी फोटो">`
-    : `<div class="candidate-photo placeholder">प्रत्याशी फोटो</div>`;
-  const symbol=brand.symbolBase64
-    ? `<img class="candidate-symbol" src="${esc(brand.symbolBase64)}" alt="चुनाव चिन्ह">`
-    : `<div class="candidate-symbol placeholder">चुनाव चिन्ह</div>`;
+  const banner=brand.bannerBase64?`<img class="full-slip-banner" src="${esc(brand.bannerBase64)}" alt="प्रत्याशी बैनर">`:`<div class="banner-missing">एडमिन से प्रत्याशी का बैनर सेट करवाएँ</div>`;
   const boothText=v.booth||"—";
   return `<article class="slip sample-slip">
-    <div class="candidate-banner sample-banner">
-      <div class="sample-symbol-box">${symbol}<div class="symbol-name">${esc(brand.symbolName||"चुनाव चिन्ह")}</div></div>
-      <div class="sample-candidate-info">
-        <div class="sample-topline">ग्राम पंचायत ${esc(panchayat||"")} से ${esc(candidatePosition)} पद के लिए<br>आपके अपने लोकप्रिय उम्मीदवार</div>
-        <div class="sample-candidate-name">${esc(candidateName)}</div>
-        <div class="sample-slogan">को ${esc(brand.symbolName||"चुनाव चिन्ह")} के निशान पर बटन दबाकर<br>भारी मतों से विजयी बनायें</div>
-      </div>
-      <div class="sample-photo-box">${photo}</div>
-    </div>
+    <div class="full-slip-banner-wrap">${banner}</div>
     <div class="sample-cutline">✂ मतदान तिथि से पूर्व बांटी गयी पर्ची, मतदान केन्द्र में जाने से पहले ऊपर का हिस्सा फाड़ दें। ✂</div>
     <div class="sample-voter-area">
       <div class="sample-voter-main">
@@ -767,7 +723,7 @@ $("bulkWardPrint").onclick=async()=>{
   const voters=cache.filter(v=>norm(v.ward)===norm(ward));
   if(!voters.length)return notice($("searchMsg"),"इस वार्ड में मतदाता नहीं मिले। पहले खोजें बटन दबाकर सूची लोड करें।","error");
   const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
-  const pages=[];for(let i=0;i<voters.length;i+=8){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+8).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
+  const pages=[];for(let i=0;i<voters.length;i+=6){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+6).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
   $("printArea").classList.remove("hidden");$("slips").className="bulk-print-pages";$("slips").innerHTML=pages.join("");await waitForSlipImages();
   notice($("searchMsg"),`वार्ड ${ward}: ${voters.length} पर्चियाँ तैयार हैं। प्रिंट संवाद में A4 और Scale 100% रखें।`,"success");window.print();
  }catch(e){notice($("searchMsg"),"वार्ड की पर्चियाँ तैयार नहीं हुईं: "+e.message,"error")}
