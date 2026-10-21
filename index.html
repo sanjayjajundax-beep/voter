@@ -508,27 +508,55 @@
 
 
 <style>
-/* FINAL PDF FIX: A4 पर शून्य पेज मार्जिन और नाम/पिता-पति का नाम बोल्ड */
+/* FINAL PDF FIX: A4 पर 6 बड़ी पर्चियाँ, शून्य मार्जिन और नाम बोल्ड */
 @media print {
   @page { size: A4 portrait; margin: 0 !important; }
   html, body { margin: 0 !important; padding: 0 !important; width: 210mm !important; }
-  .bulk-print-pages { width: 210mm !important; margin: 0 !important; padding: 0 !important; }
+  .bulk-print-pages { display:block !important; width:210mm !important; margin:0 !important; padding:0 !important; }
   .bulk-print-page {
-    width: 210mm !important; height: 297mm !important;
-    min-height: 297mm !important; max-height: 297mm !important;
-    margin: 0 !important; padding: 0 !important; box-sizing: border-box !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-template-rows: repeat(4, 50mm) !important;
-    column-gap: 2mm !important; row-gap: 15mm !important;
-    align-content: center !important; justify-content: stretch !important;
-    overflow: hidden !important;
+    width:210mm !important; height:297mm !important;
+    min-height:297mm !important; max-height:297mm !important;
+    margin:0 !important; padding:0 !important; box-sizing:border-box !important;
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(3,90mm) !important;
+    column-gap:2mm !important; row-gap:8mm !important;
+    align-content:center !important; justify-content:stretch !important;
+    overflow:hidden !important;
+    page-break-after:always !important; break-after:page !important;
   }
-  .bulk-print-page .sample-detail .voter-value {
-    font-weight: 900 !important; color: #000 !important;
+  .bulk-print-page:last-child { page-break-after:auto !important; break-after:auto !important; }
+  .bulk-print-page .sample-slip {
+    width:100% !important; height:90mm !important;
+    min-height:90mm !important; max-height:90mm !important;
+    box-sizing:border-box !important; overflow:hidden !important;
+    display:flex !important; flex-direction:column !important;
+    border:1px solid #20aabd !important; border-radius:0 !important;
+    print-color-adjust:exact !important; -webkit-print-color-adjust:exact !important;
   }
+  .bulk-print-page .full-slip-banner-wrap {
+    width:100% !important; height:38% !important; min-height:0 !important;
+    flex:0 0 38% !important; overflow:hidden !important;
+  }
+  .bulk-print-page .full-slip-banner { width:100% !important; height:100% !important; object-fit:fill !important; }
+  .bulk-print-page .sample-cutline { font-size:9px !important; line-height:1.2 !important; padding:2px 3px !important; }
+  .bulk-print-page .sample-voter-area {
+    display:grid !important; grid-template-columns:minmax(0,1fr) 30mm !important;
+    gap:4px !important; flex:1 1 auto !important; min-height:0 !important; padding:4px 5px 3px !important;
+  }
+  .bulk-print-page .sample-voter-main { display:flex !important; flex-direction:column !important; justify-content:space-between !important; min-width:0 !important; min-height:0 !important; }
+  .bulk-print-page .sample-idline { display:flex !important; align-items:center !important; gap:4px !important; margin:1px 0 3px !important; }
+  .bulk-print-page .sample-idline b { min-width:29px !important; font-size:10px !important; padding:2px 3px !important; }
+  .bulk-print-page .sample-idline strong { font-size:10px !important; line-height:1.2 !important; overflow-wrap:anywhere !important; }
+  .bulk-print-page .sample-detail { font-size:11px !important; line-height:1.3 !important; margin:3px 0 !important; overflow-wrap:anywhere !important; }
+  .bulk-print-page .sample-detail .voter-value, .sample-detail .voter-value { font-weight:900 !important; color:#000 !important; }
+  .bulk-print-page .sample-booth { display:flex !important; flex-direction:column !important; justify-content:space-between !important; min-width:0 !important; padding-left:4px !important; border-left:1px solid #39a9bc !important; }
+  .bulk-print-page .sample-booth-title { font-size:10px !important; line-height:1.2 !important; text-align:center !important; }
+  .bulk-print-page .sample-ward { font-size:11px !important; line-height:1.2 !important; padding:2px 0 !important; }
+  .bulk-print-page .sample-booth-content { font-size:9px !important; line-height:1.25 !important; padding:2px 0 !important; overflow-wrap:anywhere !important; }
+  .bulk-print-page .sample-time { font-size:9px !important; line-height:1.2 !important; padding:3px !important; }
 }
-/* स्क्रीन पर भी मतदाता के नाम स्पष्ट बोल्ड */
-.sample-detail .voter-value { font-weight: 900; color: #000; }
+.sample-detail .voter-value { font-weight:900; color:#000; }
 </style>
 
 </head><body>
@@ -879,7 +907,7 @@ $("bulkWardPrint").onclick=async()=>{
   const voters=cache.filter(v=>norm(v.ward)===norm(ward));
   if(!voters.length)return notice($("searchMsg"),"इस वार्ड में मतदाता नहीं मिले। पहले खोजें बटन दबाकर सूची लोड करें।","error");
   const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
-  const pages=[];for(let i=0;i<voters.length;i+=8){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+8).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
+  const pages=[];for(let i=0;i<voters.length;i+=6){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+6).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
   $("printArea").classList.remove("hidden");$("slips").className="bulk-print-pages";$("slips").innerHTML=pages.join("");await waitForSlipImages();
   notice($("searchMsg"),`वार्ड ${ward}: ${voters.length} पर्चियाँ तैयार हैं। प्रिंट संवाद में A4 और Scale 100% रखें।`,"success");window.print();
  }catch(e){notice($("searchMsg"),"वार्ड की पर्चियाँ तैयार नहीं हुईं: "+e.message,"error")}
