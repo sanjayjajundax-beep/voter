@@ -375,6 +375,69 @@
 }
 </style>
 
+
+<style>
+/* अंतिम सुधार: बैनर थोड़ा ऊँचा और मतदाता विवरण अधिक स्पष्ट */
+.bulk-print-page .sample-banner{
+  flex:0 0 42%!important;
+  height:42%!important;
+  grid-template-columns:64px minmax(0,1fr) 72px!important;
+  gap:4px!important;
+  padding:5px!important;
+}
+.bulk-print-page .sample-banner .candidate-symbol{
+  width:58px!important;
+  height:64px!important;
+}
+.bulk-print-page .sample-banner .candidate-photo{
+  width:68px!important;
+  height:82px!important;
+}
+.bulk-print-page .sample-banner .symbol-name{
+  font-size:8.5px!important;
+}
+.bulk-print-page .sample-topline{font-size:8.8px!important}
+.bulk-print-page .sample-candidate-name{
+  font-size:18px!important;
+  line-height:1.15!important;
+  margin:4px 0!important;
+}
+.bulk-print-page .sample-slogan{font-size:9.2px!important}
+.bulk-print-page .sample-cutline{
+  font-size:8px!important;
+  line-height:1.25!important;
+  padding:3px 4px!important;
+}
+.bulk-print-page .sample-voter-area{
+  grid-template-columns:minmax(0,1fr) 68px!important;
+  gap:4px!important;
+  padding:4px 5px 3px!important;
+}
+.bulk-print-page .sample-idline b{font-size:10px!important}
+.bulk-print-page .sample-idline strong{font-size:10px!important}
+.bulk-print-page .sample-detail{
+  font-size:10.8px!important;
+  line-height:1.24!important;
+  margin:1.5px 0!important;
+}
+.bulk-print-page .sample-booth-title{font-size:9px!important}
+.bulk-print-page .sample-ward{font-size:10px!important}
+.bulk-print-page .sample-booth-content{
+  font-size:8.5px!important;
+  line-height:1.22!important;
+}
+.bulk-print-page .sample-time{font-size:8.8px!important}
+@media print{
+  .bulk-print-page .sample-banner{
+    flex:0 0 42%!important;
+    height:42%!important;
+  }
+  .bulk-print-page .sample-detail{
+    font-size:10.5px!important;
+  }
+}
+</style>
+
 </head><body>
 <header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
