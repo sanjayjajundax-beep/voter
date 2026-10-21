@@ -438,7 +438,7 @@ function renderCandidateBranding(){
  symbol.src=brand.symbolBase64||"";symbol.style.visibility=brand.symbolBase64?"visible":"hidden";
  box.classList.remove("hidden");
 }
-auth.onAuthStateChanged(async u=>{user=u;if(!u){$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
+auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
 try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
 $("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
 document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
@@ -558,8 +558,9 @@ $("saveBranding").onclick=async()=>{
 };
 
 // स्थानीय IndexedDB कैश: एक ही मतदाता सूची को पेज रीफ्रेश पर दोबारा डाउनलोड करने से बचाएँ।
-const VOTER_CACHE_DB = "voter-slip-local-cache-v1";
-const VOTER_CACHE_TTL = 12 * 60 * 60 * 1000; // 12 घंटे
+const VOTER_CACHE_DB = "voter-slip-local-cache-v2";
+// स्थायी कैश: कोई समय-सीमा नहीं। नया Excel अपलोड होने पर activeUploadId
+// बदलता है और नई सूची अपने आप डाउनलोड होकर अलग कैश में सेव होगी।
 
 function openVoterCacheDB() {
   return new Promise((resolve, reject) => {
@@ -585,8 +586,7 @@ async function readLocalVoterCache(key) {
         .objectStore("lists").get(key);
       request.onsuccess = () => {
         const item = request.result;
-        if (!item || !Array.isArray(item.data) ||
-            Date.now() - item.savedAt > VOTER_CACHE_TTL) {
+        if (!item || !Array.isArray(item.data)) {
           resolve(null);
         } else {
           resolve(item.data);
@@ -632,22 +632,12 @@ async function getVoters() {
     throw new Error("प्रत्याशी की पंचायत नहीं मिली।");
   }
 
-  // प्रत्याशी के लिए हर खोज से पहले Firestore से ताज़ा स्थिति जाँचें,
-  // ताकि पहले से लॉगिन प्रत्याशी भी पंचायत बंद होने पर सूची न खोल सके।
-  if (!isAdmin()) {
-    const latestUser = await db.collection("users").doc(user.uid).get();
-    if (!latestUser.exists || latestUser.data().active === false) {
-      cache=[];
-      throw new Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है।");
-    }
-    const latest = await db.collection("panchayats").doc(p.id).get();
-    if (!latest.exists) throw new Error("प्रत्याशी की पंचायत उपलब्ध नहीं है।");
-    const latestData = latest.data();
-    if (latestData.active === false) {
-      cache=[];
-      throw new Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है।");
-    }
-    Object.assign(p, latestData);
+  // यूजर प्रोफाइल और पंचायत की सक्रिय स्थिति लॉगिन के समय जाँची जाती है।
+  // हर खोज पर दो अतिरिक्त Firestore reads करने की जरूरत नहीं है।
+  // activeUploadId लॉगिन पर मिली पंचायत जानकारी से कैश को version करता है।
+  if (!isAdmin() && p.active === false) {
+    cache=[];
+    throw new Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। कृपया दोबारा लॉगिन करें।");
   }
   activeSearchPlace = p;
 
@@ -690,7 +680,7 @@ async function getVoters() {
     ...doc.data()
   }));
 
-  // सूची को इस डिवाइस पर 12 घंटे तक रखें; कैश फेल हो तो ऐप सामान्य रूप से चलेगा।
+  // सूची इस ब्राउज़र में स्थायी रूप से रखें; कैश फेल हो तो Firestore से पढ़ें।
   await writeLocalVoterCache(localCacheKey, voters);
   return voters;
 }
