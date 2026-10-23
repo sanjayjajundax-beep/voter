@@ -560,7 +560,7 @@
 </style>
 
 </head><body>
-<header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><br><h6>संजय जाजुन्दा</h6><button id="logout" class="hidden red">लॉगआउट</button></header>
+<header><h1>🗳️ मतदाता पर्ची पोर्टल</h1><button id="logout" class="hidden red">लॉगआउट</button></header>
 <main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
 <main id="app" class="wrap hidden">
 <div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
@@ -778,6 +778,27 @@ async function writeLocalVoterCache(key, data) {
   }
 }
 
+
+// क्रम संख्या को वास्तविक संख्यात्मक क्रम में व्यवस्थित करें।
+// Firestore/IndexedDB से आए पुराने unsorted records पर भी यह लागू होगा।
+function sortVotersBySerial(list){
+  const toNumber = value => {
+    const s = String(value ?? "").trim()
+      .replace(/[०-९]/g, d => "०१२३४५६७८९".indexOf(d))
+      .replace(/,/g, "");
+    const m = s.match(/^\d+(?:\.\d+)?/);
+    return m ? Number(m[0]) : NaN;
+  };
+  return [...list].sort((a,b)=>{
+    const an=toNumber(a.serial), bn=toNumber(b.serial);
+    if(Number.isFinite(an) && Number.isFinite(bn) && an!==bn) return an-bn;
+    if(Number.isFinite(an)!==Number.isFinite(bn)) return Number.isFinite(an)?-1:1;
+    const rowA=Number(a._row), rowB=Number(b._row);
+    if(Number.isFinite(rowA)&&Number.isFinite(rowB)&&rowA!==rowB) return rowA-rowB;
+    return String(a.id||"").localeCompare(String(b.id||""),"en",{numeric:true});
+  });
+}
+
 async function getVoters() {
   const p = isAdmin()
     ? places.find(x => x.id === $("searchP").value)
@@ -813,7 +834,7 @@ async function getVoters() {
   const savedVoters = await readLocalVoterCache(localCacheKey);
   if (savedVoters !== null) {
     activeSearchPlace = p;
-    return savedVoters;
+    return sortVotersBySerial(savedVoters);
   }
 
   let q = db
@@ -830,10 +851,10 @@ async function getVoters() {
 
   const snapshot = await q.limit(5000).get();
 
-  const voters = snapshot.docs.map(doc => ({
+  const voters = sortVotersBySerial(snapshot.docs.map(doc => ({
     id: doc.id,
     ...doc.data()
-  }));
+  })));
 
   // सूची इस ब्राउज़र में स्थायी रूप से रखें; कैश फेल हो तो Firestore से पढ़ें।
   await writeLocalVoterCache(localCacheKey, voters);
@@ -904,7 +925,8 @@ $("bulkWardPrint").onclick=async()=>{
   let ward=$("ward").value;
   if(!isAdmin()&&profile.ward!=="ALL")ward=String(profile.ward);
   if(!ward){return notice($("searchMsg"),"पहले वार्ड चुनें। Ward ALL प्रत्याशी को एक निश्चित वार्ड चुनना होगा।","error")}
-  const voters=cache.filter(v=>norm(v.ward)===norm(ward));
+  // चुने हुए वार्ड की सभी पर्चियाँ क्रम संख्या 1, 2, 3... में ही छापें।
+  const voters=sortVotersBySerial(cache.filter(v=>norm(v.ward)===norm(ward)));
   if(!voters.length)return notice($("searchMsg"),"इस वार्ड में मतदाता नहीं मिले। पहले खोजें बटन दबाकर सूची लोड करें।","error");
   const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
   const pages=[];for(let i=0;i<voters.length;i+=6){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+6).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
