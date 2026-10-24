@@ -592,7 +592,7 @@
         <label for="publicWardNumber">वार्ड नंबर</label><input id="publicWardNumber" inputmode="numeric" placeholder="वार्ड नंबर">
       </div>
       <div class="live-meta" style="align-self:end;padding:10px 0">
-        <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> · <span id="publicRound">राउंड: अभी शुरू नहीं हुआ</span>
+        <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> · <span id="publicRound">पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ</span>
       </div>
     </div>
     <div id="publicCandidates">
@@ -602,7 +602,7 @@
     <div id="publicCountingTotals" class="live-total-grid"></div>
     <div class="notice" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
     <div class="live-meta" id="publicUpdated">अपडेट समय: —</div>
-    <p class="muted" style="margin-bottom:0">अगले राउंड की जानकारी जल्द मिलेगी।</p>
+    <p class="muted" style="margin-bottom:0">अगले पोलिंग बूथ की जानकारी जल्द मिलेगी।</p>
     <p class="muted" style="margin:8px 0 0">⚠️ यह जानकारी अधिकृत रूप से पुष्टि होने के बाद ही साझा करें।</p>
   </section>
   <section class="card login" id="publicLoginCard">
@@ -633,7 +633,7 @@
     <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
     <div><label>पद चुनें</label><select id="countingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
     <div id="countingWardWrap" class="hidden"><label>वार्ड नंबर</label><input id="countingWardNumber" inputmode="numeric" placeholder="जैसे 9"></div>
-    <div><label>राउंड नंबर</label><input id="countingRound" type="number" min="1" value="1"></div>
+    <div><label>पोलिंग बूथ नंबर</label><input id="countingBoothNumber" type="text" inputmode="numeric" placeholder="पोलिंग बूथ नंबर / वार्ड नंबर"></div>
     <div><label>काउंटिंग स्थिति</label><select id="countingStatus"><option value="running">काउंटिंग जारी है</option><option value="completed">काउंटिंग पूरी</option></select></div>
     <div class="full">
       <div class="row" style="align-items:center"><h4 style="margin:8px 0">प्रत्याशी और वोट</h4>
@@ -725,7 +725,7 @@ let liveCountingUnsubscribe = null;
 function renderPublicCounting(data){
   const type = $("publicCountingType").value;
   $("publicPanchayat").textContent = "ग्राम पंचायत: " + (data.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && data.wardNumber ? " · वार्ड " + data.wardNumber : "") + ")";
-  $("publicRound").textContent = data.round ? "राउंड नंबर: " + String(data.round).padStart(2,"0") : "राउंड: अभी शुरू नहीं हुआ";
+  $("publicRound").textContent = data.pollingBoothNumber ? "पोलिंग बूथ नंबर: " + String(data.pollingBoothNumber) : "पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ";
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
   const rejected = Math.max(0, Number(data.rejectedVotes)||0);
   const rejectedBreakdown = data.rejectedBreakdown || {};
@@ -776,7 +776,7 @@ function startPublicCountingListener(){
   $("publicWardWrap").classList.toggle("hidden", type !== "wardpanch");
   if(type === "wardpanch" && !ward){
     $("publicPanchayat").textContent = "वार्ड पंच की काउंटिंग देखने के लिए वार्ड नंबर भरें";
-    $("publicRound").textContent = "राउंड: —";
+    $("publicRound").textContent = "पोलिंग बूथ नंबर: —";
     $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर डालें, फिर उस वार्ड की लाइव काउंटिंग दिखाई देगी।</div>';
     $("publicCountingChart").innerHTML = "";
     $("publicCountingTotals").innerHTML = "";
@@ -836,7 +836,7 @@ $("publishCounting").onclick = async ()=>{
       votes:Math.max(0,Math.floor(Number(row.querySelector(".counting-candidate-votes").value)||0))
     })).filter(c=>c.name);
   if(!candidates.length) return notice($("countingAdminMsg"),"कम से कम एक प्रत्याशी का नाम भरें।","error");
-  const round = Math.max(1,parseInt($("countingRound").value,10)||1);
+  const pollingBoothNumber = $("countingBoothNumber").value.trim();
   const status = $("countingStatus").value;
   const btn=$("publishCounting"); btn.disabled=true;
   try{
@@ -846,7 +846,7 @@ $("publishCounting").onclick = async ()=>{
       wardNumber:type === "wardpanch" ? wardNumber : "",
       electionType:type,
       electionTypeLabel:countingTypeLabel(type),
-      round,candidates,status,
+      pollingBoothNumber,candidates,status,
       rejectedBreakdown:getRejectedBreakdown(),
       rejectedVotes:updateRejectedTotal(),
       notaVotes:Math.max(0,Math.floor(Number($("countingNota").value)||0)),
