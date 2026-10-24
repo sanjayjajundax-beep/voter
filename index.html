@@ -80,6 +80,22 @@
 .full-slip-banner{display:block;width:100%;height:100%;object-fit:fill;object-position:center}
 .banner-missing{width:100%;height:100%;display:grid;place-items:center;font-size:8px;color:#a11;background:#fff7f7}
 @media print{.full-slip-banner-wrap{height:29%;min-height:0}.full-slip-banner{width:100%;height:100%;object-fit:fill}}
+
+/* Public live counting */
+.live-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.live-card{border:1px solid #cfe2d5;border-top:4px solid #16834b}
+.live-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:#e8f7ed;color:#13733d;padding:5px 10px;border-radius:30px;font-size:12px;font-weight:700}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block}
+.live-candidate{display:flex;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e5eaf0;border-radius:9px;margin:8px 0;align-items:center}
+.live-candidate strong{font-size:15px}
+.live-votes{font-size:22px;font-weight:800;color:#174ea6;white-space:nowrap}
+.live-winner{background:#eaf8ef;border-color:#16834b}
+.live-meta{font-size:12px;color:#64748b}
+.live-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.live-admin-grid .full{grid-column:1/-1}
+@media(max-width:650px){.live-layout{grid-template-columns:1fr}.live-admin-grid{grid-template-columns:1fr}.live-admin-grid .full{grid-column:auto}}
+
 </style>
 <style>
 /* Readable, space-filling voter details in the 3x3 A4 ward print layout */
@@ -561,14 +577,65 @@
 
 </head><body>
 <header><div style="display:flex;flex-direction:column;gap:1px"><h1>🗳️ मतदाता पर्ची पोर्टल</h1><small style="font-family:inherit;font-size:9px;line-height:1;color:#dbeafe;margin-left:30px">संजय जाजुन्दा</small></div><button id="logout" class="hidden red">लॉगआउट</button></header>
-<main id="loginView" class="wrap"><section class="card login"><div style="font-size:42px">🗳️</div><h2>Voter Slip Portal</h2><p class="muted">Admin एवं प्रत्याशी लॉगिन</p><form id="loginForm"><label>ईमेल</label><input id="email" type="email" required><label>पासवर्ड</label><input id="password" type="password" required><button class="wide">लॉगिन करें</button></form><div id="loginMsg" class="notice hidden"></div></section></main>
+
+<main class="wrap live-layout" id="publicLiveArea">
+  <section class="card live-card">
+    <div class="live-head">
+      <h2 style="margin:0;font-size:18px">🗳️ ग्राम पंचायत चुनाव – लाइव काउंटिंग</h2>
+      <span class="live-badge"><i class="live-dot"></i> LIVE</span>
+    </div>
+    <div class="live-meta" style="margin:8px 0 12px">
+      <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> ·
+      <span id="publicRound">राउंड: अभी शुरू नहीं हुआ</span>
+    </div>
+    <div id="publicCandidates">
+      <div class="notice">लाइव काउंटिंग की जानकारी लोड हो रही है...</div>
+    </div>
+    <div class="notice" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
+    <div class="live-meta" id="publicUpdated">अपडेट समय: —</div>
+    <p class="muted" style="margin-bottom:0">अगले राउंड की जानकारी जल्द मिलेगी।</p>
+    <p class="muted" style="margin:8px 0 0">⚠️ यह जानकारी अधिकृत रूप से पुष्टि होने के बाद ही साझा करें।</p>
+  </section>
+  <section class="card login" id="publicLoginCard">
+    <div style="font-size:42px">🗳️</div>
+    <h2>Voter Slip Portal</h2>
+    <p class="muted">Admin एवं प्रत्याशी लॉगिन</p>
+    <form id="loginForm">
+      <label>ईमेल</label><input id="email" type="email" required>
+      <label>पासवर्ड</label><input id="password" type="password" required>
+      <button class="wide">लॉगिन करें</button>
+    </form>
+    <div id="loginMsg" class="notice hidden"></div>
+  </section>
+</main>
+<main id="loginView" class="wrap hidden"></main>
 <main id="app" class="wrap hidden">
 <div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
-<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button></nav>
+<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button><button class="tab" data-id="countingAdmin">लाइव काउंटिंग</button></nav>
 <section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
 <section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
 <section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
 <div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">पूरी पर्ची का बैनर सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>तैयार बैनर इमेज (JPG / PNG)</label><input id="brandingBannerFile" class="file-input" type="file" accept="image/*"><img id="brandingBannerPreview" class="banner-preview hidden" alt="बैनर Preview"><div class="image-tools"><button id="removeBrandingBanner" class="red" type="button">बैनर हटाएँ</button></div><div class="muted">एक ही तैयार बैनर अपलोड करें। उसमें प्रत्याशी की फोटो, नाम और चुनाव चिन्ह पहले से जोड़ लें। पोर्टल इसे हर पर्ची के ऊपर पूरी चौड़ाई में लगाएगा। इमेज compress होकर Firestore में सेव होगी।</div><button id="saveBranding" class="green" type="button">बैनर सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
+
+<section id="countingAdmin" class="card panel no-print">
+  <h3>🗳️ लाइव काउंटिंग कंट्रोल</h3>
+  <div class="notice">यहाँ प्रकाशित किए गए आंकड़े बिना लॉगिन वेबसाइट देखने वाले सभी लोगों को तुरंत दिखाई देंगे। केवल एडमिन इन्हें बदल सकता है।</div>
+  <div class="live-admin-grid">
+    <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
+    <div><label>राउंड नंबर</label><input id="countingRound" type="number" min="1" value="1"></div>
+    <div><label>काउंटिंग स्थिति</label><select id="countingStatus"><option value="running">काउंटिंग जारी है</option><option value="completed">काउंटिंग पूरी</option></select></div>
+    <div><label>प्रत्याशी 1 का नाम</label><input id="countCandidate1" placeholder="प्रत्याशी का नाम"></div>
+    <div><label>प्रत्याशी 1 के वोट</label><input id="countVotes1" type="number" min="0" value="0"></div>
+    <div><label>प्रत्याशी 2 का नाम</label><input id="countCandidate2" placeholder="प्रत्याशी का नाम"></div>
+    <div><label>प्रत्याशी 2 के वोट</label><input id="countVotes2" type="number" min="0" value="0"></div>
+    <div><label>प्रत्याशी 3 का नाम</label><input id="countCandidate3" placeholder="प्रत्याशी का नाम"></div>
+    <div><label>प्रत्याशी 3 के वोट</label><input id="countVotes3" type="number" min="0" value="0"></div>
+    <div class="full"><label>अधिकृत अपडेट / टिप्पणी (वैकल्पिक)</label><input id="countingNote" placeholder="जैसे: राउंड 01 की आधिकारिक जानकारी"></div>
+  </div>
+  <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें</button>
+  <div id="countingAdminMsg" class="notice hidden"></div>
+</section>
+
 <section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden"><img id="candidateLoginBanner" class="banner-preview" alt="आपका प्रत्याशी बैनर"></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (6 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
 <section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -625,8 +692,68 @@ function renderCandidateBranding(){
  if(candidateBranding?.bannerBase64){banner.src=candidateBranding.bannerBase64;box.classList.remove("hidden");}
  else{banner.removeAttribute("src");box.classList.add("hidden");}
 }
-auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
-try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
+
+// सार्वजनिक लाइव काउंटिंग: यह listener लॉगिन के बिना केवल सार्वजनिक परिणाम दस्तावेज़ पढ़ता है।
+const LIVE_COUNTING_DOC = "SUWANA01";
+let liveCountingUnsubscribe = null;
+function renderPublicCounting(data){
+  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (data.panchayatName || "सुवाणा");
+  $("publicRound").textContent = data.round ? "राउंड नंबर: " + String(data.round).padStart(2,"0") : "राउंड: अभी शुरू नहीं हुआ";
+  const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+  const maxVotes = candidates.reduce((m,c)=>Math.max(m,Number(c.votes)||0),0);
+  $("publicCandidates").innerHTML = candidates.map(c=>{
+    const isLead = maxVotes > 0 && Number(c.votes) === maxVotes;
+    return `<div class="live-candidate ${isLead?"live-winner":""}">
+      <div><strong>${esc(c.name || "प्रत्याशी")}</strong>${isLead?'<div class="live-meta">आगे चल रहे हैं</div>':""}</div>
+      <div class="live-votes">${Number(c.votes)||0} वोट</div>
+    </div>`;
+  }).join("") || '<div class="notice">अभी तक काउंटिंग अपडेट प्रकाशित नहीं हुआ है।</div>';
+  const leaders = candidates.filter(c=>Number(c.votes)===maxVotes && maxVotes>0).map(c=>c.name).filter(Boolean);
+  const status = data.status === "completed" ? "काउंटिंग पूरी" : "काउंटिंग जारी";
+  $("publicLead").textContent = data.status === "completed"
+    ? "स्थिति: " + status + (leaders.length ? " · सबसे अधिक वोट: " + leaders.join(", ") : "")
+    : "अब तक की स्थिति: " + (leaders.length ? "आगे चल रहे प्रत्याशी: " + leaders.join(", ") : "अभी बढ़त उपलब्ध नहीं है।");
+  $("publicUpdated").textContent = "अपडेट समय: " + (data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "—") + (data.note ? " · " + data.note : "");
+  if(data.status === "completed") $("publicLead").classList.add("success");
+  else $("publicLead").classList.remove("success");
+}
+function startPublicCountingListener(){
+  if(liveCountingUnsubscribe) liveCountingUnsubscribe();
+  liveCountingUnsubscribe = db.collection("liveCounting").doc(LIVE_COUNTING_DOC).onSnapshot(
+    snap => renderPublicCounting(snap.exists ? snap.data() : {}),
+    err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग अभी लोड नहीं हो सकी।</div>'; console.error("Live counting listener:",err); }
+  );
+}
+startPublicCountingListener();
+
+$("publishCounting").onclick = async ()=>{
+  if(!isAdmin()) return notice($("countingAdminMsg"),"केवल एडमिन काउंटिंग अपडेट कर सकता है।","error");
+  const candidates = [1,2,3].map(i=>({
+    name:$("countCandidate"+i).value.trim() || ("प्रत्याशी "+i),
+    votes:Math.max(0,Number($("countVotes"+i).value)||0)
+  }));
+  const round = Math.max(1,parseInt($("countingRound").value,10)||1);
+  const status = $("countingStatus").value;
+  const btn=$("publishCounting"); btn.disabled=true;
+  try{
+    await db.collection("liveCounting").doc(LIVE_COUNTING_DOC).set({
+      panchayatId:LIVE_COUNTING_DOC,
+      panchayatName:"सुवाणा",
+      round,
+      candidates,
+      status,
+      note:$("countingNote").value.trim(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy:user.uid
+    });
+    notice($("countingAdminMsg"),"लाइव काउंटिंग सफलतापूर्वक प्रकाशित हो गई। सभी दर्शकों को अपडेट दिखाई देगा।","success");
+  }catch(e){
+    notice($("countingAdminMsg"),"अपडेट प्रकाशित नहीं हुआ: "+e.message+" · Firestore Rules में liveCounting पर Admin write और public read अनुमति जाँचें।","error");
+  }finally{btn.disabled=false;}
+};
+
+auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.add("hidden");$("publicLoginCard").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
+try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("publicLoginCard").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts","countingAdmin"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
 $("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
 document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
