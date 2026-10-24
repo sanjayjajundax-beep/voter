@@ -91,8 +91,8 @@
 .live-candidate strong{font-size:15px}
 .live-votes{font-size:22px;font-weight:800;color:#174ea6;white-space:nowrap}
 .live-winner{background:#eaf8ef;border-color:#16834b}
-.live-meta{font-size:12px;color:#64748b}
-.live-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.live-meta{font-size:12px;color:#64748b}.live-chart{margin:14px 0}.live-bar-row{margin:10px 0}.live-bar-label{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:4px}.live-bar-track{height:12px;background:#e9edf3;border-radius:20px;overflow:hidden}.live-bar-fill{height:100%;border-radius:20px;background:#2563eb}.live-total-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.live-total{padding:10px;border:1px solid #e2e8f0;border-radius:10px;text-align:center;background:#f8fafc}.live-total strong{display:block;font-size:20px;margin-top:3px}@media(max-width:520px){.live-total-grid{grid-template-columns:1fr 1fr}}
+.counting-candidate-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(110px,.7fr) auto;gap:8px;align-items:end;background:#f7f9fc;border:1px solid #e2e8f0;border-radius:9px;padding:8px;margin:7px 0}.counting-candidate-row label{margin-top:0}.counting-candidate-row input{margin-bottom:0}@media(max-width:600px){.counting-candidate-row{grid-template-columns:1fr 1fr}.counting-candidate-row .remove-count-candidate{grid-column:1/-1;width:100%}}.live-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .live-admin-grid .full{grid-column:1/-1}
 @media(max-width:650px){.live-layout{grid-template-columns:1fr}.live-admin-grid{grid-template-columns:1fr}.live-admin-grid .full{grid-column:auto}}
 
@@ -584,13 +584,22 @@
       <h2 style="margin:0;font-size:18px">🗳️ ग्राम पंचायत चुनाव – लाइव काउंटिंग</h2>
       <span class="live-badge"><i class="live-dot"></i> LIVE</span>
     </div>
-    <div class="live-meta" style="margin:8px 0 12px">
-      <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> ·
-      <span id="publicRound">राउंड: अभी शुरू नहीं हुआ</span>
+    <div class="row" style="margin:8px 0 12px">
+      <div><label for="publicCountingType">किस पद की काउंटिंग देखें</label>
+        <select id="publicCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select>
+      </div>
+      <div id="publicWardWrap" class="hidden">
+        <label for="publicWardNumber">वार्ड नंबर</label><input id="publicWardNumber" inputmode="numeric" placeholder="वार्ड नंबर">
+      </div>
+      <div class="live-meta" style="align-self:end;padding:10px 0">
+        <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> · <span id="publicRound">राउंड: अभी शुरू नहीं हुआ</span>
+      </div>
     </div>
     <div id="publicCandidates">
       <div class="notice">लाइव काउंटिंग की जानकारी लोड हो रही है...</div>
     </div>
+    <div id="publicCountingChart" class="live-chart"></div>
+    <div id="publicCountingTotals" class="live-total-grid"></div>
     <div class="notice" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
     <div class="live-meta" id="publicUpdated">अपडेट समय: —</div>
     <p class="muted" style="margin-bottom:0">अगले राउंड की जानकारी जल्द मिलेगी।</p>
@@ -619,17 +628,31 @@
 
 <section id="countingAdmin" class="card panel no-print">
   <h3>🗳️ लाइव काउंटिंग कंट्रोल</h3>
-  <div class="notice">यहाँ प्रकाशित किए गए आंकड़े बिना लॉगिन वेबसाइट देखने वाले सभी लोगों को तुरंत दिखाई देंगे। केवल एडमिन इन्हें बदल सकता है।</div>
+  <div class="notice">सरपंच और वार्ड पंच की काउंटिंग अलग-अलग प्रकाशित होगी। जितने प्रत्याशी हों, उतने नाम जोड़ें। प्रकाशित आंकड़े बिना लॉगिन सभी दर्शकों को तुरंत दिखाई देंगे।</div>
   <div class="live-admin-grid">
     <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
+    <div><label>पद चुनें</label><select id="countingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
+    <div id="countingWardWrap" class="hidden"><label>वार्ड नंबर</label><input id="countingWardNumber" inputmode="numeric" placeholder="जैसे 9"></div>
     <div><label>राउंड नंबर</label><input id="countingRound" type="number" min="1" value="1"></div>
     <div><label>काउंटिंग स्थिति</label><select id="countingStatus"><option value="running">काउंटिंग जारी है</option><option value="completed">काउंटिंग पूरी</option></select></div>
-    <div><label>प्रत्याशी 1 का नाम</label><input id="countCandidate1" placeholder="प्रत्याशी का नाम"></div>
-    <div><label>प्रत्याशी 1 के वोट</label><input id="countVotes1" type="number" min="0" value="0"></div>
-    <div><label>प्रत्याशी 2 का नाम</label><input id="countCandidate2" placeholder="प्रत्याशी का नाम"></div>
-    <div><label>प्रत्याशी 2 के वोट</label><input id="countVotes2" type="number" min="0" value="0"></div>
-    <div><label>प्रत्याशी 3 का नाम</label><input id="countCandidate3" placeholder="प्रत्याशी का नाम"></div>
-    <div><label>प्रत्याशी 3 के वोट</label><input id="countVotes3" type="number" min="0" value="0"></div>
+    <div class="full">
+      <div class="row" style="align-items:center"><h4 style="margin:8px 0">प्रत्याशी और वोट</h4>
+        <button id="addCountingCandidate" type="button" class="green">＋ प्रत्याशी जोड़ें</button>
+      </div>
+      <div id="countingCandidateRows"></div>
+    </div>
+    <div class="full">
+      <h4 style="margin:8px 0">निरस्त वोट का अलग-अलग विवरण</h4>
+      <div class="notice">हर कारण के अनुसार वोटों की संख्या भरें। कुल निरस्त वोट अपने-आप जुड़ेंगे। NOTA इससे अलग रहेगा।</div>
+      <div class="live-admin-grid">
+        <div><label>एक से अधिक निशान वाले</label><input id="rejectedMultipleMarks" type="number" min="0" step="1" value="0"></div>
+        <div><label>गलत तरीके से मुहर लगे</label><input id="rejectedWrongMark" type="number" min="0" step="1" value="0"></div>
+        <div><label>बिना वैध निशान वाले</label><input id="rejectedNoValidMark" type="number" min="0" step="1" value="0"></div>
+        <div><label>अन्य कारणों से निरस्त</label><input id="rejectedOther" type="number" min="0" step="1" value="0"></div>
+      </div>
+      <div class="stat" style="margin-top:10px">कुल निरस्त वोट<strong id="countingRejectedTotal">0</strong></div>
+    </div>
+    <div><label>NOTA वोट</label><input id="countingNota" type="number" min="0" step="1" value="0"></div>
     <div class="full"><label>अधिकृत अपडेट / टिप्पणी (वैकल्पिक)</label><input id="countingNote" placeholder="जैसे: राउंड 01 की आधिकारिक जानकारी"></div>
   </div>
   <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें</button>
@@ -693,25 +716,54 @@ function renderCandidateBranding(){
  else{banner.removeAttribute("src");box.classList.add("hidden");}
 }
 
-// सार्वजनिक लाइव काउंटिंग: यह listener लॉगिन के बिना केवल सार्वजनिक परिणाम दस्तावेज़ पढ़ता है।
+// सार्वजनिक लाइव काउंटिंग: सरपंच और वार्ड पंच के अलग-अलग दस्तावेज़।
 const LIVE_COUNTING_DOC = "SUWANA01";
+const countingTypeLabel = type => type === "wardpanch" ? "वार्ड पंच" : "सरपंच";
+const countingWardKey = value => String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g,"");
+const countingDocId = (type, ward="") => type === "wardpanch" ? LIVE_COUNTING_DOC + "_WARDPANCH_" + countingWardKey(ward) : LIVE_COUNTING_DOC;
 let liveCountingUnsubscribe = null;
 function renderPublicCounting(data){
-  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (data.panchayatName || "सुवाणा");
+  const type = $("publicCountingType").value;
+  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (data.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && data.wardNumber ? " · वार्ड " + data.wardNumber : "") + ")";
   $("publicRound").textContent = data.round ? "राउंड नंबर: " + String(data.round).padStart(2,"0") : "राउंड: अभी शुरू नहीं हुआ";
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+  const rejected = Math.max(0, Number(data.rejectedVotes)||0);
+  const rejectedBreakdown = data.rejectedBreakdown || {};
+  const rejectedItems = [
+    ["एक से अधिक निशान वाले", rejectedBreakdown.multipleMarks],
+    ["गलत तरीके से मुहर लगे", rejectedBreakdown.wrongMark],
+    ["बिना वैध निशान वाले", rejectedBreakdown.noValidMark],
+    ["अन्य कारणों से निरस्त", rejectedBreakdown.other]
+  ];
+  const nota = Math.max(0, Number(data.notaVotes)||0);
+  const candidateVotes = candidates.reduce((sum,c)=>sum+(Math.max(0,Number(c.votes)||0)),0);
+  const totalVotes = candidateVotes + rejected + nota;
   const maxVotes = candidates.reduce((m,c)=>Math.max(m,Number(c.votes)||0),0);
   $("publicCandidates").innerHTML = candidates.map(c=>{
-    const isLead = maxVotes > 0 && Number(c.votes) === maxVotes;
+    const votes = Math.max(0,Number(c.votes)||0);
+    const isLead = maxVotes > 0 && votes === maxVotes;
+    const pct = totalVotes ? (votes/totalVotes*100) : 0;
     return `<div class="live-candidate ${isLead?"live-winner":""}">
-      <div><strong>${esc(c.name || "प्रत्याशी")}</strong>${isLead?'<div class="live-meta">आगे चल रहे हैं</div>':""}</div>
-      <div class="live-votes">${Number(c.votes)||0} वोट</div>
+      <div><strong>${esc(c.name || "प्रत्याशी")}</strong>${isLead?'<div class="live-meta">आगे चल रहे हैं</div>':""}<div class="live-meta">${pct.toFixed(1)}% कुल वोट</div></div>
+      <div class="live-votes">${votes.toLocaleString("en-IN")} वोट</div>
     </div>`;
-  }).join("") || '<div class="notice">अभी तक काउंटिंग अपडेट प्रकाशित नहीं हुआ है।</div>';
+  }).join("") || '<div class="notice">इस पद की काउंटिंग अपडेट अभी प्रकाशित नहीं हुई है।</div>';
+  const chartItems = candidates.map(c=>({name:c.name||"प्रत्याशी",votes:Math.max(0,Number(c.votes)||0)}));
+  const chartMax = Math.max(1,...chartItems.map(c=>c.votes));
+  $("publicCountingChart").innerHTML = chartItems.length
+    ? '<h4>प्रत्याशीवार वोट ग्राफ</h4>' + chartItems.map(c=>`<div class="live-bar-row"><div class="live-bar-label"><span>${esc(c.name)}</span><strong>${c.votes.toLocaleString("en-IN")}</strong></div><div class="live-bar-track"><div class="live-bar-fill" style="width:${(c.votes/chartMax*100).toFixed(2)}%"></div></div></div>`).join("")
+    : "";
+  $("publicCountingTotals").innerHTML = `
+    <div class="live-total">कुल वोट<strong>${totalVotes.toLocaleString("en-IN")}</strong></div>
+    <div class="live-total">कुल निरस्त वोट<strong>${rejected.toLocaleString("en-IN")}</strong></div>
+    <div class="live-total">NOTA<strong>${nota.toLocaleString("en-IN")}</strong></div>
+    <div class="full" style="grid-column:1/-1">
+      <h4 style="margin:12px 0 8px">निरस्त वोट का कारणवार विवरण</h4>
+      <div class="live-total-grid">${rejectedItems.map(([label,value]) => `<div class="live-total">${label}<strong>${Math.max(0,Number(value)||0).toLocaleString("en-IN")}</strong></div>`).join("")}</div>
+    </div>`;
   const leaders = candidates.filter(c=>Number(c.votes)===maxVotes && maxVotes>0).map(c=>c.name).filter(Boolean);
-  const status = data.status === "completed" ? "काउंटिंग पूरी" : "काउंटिंग जारी";
   $("publicLead").textContent = data.status === "completed"
-    ? "स्थिति: " + status + (leaders.length ? " · सबसे अधिक वोट: " + leaders.join(", ") : "")
+    ? "स्थिति: काउंटिंग पूरी" + (leaders.length ? " · सबसे अधिक वोट: " + leaders.join(", ") : "")
     : "अब तक की स्थिति: " + (leaders.length ? "आगे चल रहे प्रत्याशी: " + leaders.join(", ") : "अभी बढ़त उपलब्ध नहीं है।");
   $("publicUpdated").textContent = "अपडेट समय: " + (data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "—") + (data.note ? " · " + data.note : "");
   if(data.status === "completed") $("publicLead").classList.add("success");
@@ -719,34 +771,90 @@ function renderPublicCounting(data){
 }
 function startPublicCountingListener(){
   if(liveCountingUnsubscribe) liveCountingUnsubscribe();
-  liveCountingUnsubscribe = db.collection("liveCounting").doc(LIVE_COUNTING_DOC).onSnapshot(
+  const type = $("publicCountingType").value;
+  const ward = $("publicWardNumber").value.trim();
+  $("publicWardWrap").classList.toggle("hidden", type !== "wardpanch");
+  if(type === "wardpanch" && !ward){
+    $("publicPanchayat").textContent = "वार्ड पंच की काउंटिंग देखने के लिए वार्ड नंबर भरें";
+    $("publicRound").textContent = "राउंड: —";
+    $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर डालें, फिर उस वार्ड की लाइव काउंटिंग दिखाई देगी।</div>';
+    $("publicCountingChart").innerHTML = "";
+    $("publicCountingTotals").innerHTML = "";
+    $("publicLead").textContent = "वार्ड नंबर चुनने की प्रतीक्षा है।";
+    $("publicUpdated").textContent = "अपडेट समय: —";
+    return;
+  }
+  liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId(type,ward)).onSnapshot(
     snap => renderPublicCounting(snap.exists ? snap.data() : {}),
     err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग अभी लोड नहीं हो सकी।</div>'; console.error("Live counting listener:",err); }
   );
 }
+$("publicCountingType").addEventListener("change", startPublicCountingListener);
+$("publicWardNumber").addEventListener("change", startPublicCountingListener);
+$("publicWardNumber").addEventListener("keydown", e=>{if(e.key==="Enter")startPublicCountingListener()});
+$("countingType").addEventListener("change", ()=>{
+  $("countingWardWrap").classList.toggle("hidden", $("countingType").value !== "wardpanch");
+});
 startPublicCountingListener();
+
+let countingCandidateSerial = 0;
+function addCountingCandidateRow(name="", votes=0){
+  const row = document.createElement("div");
+  row.className = "counting-candidate-row";
+  row.innerHTML = `<div><label>प्रत्याशी का नाम</label><input class="counting-candidate-name" placeholder="प्रत्याशी का नाम" value="${esc(name)}"></div>
+    <div><label>प्राप्त वोट</label><input class="counting-candidate-votes" type="number" min="0" step="1" value="${Number(votes)||0}"></div>
+    <button type="button" class="red remove-count-candidate">हटाएँ</button>`;
+  row.querySelector(".remove-count-candidate").addEventListener("click", ()=>row.remove());
+  $("countingCandidateRows").appendChild(row);
+  countingCandidateSerial++;
+}
+$("addCountingCandidate").addEventListener("click", ()=>addCountingCandidateRow());
+for(let i=0;i<3;i++) addCountingCandidateRow();
+
+const rejectedInputIds = ["rejectedMultipleMarks","rejectedWrongMark","rejectedNoValidMark","rejectedOther"];
+function getRejectedBreakdown(){
+  const values = rejectedInputIds.map(id => Math.max(0, Math.floor(Number($(id).value)||0)));
+  return {multipleMarks:values[0], wrongMark:values[1], noValidMark:values[2], other:values[3]};
+}
+function updateRejectedTotal(){
+  const b = getRejectedBreakdown();
+  const total = b.multipleMarks + b.wrongMark + b.noValidMark + b.other;
+  $("countingRejectedTotal").textContent = total.toLocaleString("en-IN");
+  return total;
+}
+rejectedInputIds.forEach(id => $(id).addEventListener("input", updateRejectedTotal));
+updateRejectedTotal();
 
 $("publishCounting").onclick = async ()=>{
   if(!isAdmin()) return notice($("countingAdminMsg"),"केवल एडमिन काउंटिंग अपडेट कर सकता है।","error");
-  const candidates = [1,2,3].map(i=>({
-    name:$("countCandidate"+i).value.trim() || ("प्रत्याशी "+i),
-    votes:Math.max(0,Number($("countVotes"+i).value)||0)
-  }));
+  const type = $("countingType").value;
+  const wardNumber = $("countingWardNumber").value.trim();
+  if(type === "wardpanch" && !wardNumber) return notice($("countingAdminMsg"),"वार्ड पंच की काउंटिंग के लिए वार्ड नंबर भरें।","error");
+  const candidates = [...$("countingCandidateRows").querySelectorAll(".counting-candidate-row")]
+    .map(row=>({
+      name:row.querySelector(".counting-candidate-name").value.trim(),
+      votes:Math.max(0,Math.floor(Number(row.querySelector(".counting-candidate-votes").value)||0))
+    })).filter(c=>c.name);
+  if(!candidates.length) return notice($("countingAdminMsg"),"कम से कम एक प्रत्याशी का नाम भरें।","error");
   const round = Math.max(1,parseInt($("countingRound").value,10)||1);
   const status = $("countingStatus").value;
   const btn=$("publishCounting"); btn.disabled=true;
   try{
-    await db.collection("liveCounting").doc(LIVE_COUNTING_DOC).set({
+    await db.collection("liveCounting").doc(countingDocId(type,wardNumber)).set({
       panchayatId:LIVE_COUNTING_DOC,
-      panchayatName:"सुवाणा",
-      round,
-      candidates,
-      status,
+      panchayatName:$("countingPanchayatName").value.trim() || "सुवाणा",
+      wardNumber:type === "wardpanch" ? wardNumber : "",
+      electionType:type,
+      electionTypeLabel:countingTypeLabel(type),
+      round,candidates,status,
+      rejectedBreakdown:getRejectedBreakdown(),
+      rejectedVotes:updateRejectedTotal(),
+      notaVotes:Math.max(0,Math.floor(Number($("countingNota").value)||0)),
       note:$("countingNote").value.trim(),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedBy:user.uid
     });
-    notice($("countingAdminMsg"),"लाइव काउंटिंग सफलतापूर्वक प्रकाशित हो गई। सभी दर्शकों को अपडेट दिखाई देगा।","success");
+    notice($("countingAdminMsg"),countingTypeLabel(type)+" की लाइव काउंटिंग सफलतापूर्वक प्रकाशित हो गई।","success");
   }catch(e){
     notice($("countingAdminMsg"),"अपडेट प्रकाशित नहीं हुआ: "+e.message+" · Firestore Rules में liveCounting पर Admin write और public read अनुमति जाँचें।","error");
   }finally{btn.disabled=false;}
