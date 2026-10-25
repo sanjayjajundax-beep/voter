@@ -575,40 +575,99 @@
 .sample-detail .voter-value { font-weight:900; color:#000; }
 </style>
 
+
+<style>
+/* नया विजुअल लाइव काउंटिंग डैशबोर्ड */
+.public-dashboard{display:block!important;max-width:1240px!important;padding:0 14px 24px!important}
+.public-hero{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:24px 26px;margin:16px 0 12px;border-radius:18px;color:#fff;background:linear-gradient(115deg,#092b62 0%,#075b91 55%,#079b91 100%);box-shadow:0 8px 24px #1233;position:relative;overflow:hidden}
+.public-hero:after{content:"";position:absolute;width:230px;height:230px;border:30px solid #ffffff12;border-radius:50%;right:12%;top:-150px}
+.public-hero h2{font-size:clamp(22px,4vw,34px);margin:5px 0;font-weight:800;position:relative;z-index:1}
+.public-hero p{margin:0;color:#d9f4ff;font-size:13px}.hero-kicker{font-size:14px;font-weight:700;color:#baf5e8}
+.public-hero .live-badge{background:#dcfce7;color:#087443;position:relative;z-index:1}
+.public-controls{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:12px 0!important;padding:14px 18px!important}
+.ward-entry-row{display:flex;gap:8px;align-items:center}.ward-entry-row input{flex:1;min-width:0}
+.ward-ok-btn{padding:10px 18px!important;border:0;border-radius:9px;background:#0878f9;color:#fff;font-weight:800;cursor:pointer;white-space:nowrap;min-height:42px}
+.ward-ok-btn:active{transform:scale(.97)}
+.control-field{flex:0 1 210px;min-width:160px}.control-field label{margin-top:0}.control-field select,.control-field input{margin-bottom:0}
+.control-context{display:flex;flex-direction:column;gap:4px;margin-left:auto;padding:4px 0;font-size:13px;color:#174ea6}
+.control-context span{color:#64748b;font-size:12px}
+.public-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
+.public-kpi{border-radius:14px;padding:15px 17px;color:#fff;box-shadow:0 5px 14px #1232;min-width:0}
+.public-kpi span{display:block;font-size:13px;font-weight:700;opacity:.95}
+.public-kpi strong{display:block;font-size:clamp(22px,3vw,30px);line-height:1.25;margin:5px 0}
+.public-kpi small{font-size:11px;opacity:.88}
+.kpi-blue{background:linear-gradient(135deg,#0878f9,#0753b8)}.kpi-green{background:linear-gradient(135deg,#0ab875,#08794e)}
+.kpi-orange{background:linear-gradient(135deg,#ffad32,#e56c00)}.kpi-pink{background:linear-gradient(135deg,#ed4b9b,#a51a73)}
+.public-main-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:14px;align-items:stretch}
+.public-panel{margin:0!important;padding:18px!important;border:1px solid #dbe6f2;box-shadow:0 5px 20px #1231}
+.panel-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e6edf5;padding-bottom:12px;margin-bottom:12px}
+.panel-heading h3{font-size:18px;color:#123c80;margin:0}.panel-subtitle{font-size:11px;color:#64748b}
+.dashboard-candidate{display:flex;gap:10px;align-items:center;padding:12px 10px;border:1px solid #e5ebf3;border-radius:12px;margin:9px 0;background:#fff}
+.dashboard-candidate.is-leading{background:linear-gradient(100deg,#edfff4,#fff);border-color:#86d7a6}
+.candidate-rank{width:30px;height:30px;display:grid;place-items:center;flex:none;border-radius:50%;background:#eaf1fb;color:#174ea6;font-weight:800}
+.is-leading .candidate-rank{background:#0aa66a;color:white}
+.candidate-result-main{flex:1;min-width:0}.candidate-result-top,.candidate-result-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.candidate-result-top strong{font-size:15px;overflow-wrap:anywhere}.candidate-result-top span{font-weight:800;color:#123c80;white-space:nowrap;font-size:14px}
+.candidate-progress{height:10px;background:#e8edf4;border-radius:20px;overflow:hidden;margin:8px 0 5px}
+.candidate-progress i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#0878f9,#10b981)}
+.is-leading .candidate-progress i{background:linear-gradient(90deg,#08a66a,#34d399)}
+.candidate-result-bottom{font-size:11px;color:#64748b}.winner-tag{color:#087443;background:#d9fbe8;border-radius:20px;padding:4px 9px;font-size:11px}
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:22px;padding:15px 0;min-height:280px}
+.donut-chart{width:min(230px,48vw);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;flex:none}
+.donut-hole{width:58%;height:58%;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #e5eaf0}
+.donut-hole small{font-size:12px;color:#64748b}.donut-hole strong{font-size:23px;color:#123c80}
+.donut-legend{flex:1;min-width:130px}.donut-legend>div{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid #edf1f6;font-size:12px}
+.donut-legend i{width:10px;height:10px;border-radius:50%}.donut-legend span{overflow-wrap:anywhere}.donut-legend b{white-space:nowrap;color:#123c80}
+.public-status{padding:12px 14px;background:#eef5ff;border-left:4px solid #2675db;border-radius:9px;font-weight:700;color:#174ea6;font-size:13px;margin-top:8px}
+.public-status.is-completed{background:#e9fbf0;border-color:#0aa66a;color:#087443}
+.updated-line{font-size:11px;color:#64748b;margin-top:10px}
+.public-footnote{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:13px 4px;color:#64748b;font-size:11px}
+.public-login{max-width:480px!important;margin:10px auto 22px!important}
+@media(max-width:760px){.public-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.public-main-grid{grid-template-columns:1fr}.donut-wrap{gap:12px}.public-hero{padding:20px 16px}.control-context{margin-left:0;flex-basis:100%}}
+@media(max-width:430px){.public-dashboard{padding:0 8px 18px!important}.public-kpi{padding:12px}.public-kpi span{font-size:11px}.public-kpi strong{font-size:23px}.donut-wrap{flex-direction:column}.donut-chart{width:190px}.donut-legend{width:100%}.panel-heading h3{font-size:16px}}
+</style>
+
 </head><body>
 <header><div style="display:flex;flex-direction:column;gap:1px"><h1>🗳️ मतदाता पर्ची पोर्टल</h1><small style="font-family:inherit;font-size:9px;line-height:1;color:#dbeafe;margin-left:30px">संजय जाजुन्दा</small></div><button id="logout" class="hidden red">लॉगआउट</button></header>
 
-<main class="wrap live-layout" id="publicLiveArea">
-  <section class="card live-card">
-    <div class="live-head">
-      <h2 style="margin:0;font-size:18px">🗳️ ग्राम पंचायत चुनाव – लाइव काउंटिंग</h2>
-      <span class="live-badge"><i class="live-dot"></i> LIVE</span>
+<main class="wrap public-dashboard" id="publicLiveArea">
+  <section class="public-hero">
+    <div>
+      <div class="hero-kicker">🗳️ ग्राम पंचायत सुवाणा</div>
+      <h2>लाइव काउंटिंग डैशबोर्ड</h2>
+      <p>पारदर्शी चुनाव परिणाम · ताज़ा अपडेट</p>
     </div>
-    <div class="row" style="margin:8px 0 12px">
-      <div><label for="publicCountingType">किस पद की काउंटिंग देखें</label>
-        <select id="publicCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select>
-      </div>
-      <div id="publicWardWrap" class="hidden">
-        <label for="publicWardNumber">वार्ड नंबर</label><input id="publicWardNumber" inputmode="numeric" placeholder="वार्ड नंबर">
-      </div>
-      <div class="live-meta" style="align-self:end;padding:10px 0">
-        <span id="publicPanchayat">ग्राम पंचायत: सुवाणा</span> · <span id="publicRound">पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ</span>
-      </div>
-    </div>
-    <div id="publicCandidates">
-      <div class="notice">लाइव काउंटिंग की जानकारी लोड हो रही है...</div>
-    </div>
-    <div id="publicCountingChart" class="live-chart"></div>
-    <div id="publicCountingTotals" class="live-total-grid"></div>
-    <div class="notice" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
-    <div class="live-meta" id="publicUpdated">अपडेट समय: —</div>
-    <p class="muted" style="margin-bottom:0">अगले पोलिंग बूथ की जानकारी जल्द मिलेगी।</p>
-    <p class="muted" style="margin:8px 0 0">⚠️ यह जानकारी अधिकृत रूप से पुष्टि होने के बाद ही साझा करें।</p>
+    <span class="live-badge"><i class="live-dot"></i> LIVE</span>
   </section>
-  <section class="card login" id="publicLoginCard">
-    <div style="font-size:42px">🗳️</div>
-    <h2>Voter Slip Portal</h2>
-    <p class="muted">Admin एवं प्रत्याशी लॉगिन</p>
+  <section class="public-controls card">
+    <div class="control-field"><label for="publicCountingType">किस पद का परिणाम देखें</label>
+      <select id="publicCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select>
+    </div>
+    <div class="control-field hidden" id="publicWardWrap"><label for="publicWardNumber">वार्ड नंबर</label><div class="ward-entry-row"><input id="publicWardNumber" inputmode="numeric" placeholder="वार्ड नंबर"><button type="button" id="publicWardOk" class="ward-ok-btn">OK</button></div></div>
+    <div class="control-context"><strong id="publicPanchayat">ग्राम पंचायत: सुवाणा</strong><span id="publicRound">पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ</span></div>
+  </section>
+  <section class="public-kpis" id="publicCountingTotals">
+    <div class="public-kpi kpi-blue"><span>कुल वैध प्रत्याशी वोट</span><strong>—</strong></div>
+    <div class="public-kpi kpi-green"><span>कुल वोट</span><strong>—</strong></div>
+    <div class="public-kpi kpi-orange"><span>निरस्त वोट</span><strong>—</strong></div>
+    <div class="public-kpi kpi-pink"><span>NOTA वोट</span><strong>—</strong></div>
+  </section>
+  <section class="public-main-grid">
+    <div class="card public-panel candidate-panel">
+      <div class="panel-heading"><h3>🏆 प्रत्याशीवार परिणाम</h3><span class="panel-subtitle">वोट और प्रतिशत</span></div>
+      <div id="publicCandidates"><div class="notice">लाइव काउंटिंग की जानकारी लोड हो रही है...</div></div>
+    </div>
+    <div class="card public-panel chart-panel">
+      <div class="panel-heading"><h3>📊 वोटों का विश्लेषण</h3><span class="panel-subtitle">कुल वोट में हिस्सेदारी</span></div>
+      <div id="publicCountingChart" class="live-chart"></div>
+      <div class="public-status" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
+      <div class="updated-line" id="publicUpdated">अपडेट समय: —</div>
+    </div>
+  </section>
+  <section class="card login public-login" id="publicLoginCard">
+    <div style="font-size:32px">🔐</div>
+    <h2>Admin एवं प्रत्याशी लॉगिन</h2>
+    <p class="muted">पोर्टल के प्रबंधन के लिए लॉगिन करें</p>
     <form id="loginForm">
       <label>ईमेल</label><input id="email" type="email" required>
       <label>पासवर्ड</label><input id="password" type="password" required>
@@ -726,14 +785,13 @@ let liveCountingUnsubscribe = null;
 function renderPublicCounting(sheet){
   const type = $("publicCountingType").value;
   const ward = $("publicWardNumber").value.trim();
-  // नए फॉर्मेट को प्राथमिकता; पुराने फॉर्मेट में सरपंच का डेटा सीधे डॉक्यूमेंट में था।
   const legacyType = String(sheet.electionType || "").toLowerCase();
   const data = type === "wardpanch"
     ? ((sheet.wardPanchResults || {})[countingWardKey(ward)] || {})
     : (sheet.sarpanchResult || ((legacyType !== "wardpanch" && Array.isArray(sheet.candidates)) ? sheet : {}));
   const availableWards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
   if(type === "wardpanch" && !ward && availableWards.length) $("publicWardNumber").placeholder = "उपलब्ध वार्ड: " + availableWards.join(", ");
-  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (sheet.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && ward ? " · वार्ड " + ward : "") + ")";
+  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (sheet.panchayatName || "सुवाणा") + " · " + countingTypeLabel(type) + (type === "wardpanch" && ward ? " · वार्ड " + ward : "");
   $("publicRound").textContent = data.pollingBoothNumber ? "पोलिंग बूथ नंबर: " + String(data.pollingBoothNumber) : "पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ";
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
   const rejectedBreakdown = data.rejectedBreakdown || {};
@@ -749,35 +807,50 @@ function renderPublicCounting(sheet){
   const candidateVotes = candidates.reduce((sum,c)=>sum+(Math.max(0,Number(c.votes)||0)),0);
   const totalVotes = candidateVotes + rejected + nota;
   const maxVotes = candidates.reduce((m,c)=>Math.max(m,Number(c.votes)||0),0);
-  $("publicCandidates").innerHTML = candidates.map(c=>{
-    const votes = Math.max(0,Number(c.votes)||0);
-    const isLead = maxVotes > 0 && votes === maxVotes;
-    const pct = totalVotes ? (votes/totalVotes*100) : 0;
-    return `<div class="live-candidate ${isLead?"live-winner":""}">
-      <div><strong>${esc(c.name || "प्रत्याशी")}</strong>${isLead?'<div class="live-meta">आगे चल रहे हैं</div>':""}<div class="live-meta">${pct.toFixed(1)}% कुल वोट</div></div>
-      <div class="live-votes">${votes.toLocaleString("en-IN")} वोट</div>
+  const leaders = candidates.filter(c=>Number(c.votes)===maxVotes && maxVotes>0).map(c=>c.name).filter(Boolean);
+  const completed = data.status === "completed";
+  const sortedCandidates = candidates.map(c=>({...c, votes:Math.max(0,Number(c.votes)||0)})).sort((a,b)=>b.votes-a.votes);
+  $("publicCandidates").innerHTML = sortedCandidates.map((c,index)=>{
+    const isLead = maxVotes > 0 && c.votes === maxVotes;
+    const pct = totalVotes ? (c.votes/totalVotes*100) : 0;
+    return `<div class="dashboard-candidate ${isLead?"is-leading":""}">
+      <div class="candidate-rank">${index+1}</div>
+      <div class="candidate-result-main">
+        <div class="candidate-result-top"><strong>${esc(c.name || "प्रत्याशी")}</strong><span>${c.votes.toLocaleString("en-IN")} वोट</span></div>
+        <div class="candidate-progress"><i style="width:${Math.min(100,pct).toFixed(2)}%"></i></div>
+        <div class="candidate-result-bottom"><span>${pct.toFixed(2)}% कुल वोट</span>${isLead?`<b class="winner-tag">${completed?"🏆 विजेता":"▲ आगे चल रहे हैं"}</b>`:""}</div>
+      </div>
     </div>`;
   }).join("") || '<div class="notice">इस पद की काउंटिंग अपडेट अभी प्रकाशित नहीं हुई है।</div>';
-  const chartItems = candidates.map(c=>({name:c.name||"प्रत्याशी",votes:Math.max(0,Number(c.votes)||0)}));
-  const chartMax = Math.max(1,...chartItems.map(c=>c.votes));
-  $("publicCountingChart").innerHTML = chartItems.length
-    ? '<h4>प्रत्याशीवार वोट ग्राफ</h4>' + chartItems.map(c=>`<div class="live-bar-row"><div class="live-bar-label"><span>${esc(c.name)}</span><strong>${c.votes.toLocaleString("en-IN")}</strong></div><div class="live-bar-track"><div class="live-bar-fill" style="width:${(c.votes/chartMax*100).toFixed(2)}%"></div></div></div>`).join("")
-    : "";
+
+  const palette = ["#0878f9","#08a66a","#ff8a00","#9333ea","#e84393","#0ea5a4","#64748b"];
+  let offset = 0;
+  const segments = [];
+  const chartRows = sortedCandidates.map((c,i)=>{
+    const value = totalVotes ? c.votes/totalVotes*100 : 0;
+    const from = offset; offset += value;
+    segments.push(`${palette[i%palette.length]} ${from.toFixed(2)}% ${offset.toFixed(2)}%`);
+    return {name:c.name||"प्रत्याशी",votes:c.votes,pct:value,color:palette[i%palette.length]};
+  });
+  if(rejected){const from=offset;offset+=totalVotes?rejected/totalVotes*100:0;segments.push(`#ef4444 ${from.toFixed(2)}% ${offset.toFixed(2)}%`);}
+  if(nota){const from=offset;offset+=totalVotes?nota/totalVotes*100:0;segments.push(`#64748b ${from.toFixed(2)}% ${offset.toFixed(2)}%`);}
+  $("publicCountingChart").innerHTML = totalVotes ? `
+    <div class="donut-wrap"><div class="donut-chart" style="background:conic-gradient(${segments.join(",")})"><div class="donut-hole"><small>कुल वोट</small><strong>${totalVotes.toLocaleString("en-IN")}</strong></div></div>
+      <div class="donut-legend">${chartRows.map(r=>`<div><i style="background:${r.color}"></i><span>${esc(r.name)}</span><b>${r.pct.toFixed(1)}%</b></div>`).join("")}
+      ${rejected?`<div><i style="background:#ef4444"></i><span>निरस्त वोट</span><b>${(rejected/totalVotes*100).toFixed(1)}%</b></div>`:""}
+      ${nota?`<div><i style="background:#64748b"></i><span>NOTA</span><b>${(nota/totalVotes*100).toFixed(1)}%</b></div>`:""}</div>
+    </div>` : '<div class="notice">वोट दर्ज होने पर चार्ट यहाँ दिखाई देगा।</div>';
+
   $("publicCountingTotals").innerHTML = `
-    <div class="live-total">कुल वोट<strong>${totalVotes.toLocaleString("en-IN")}</strong></div>
-    <div class="live-total">कुल निरस्त वोट<strong>${rejected.toLocaleString("en-IN")}</strong></div>
-    <div class="live-total">NOTA<strong>${nota.toLocaleString("en-IN")}</strong></div>
-    <div class="full" style="grid-column:1/-1">
-      <h4 style="margin:12px 0 8px">निरस्त वोट का कारणवार विवरण</h4>
-      <div class="live-total-grid">${rejectedItems.map(([label,value]) => `<div class="live-total">${label}<strong>${Math.max(0,Number(value)||0).toLocaleString("en-IN")}</strong></div>`).join("")}</div>
-    </div>`;
-  const leaders = candidates.filter(c=>Number(c.votes)===maxVotes && maxVotes>0).map(c=>c.name).filter(Boolean);
-  $("publicLead").textContent = data.status === "completed"
-    ? "स्थिति: काउंटिंग पूरी" + (leaders.length ? " · सबसे अधिक वोट: " + leaders.join(", ") : "")
-    : "अब तक की स्थिति: " + (leaders.length ? "आगे चल रहे प्रत्याशी: " + leaders.join(", ") : "अभी बढ़त उपलब्ध नहीं है।");
-  $("publicUpdated").textContent = "अपडेट समय: " + (data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "—") + (data.note ? " · " + data.note : "");
-  if(data.status === "completed") $("publicLead").classList.add("success");
-  else $("publicLead").classList.remove("success");
+    <div class="public-kpi kpi-blue"><span>वैध प्रत्याशी वोट</span><strong>${candidateVotes.toLocaleString("en-IN")}</strong><small>प्रत्याशियों को मिले वोट</small></div>
+    <div class="public-kpi kpi-green"><span>कुल वोट</span><strong>${totalVotes.toLocaleString("en-IN")}</strong><small>सभी श्रेणियों सहित</small></div>
+    <div class="public-kpi kpi-orange"><span>निरस्त वोट</span><strong>${rejected.toLocaleString("en-IN")}</strong><small>अमान्य मत</small></div>
+    <div class="public-kpi kpi-pink"><span>NOTA वोट</span><strong>${nota.toLocaleString("en-IN")}</strong><small>नोटा मत</small></div>`;
+  $("publicLead").textContent = completed
+    ? "काउंटिंग पूरी" + (leaders.length ? " · विजेता: " + leaders.join(", ") : "")
+    : "काउंटिंग जारी" + (leaders.length ? " · आगे चल रहे प्रत्याशी: " + leaders.join(", ") : " · अभी बढ़त उपलब्ध नहीं है।");
+  $("publicLead").classList.toggle("is-completed",completed);
+  $("publicUpdated").textContent = "अंतिम अपडेट: " + (data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "—") + (data.note ? " · " + data.note : "");
 }
 function startPublicCountingListener(){
   if(liveCountingUnsubscribe) liveCountingUnsubscribe();
