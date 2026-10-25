@@ -688,6 +688,16 @@
 <section id="countingAdmin" class="card panel no-print">
   <h3>🗳️ लाइव काउंटिंग कंट्रोल</h3>
   <div class="notice">सरपंच और सभी वार्ड पंचों के परिणाम एक ही सार्वजनिक शीट में सेव होंगे। हर वार्ड का डेटा अलग सुरक्षित रहेगा। जितने प्रत्याशी हों, उतने नाम जोड़ें। प्रकाशित आंकड़े बिना लॉगिन सभी दर्शकों को तुरंत दिखाई देंगे।</div>
+  <div class="result" style="margin:12px 0;border:1px solid #f0c36d;background:#fffaf0">
+    <h4 style="margin:0 0 8px">✏️ पहले से सेव काउंटिंग डेटा सुधारें</h4>
+    <div class="row">
+      <div><label>किसका डेटा सुधारना है?</label><select id="editCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
+      <div id="editCountingWardWrap" class="hidden"><label>वार्ड नंबर</label><input id="editCountingWardNumber" inputmode="numeric" placeholder="वार्ड नंबर"></div>
+    </div>
+    <button id="loadSavedCounting" type="button">पुराना सेव डेटा खोलें</button>
+    <div id="editCountingMsg" class="notice hidden"></div>
+    <div class="muted">डेटा खुलने के बाद नीचे फॉर्म में आवश्यक सुधार करें और “सुधार सेव करें” दबाएँ।</div>
+  </div>
   <div class="live-admin-grid">
     <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
     <div><label>पद चुनें</label><select id="countingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
@@ -714,7 +724,7 @@
     <div><label>NOTA वोट</label><input id="countingNota" type="number" min="0" step="1" value="0"></div>
     <div class="full"><label>अधिकृत अपडेट / टिप्पणी (वैकल्पिक)</label><input id="countingNote" placeholder="जैसे: राउंड 01 की आधिकारिक जानकारी"></div>
   </div>
-  <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें</button>
+  <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें / सुधार सेव करें</button>
   <button id="exportCountingExcel" class="wide" type="button">📊 Firebase में सेव काउंटिंग डेटा की Excel डाउनलोड करें</button>
   <div id="countingAdminMsg" class="notice hidden"></div>
 </section>
@@ -930,6 +940,57 @@ function updateRejectedTotal(){
 }
 rejectedInputIds.forEach(id => $(id).addEventListener("input", updateRejectedTotal));
 updateRejectedTotal();
+
+$("editCountingType").addEventListener("change", ()=>{
+  $("editCountingWardWrap").classList.toggle("hidden", $("editCountingType").value !== "wardpanch");
+});
+
+function fillCountingForm(data, type, ward){
+  $("countingType").value=type;
+  $("countingWardWrap").classList.toggle("hidden", type !== "wardpanch");
+  $("countingWardNumber").value=type === "wardpanch" ? String(data.wardNumber || ward || "") : "";
+  $("countingBoothNumber").value=data.pollingBoothNumber || "";
+  $("countingStatus").value=data.status === "completed" ? "completed" : "running";
+  $("countingCandidateRows").innerHTML="";
+  (Array.isArray(data.candidates) && data.candidates.length ? data.candidates : [{name:"",votes:0}]).forEach(c=>addCountingCandidateRow(c.name || "",c.votes || 0));
+  const b=data.rejectedBreakdown || {};
+  $("rejectedMultipleMarks").value=Number(b.multipleMarks)||0;
+  $("rejectedWrongMark").value=Number(b.wrongMark)||0;
+  $("rejectedNoValidMark").value=Number(b.noValidMark)||0;
+  $("rejectedOther").value=Number(b.other)||0;
+  updateRejectedTotal();
+  $("countingNota").value=Number(data.notaVotes)||0;
+  $("countingNote").value=data.note || "";
+  notice($("editCountingMsg"),"पुराना डेटा फॉर्म में खुल गया है। सुधार करके नीचे ‘सुधार सेव करें’ दबाएँ।","success");
+  $("publishCounting").textContent="✏️ सुधार सेव करें और लाइव अपडेट करें";
+}
+
+$("loadSavedCounting").onclick=async()=>{
+  if(!isAdmin()) return notice($("editCountingMsg"),"केवल एडमिन सेव डेटा सुधार सकता है।","error");
+  const type=$("editCountingType").value;
+  const ward=$("editCountingWardNumber").value.trim();
+  if(type === "wardpanch" && !ward) return notice($("editCountingMsg"),"वार्ड नंबर भरें।","error");
+  const btn=$("loadSavedCounting"); btn.disabled=true;
+  try{
+    const ref=db.collection("liveCounting").doc(countingDocId());
+    const snap=await ref.get();
+    let data=null;
+    if(snap.exists){
+      const sheet=snap.data()||{};
+      data=type === "sarpanch" ? (sheet.sarpanchResult || ((Array.isArray(sheet.candidates) && sheet.electionType !== "wardpanch") ? sheet : null)) : ((sheet.wardPanchResults||{})[countingWardKey(ward)] || null);
+    }
+    // पुराने ward-wise दस्तावेज़ से भी डेटा पढ़ें; सेव करते समय नए साझा दस्तावेज़ में अपडेट होगा।
+    if(!data && type === "wardpanch"){
+      const oldSnap=await db.collection("liveCounting").doc(LIVE_COUNTING_DOC+"_WARDPANCH_"+countingWardKey(ward)).get();
+      if(oldSnap.exists) data=oldSnap.data();
+    }
+    if(!data) return notice($("editCountingMsg"),"इस चयन के लिए Firebase में सेव काउंटिंग डेटा नहीं मिला।","error");
+    fillCountingForm(data,type,ward);
+    $("countingAdminMsg").classList.add("hidden");
+  }catch(e){
+    console.error(e); notice($("editCountingMsg"),"सेव डेटा लोड नहीं हुआ: "+e.message,"error");
+  }finally{btn.disabled=false;}
+};
 
 $("publishCounting").onclick = async ()=>{
   if(!isAdmin()) return notice($("countingAdminMsg"),"केवल एडमिन काउंटिंग अपडेट कर सकता है।","error");
