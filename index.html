@@ -716,7 +716,7 @@ function renderCandidateBranding(){
  else{banner.removeAttribute("src");box.classList.add("hidden");}
 }
 
-// सार्वजनिक लाइव काउंटिंग: सरपंच और वार्ड पंच के अलग-अलग दस्तावेज़।
+// सार्वजनिक लाइव काउंटिंग: नए एकल दस्तावेज़ और पुराने Firebase दस्तावेज़—दोनों पढ़ें।
 const LIVE_COUNTING_DOC = "SUWANA01";
 const countingTypeLabel = type => type === "wardpanch" ? "वार्ड पंच" : "सरपंच";
 const countingWardKey = value => String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g,"");
@@ -725,14 +725,19 @@ let liveCountingUnsubscribe = null;
 function renderPublicCounting(sheet){
   const type = $("publicCountingType").value;
   const ward = $("publicWardNumber").value.trim();
-  const data = type === "wardpanch" ? ((sheet.wardPanchResults || {})[countingWardKey(ward)] || {}) : (sheet.sarpanchResult || {});
+  // नए फॉर्मेट को प्राथमिकता; पुराने फॉर्मेट में सरपंच का डेटा सीधे डॉक्यूमेंट में था।
+  const legacyType = String(sheet.electionType || "").toLowerCase();
+  const data = type === "wardpanch"
+    ? ((sheet.wardPanchResults || {})[countingWardKey(ward)] || {})
+    : (sheet.sarpanchResult || ((legacyType !== "wardpanch" && Array.isArray(sheet.candidates)) ? sheet : {}));
   const availableWards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
   if(type === "wardpanch" && !ward && availableWards.length) $("publicWardNumber").placeholder = "उपलब्ध वार्ड: " + availableWards.join(", ");
   $("publicPanchayat").textContent = "ग्राम पंचायत: " + (sheet.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && ward ? " · वार्ड " + ward : "") + ")";
   $("publicRound").textContent = data.pollingBoothNumber ? "पोलिंग बूथ नंबर: " + String(data.pollingBoothNumber) : "पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ";
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
-  const rejected = Math.max(0, Number(data.rejectedVotes)||0);
   const rejectedBreakdown = data.rejectedBreakdown || {};
+  const rejectedFromBreakdown = Object.values(rejectedBreakdown).reduce((n,v)=>n+(Math.max(0,Number(v)||0)),0);
+  const rejected = Math.max(0, Number(data.rejectedVotes)||rejectedFromBreakdown||0);
   const rejectedItems = [
     ["एक से अधिक निशान वाले", rejectedBreakdown.multipleMarks],
     ["गलत तरीके से मुहर लगे", rejectedBreakdown.wrongMark],
@@ -778,22 +783,42 @@ function startPublicCountingListener(){
   const type = $("publicCountingType").value;
   const ward = $("publicWardNumber").value.trim();
   $("publicWardWrap").classList.toggle("hidden", type !== "wardpanch");
+  const rootRef = db.collection("liveCounting").doc(countingDocId());
   if(type === "wardpanch" && !ward){
-    liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId()).onSnapshot(snap=>{
+    liveCountingUnsubscribe = rootRef.onSnapshot(snap=>{
       const sheet = snap.exists ? snap.data() : {};
       const wards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
-      $("publicPanchayat").textContent = wards.length ? "उपलब्ध वार्ड नंबर: " + wards.join(", ") : "वार्ड पंच का परिणाम अभी प्रकाशित नहीं हुआ है";
+      $("publicPanchayat").textContent = wards.length ? "उपलब्ध वार्ड नंबर: " + wards.join(", ") : "वार्ड पंच का परिणाम देखने के लिए वार्ड नंबर भरें";
       $("publicRound").textContent = "पोलिंग बूथ नंबर: —";
-      $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर भरें। उपलब्ध वार्ड: ' + (wards.join(", ") || "अभी कोई नहीं") + '</div>';
+      $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर भरें। पुराने और नए दोनों सेव किए गए वार्ड परिणाम यहाँ दिखेंगे।</div>';
       $("publicCountingChart").innerHTML = ""; $("publicCountingTotals").innerHTML = "";
       $("publicLead").textContent = "वार्ड चुनकर परिणाम देखें।";
       $("publicUpdated").textContent = "अपडेट समय: " + (sheet.updatedAt && sheet.updatedAt.toDate ? sheet.updatedAt.toDate().toLocaleString("hi-IN") : "—");
-    }, err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका।</div>';});
+    }, err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका। Firebase Rules में liveCounting public read अनुमति जाँचें।</div>';});
     return;
   }
-  liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId()).onSnapshot(
+  if(type === "wardpanch"){
+    // पहले नए एकल दस्तावेज़ में wardPanchResults देखें; यदि वहाँ नहीं है तो पुराना वार्ड डॉक्यूमेंट पढ़ें।
+    const legacyWardRef = db.collection("liveCounting").doc(LIVE_COUNTING_DOC + "_WARDPANCH_" + countingWardKey(ward));
+    let rootData = {};
+    let legacyUnsub = null;
+    const rootUnsub = rootRef.onSnapshot(snap=>{
+      rootData = snap.exists ? snap.data() : {};
+      const modern = (rootData.wardPanchResults || {})[countingWardKey(ward)];
+      if(modern){ if(legacyUnsub){legacyUnsub();legacyUnsub=null;} renderPublicCounting(rootData); }
+      else if(!legacyUnsub){
+        legacyUnsub = legacyWardRef.onSnapshot(oldSnap=>{
+          if(oldSnap.exists) renderPublicCounting({...rootData, wardPanchResults:{...(rootData.wardPanchResults||{}), [countingWardKey(ward)]:oldSnap.data()}});
+          else renderPublicCounting({...rootData, wardPanchResults:{}});
+        },err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">इस वार्ड का परिणाम नहीं पढ़ा जा सका। Firebase Rules जाँचें।</div>';});
+      }
+    },err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका। Firebase Rules में public read अनुमति जाँचें।</div>';});
+    liveCountingUnsubscribe = ()=>{rootUnsub(); if(legacyUnsub) legacyUnsub();};
+    return;
+  }
+  liveCountingUnsubscribe = rootRef.onSnapshot(
     snap => renderPublicCounting(snap.exists ? snap.data() : {}),
-    err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग अभी लोड नहीं हो सकी।</div>'; console.error("Live counting listener:",err); }
+    err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग लोड नहीं हो सकी। Firebase Rules में public read अनुमति जाँचें।</div>'; console.error("Live counting listener:",err); }
   );
 }
 $("publicCountingType").addEventListener("change", startPublicCountingListener);
