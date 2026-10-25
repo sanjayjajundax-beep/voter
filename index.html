@@ -628,7 +628,7 @@
 
 <section id="countingAdmin" class="card panel no-print">
   <h3>🗳️ लाइव काउंटिंग कंट्रोल</h3>
-  <div class="notice">सरपंच और वार्ड पंच की काउंटिंग अलग-अलग प्रकाशित होगी। जितने प्रत्याशी हों, उतने नाम जोड़ें। प्रकाशित आंकड़े बिना लॉगिन सभी दर्शकों को तुरंत दिखाई देंगे।</div>
+  <div class="notice">सरपंच और सभी वार्ड पंचों के परिणाम एक ही सार्वजनिक शीट में सेव होंगे। हर वार्ड का डेटा अलग सुरक्षित रहेगा। जितने प्रत्याशी हों, उतने नाम जोड़ें। प्रकाशित आंकड़े बिना लॉगिन सभी दर्शकों को तुरंत दिखाई देंगे।</div>
   <div class="live-admin-grid">
     <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
     <div><label>पद चुनें</label><select id="countingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
@@ -720,11 +720,15 @@ function renderCandidateBranding(){
 const LIVE_COUNTING_DOC = "SUWANA01";
 const countingTypeLabel = type => type === "wardpanch" ? "वार्ड पंच" : "सरपंच";
 const countingWardKey = value => String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g,"");
-const countingDocId = (type, ward="") => type === "wardpanch" ? LIVE_COUNTING_DOC + "_WARDPANCH_" + countingWardKey(ward) : LIVE_COUNTING_DOC;
+const countingDocId = () => LIVE_COUNTING_DOC;
 let liveCountingUnsubscribe = null;
-function renderPublicCounting(data){
+function renderPublicCounting(sheet){
   const type = $("publicCountingType").value;
-  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (data.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && data.wardNumber ? " · वार्ड " + data.wardNumber : "") + ")";
+  const ward = $("publicWardNumber").value.trim();
+  const data = type === "wardpanch" ? ((sheet.wardPanchResults || {})[countingWardKey(ward)] || {}) : (sheet.sarpanchResult || {});
+  const availableWards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
+  if(type === "wardpanch" && !ward && availableWards.length) $("publicWardNumber").placeholder = "उपलब्ध वार्ड: " + availableWards.join(", ");
+  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (sheet.panchayatName || "सुवाणा") + " (" + countingTypeLabel(type) + (type === "wardpanch" && ward ? " · वार्ड " + ward : "") + ")";
   $("publicRound").textContent = data.pollingBoothNumber ? "पोलिंग बूथ नंबर: " + String(data.pollingBoothNumber) : "पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ";
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
   const rejected = Math.max(0, Number(data.rejectedVotes)||0);
@@ -775,16 +779,19 @@ function startPublicCountingListener(){
   const ward = $("publicWardNumber").value.trim();
   $("publicWardWrap").classList.toggle("hidden", type !== "wardpanch");
   if(type === "wardpanch" && !ward){
-    $("publicPanchayat").textContent = "वार्ड पंच की काउंटिंग देखने के लिए वार्ड नंबर भरें";
-    $("publicRound").textContent = "पोलिंग बूथ नंबर: —";
-    $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर डालें, फिर उस वार्ड की लाइव काउंटिंग दिखाई देगी।</div>';
-    $("publicCountingChart").innerHTML = "";
-    $("publicCountingTotals").innerHTML = "";
-    $("publicLead").textContent = "वार्ड नंबर चुनने की प्रतीक्षा है।";
-    $("publicUpdated").textContent = "अपडेट समय: —";
+    liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId()).onSnapshot(snap=>{
+      const sheet = snap.exists ? snap.data() : {};
+      const wards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
+      $("publicPanchayat").textContent = wards.length ? "उपलब्ध वार्ड नंबर: " + wards.join(", ") : "वार्ड पंच का परिणाम अभी प्रकाशित नहीं हुआ है";
+      $("publicRound").textContent = "पोलिंग बूथ नंबर: —";
+      $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर भरें। उपलब्ध वार्ड: ' + (wards.join(", ") || "अभी कोई नहीं") + '</div>';
+      $("publicCountingChart").innerHTML = ""; $("publicCountingTotals").innerHTML = "";
+      $("publicLead").textContent = "वार्ड चुनकर परिणाम देखें।";
+      $("publicUpdated").textContent = "अपडेट समय: " + (sheet.updatedAt && sheet.updatedAt.toDate ? sheet.updatedAt.toDate().toLocaleString("hi-IN") : "—");
+    }, err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका।</div>';});
     return;
   }
-  liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId(type,ward)).onSnapshot(
+  liveCountingUnsubscribe = db.collection("liveCounting").doc(countingDocId()).onSnapshot(
     snap => renderPublicCounting(snap.exists ? snap.data() : {}),
     err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग अभी लोड नहीं हो सकी।</div>'; console.error("Live counting listener:",err); }
   );
@@ -840,20 +847,19 @@ $("publishCounting").onclick = async ()=>{
   const status = $("countingStatus").value;
   const btn=$("publishCounting"); btn.disabled=true;
   try{
-    await db.collection("liveCounting").doc(countingDocId(type,wardNumber)).set({
-      panchayatId:LIVE_COUNTING_DOC,
-      panchayatName:$("countingPanchayatName").value.trim() || "सुवाणा",
+    const resultData = {
       wardNumber:type === "wardpanch" ? wardNumber : "",
-      electionType:type,
-      electionTypeLabel:countingTypeLabel(type),
+      electionType:type, electionTypeLabel:countingTypeLabel(type),
       pollingBoothNumber,candidates,status,
-      rejectedBreakdown:getRejectedBreakdown(),
-      rejectedVotes:updateRejectedTotal(),
+      rejectedBreakdown:getRejectedBreakdown(), rejectedVotes:updateRejectedTotal(),
       notaVotes:Math.max(0,Math.floor(Number($("countingNota").value)||0)),
       note:$("countingNote").value.trim(),
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
-      updatedBy:user.uid
-    });
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedBy:user.uid
+    };
+    const sheetRef = db.collection("liveCounting").doc(countingDocId());
+    const common = {panchayatId:LIVE_COUNTING_DOC, panchayatName:$("countingPanchayatName").value.trim() || "सुवाणा", updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedBy:user.uid};
+    if(type === "wardpanch") await sheetRef.set({...common, wardPanchResults:{[countingWardKey(wardNumber)]:resultData}}, {merge:true});
+    else await sheetRef.set({...common, sarpanchResult:resultData}, {merge:true});
     notice($("countingAdminMsg"),countingTypeLabel(type)+" की लाइव काउंटिंग सफलतापूर्वक प्रकाशित हो गई।","success");
   }catch(e){
     notice($("countingAdminMsg"),"अपडेट प्रकाशित नहीं हुआ: "+e.message+" · Firestore Rules में liveCounting पर Admin write और public read अनुमति जाँचें।","error");
