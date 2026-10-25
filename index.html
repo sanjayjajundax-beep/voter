@@ -656,6 +656,7 @@
     <div class="full"><label>अधिकृत अपडेट / टिप्पणी (वैकल्पिक)</label><input id="countingNote" placeholder="जैसे: राउंड 01 की आधिकारिक जानकारी"></div>
   </div>
   <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें</button>
+  <button id="exportCountingExcel" class="wide" type="button">📊 Firebase में सेव काउंटिंग डेटा की Excel डाउनलोड करें</button>
   <div id="countingAdminMsg" class="notice hidden"></div>
 </section>
 
@@ -890,6 +891,71 @@ $("publishCounting").onclick = async ()=>{
     notice($("countingAdminMsg"),"अपडेट प्रकाशित नहीं हुआ: "+e.message+" · Firestore Rules में liveCounting पर Admin write और public read अनुमति जाँचें।","error");
   }finally{btn.disabled=false;}
 };
+
+// Admin can export all saved counting results directly from Firestore to Excel.
+function countingExportRow(type, ward, data, sourceId){
+  const candidates = Array.isArray(data.candidates) ? data.candidates : [];
+  const rejected = data.rejectedBreakdown || {};
+  const candidateTotal = candidates.reduce((n,c)=>n+(Number(c.votes)||0),0);
+  const rejectedTotal = Number(data.rejectedVotes) || Object.values(rejected).reduce((n,v)=>n+(Number(v)||0),0);
+  const nota = Number(data.notaVotes)||0;
+  const total = candidateTotal + rejectedTotal + nota;
+  const updated = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "";
+  return {
+    "पद": countingTypeLabel(type), "वार्ड नंबर": ward || "—", "पोलिंग बूथ नंबर": data.pollingBoothNumber || "",
+    "प्रत्याशी": candidates.map(c=>c.name||"").join(" | "),
+    "प्रत्याशीवार वोट": candidates.map(c=>`${c.name||""}: ${Number(c.votes)||0}`).join(" | "),
+    "कुल प्रत्याशी वोट": candidateTotal, "NOTA": nota,
+    "एक से अधिक निशान": Number(rejected.multipleMarks)||0,
+    "गलत मुहर": Number(rejected.wrongMark)||0,
+    "बिना वैध निशान": Number(rejected.noValidMark)||0,
+    "अन्य निरस्त": Number(rejected.other)||0,
+    "कुल निरस्त वोट": rejectedTotal, "कुल वोट": total,
+    "स्थिति": data.status === "completed" ? "काउंटिंग पूरी" : "काउंटिंग जारी",
+    "टिप्पणी": data.note || "", "अपडेट समय": updated, "Firebase डॉक्यूमेंट": sourceId
+  };
+}
+$("exportCountingExcel").addEventListener("click", async ()=>{
+  if(!isAdmin()) return notice($("countingAdminMsg"),"Excel डाउनलोड केवल एडमिन कर सकता है।","error");
+  const btn=$("exportCountingExcel"); btn.disabled=true;
+  try{
+    notice($("countingAdminMsg"),"Firebase से सेव काउंटिंग डेटा पढ़ रहे हैं...");
+    const snap=await db.collection("liveCounting").get();
+    const rows=[]; const modernWardKeys=new Set();
+    const docs=snap.docs;
+    const root=docs.find(d=>d.id===LIVE_COUNTING_DOC);
+    if(root){
+      const sheet=root.data()||{};
+      if(sheet.sarpanchResult && Array.isArray(sheet.sarpanchResult.candidates)) rows.push(countingExportRow("sarpanch","",sheet.sarpanchResult,root.id));
+      else if(String(sheet.electionType||"").toLowerCase()!=="wardpanch" && Array.isArray(sheet.candidates)) rows.push(countingExportRow("sarpanch","",sheet,root.id));
+      Object.entries(sheet.wardPanchResults||{}).forEach(([ward,data])=>{
+        if(data && Array.isArray(data.candidates)){modernWardKeys.add(countingWardKey(ward));rows.push(countingExportRow("wardpanch",ward,data,root.id));}
+      });
+    }
+    docs.forEach(d=>{
+      const match=d.id.match(new RegExp("^"+LIVE_COUNTING_DOC+"_WARDPANCH_(.+)$"));
+      if(!match) return;
+      const ward=match[1], data=d.data()||{};
+      if(modernWardKeys.has(countingWardKey(ward)) || !Array.isArray(data.candidates)) return;
+      rows.push(countingExportRow("wardpanch",ward,data,d.id));
+    });
+    if(!rows.length) throw new Error("Firebase में कोई सेव काउंटिंग डेटा नहीं मिला।");
+    const wb=XLSX.utils.book_new();
+    const ws=XLSX.utils.json_to_sheet(rows);
+    ws["!cols"]=[{wch:14},{wch:12},{wch:16},{wch:30},{wch:45},{wch:16},{wch:10},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:30},{wch:22},{wch:32}];
+    XLSX.utils.book_append_sheet(wb,ws,"काउंटिंग रिजल्ट");
+    const summary=[
+      {"विवरण":"कुल सेव परिणाम","संख्या":rows.length},
+      {"विवरण":"सरपंच परिणाम","संख्या":rows.filter(r=>r["पद"]==="सरपंच").length},
+      {"विवरण":"वार्ड पंच परिणाम","संख्या":rows.filter(r=>r["पद"]==="वार्ड पंच").length},
+      {"विवरण":"कुल वोट (सभी परिणाम)","संख्या":rows.reduce((n,r)=>n+(Number(r["कुल वोट"])||0),0)}
+    ];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),"सारांश");
+    XLSX.writeFile(wb,"Suwana_Live_Counting_Results.xlsx");
+    notice($("countingAdminMsg"),`Excel तैयार है। ${rows.length} सेव परिणाम डाउनलोड हो गए। Firebase का डेटा सुरक्षित है।`,"success");
+  }catch(e){notice($("countingAdminMsg"),"Excel नहीं बन सकी: "+e.message,"error");}
+  finally{btn.disabled=false;}
+});
 
 auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.add("hidden");$("publicLoginCard").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
 try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("publicLoginCard").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts","countingAdmin"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
