@@ -1,1405 +1,534 @@
-<!doctype html>
-<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voter Slip Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
-<style>
-:root{--b:#174ea6;--t:#087e8b;--bg:#f3f6fb;--ink:#243247}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Poppins,'Tiro Devanagari Hindi',sans-serif}header{background:linear-gradient(120deg,#123c80,#087e8b);color:white;padding:14px;display:flex;justify-content:space-between}h1{font-size:18px;margin:0}.wrap{max-width:1050px;margin:18px auto;padding:0 12px}.card{background:white;padding:16px;border-radius:12px;margin:12px 0;box-shadow:0 3px 15px #1234}.login{max-width:430px;margin:55px auto;text-align:center}label{display:block;font-size:13px;font-weight:600;margin-top:8px}input,select{width:100%;padding:11px;border:1px solid #ccd6e3;border-radius:8px;margin:5px 0 10px}button{background:var(--b);color:white;border:0;border-radius:8px;padding:10px 14px;margin:3px;cursor:pointer}.green{background:#16834b}.red{background:#b42318}.gray{background:#64748b}.wide{width:100%}.hidden{display:none!important}.muted{color:#64748b;font-size:13px}.notice{background:#eef5ff;color:#174ea6;padding:10px;border-radius:8px;margin:10px 0;font-size:13px}.error{background:#fff0f0;color:#a71919}.success{background:#eaf8ef;color:#126b3a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.stat{background:white;padding:14px;border-left:4px solid var(--b);border-radius:9px}.stat strong{display:block;font-size:22px}.tabs{display:flex;gap:6px;flex-wrap:wrap}.tab{background:white;color:var(--b);border:1px solid #ddd}.tab.active{background:var(--b);color:white}.panel{display:none}.panel.active{display:block}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:450px}td,th{text-align:left;padding:9px;border-bottom:1px solid #e5eaf0;font-size:13px}.result{background:white;border:1px solid #e2e8f0;border-radius:9px;padding:12px;margin:8px 0}#printArea{background:#fff}.slips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.slip{position:relative;overflow:visible;border:1.5px solid #174ea6;border-radius:12px;padding:0;color:#172033;background:#fff;break-inside:avoid;box-shadow:0 2px 8px #1232}.candidate-banner{display:grid;grid-template-columns:70px 1fr 70px;align-items:center;gap:9px;padding:9px 10px;background:linear-gradient(110deg,#eef7ff,#fff8e8);border-bottom:2px solid #174ea6}.placeholder{display:grid;place-items:center;font-size:9px;color:#64748b}.candidate-photo{width:68px;height:68px;object-fit:cover;border-radius:9px;border:2px solid #174ea6;background:#fff}.candidate-info{text-align:center;min-width:0}.candidate-info b{display:block;font-size:14px;color:#123c80;overflow-wrap:anywhere}.candidate-info small{font-size:9px;color:#64748b}.candidate-symbol{width:66px;height:66px;object-fit:contain;border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:3px}.image-preview{width:112px;height:112px;object-fit:contain;background:#f8fafc;border:1px dashed #94a3b8;border-radius:9px;padding:4px;display:block;margin:5px 0 8px}.image-tools{display:flex;gap:6px;flex-wrap:wrap}.image-tools button{margin:2px 0}.file-input{padding:8px;background:#f8fafc}.slip-head{background:linear-gradient(120deg,#123c80,#087e8b);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:10px}.slip-mark{width:42px;height:42px;border:1px solid #ffffffaa;border-radius:50%;display:grid;place-items:center;font-size:23px;flex:none}.slip-head h4{font-size:17px;margin:0;text-align:left;line-height:1.3}.slip-head small{display:block;font-size:10px;opacity:.9;margin-top:3px}.slip-body{padding:12px 14px}.slip-panchayat{font-size:12px;background:#eef5ff;border-left:3px solid #174ea6;border-radius:4px;padding:7px 9px;margin-bottom:10px}.slip-name{font-size:17px;font-weight:700;color:#123c80;margin:4px 0 10px;overflow-wrap:anywhere}.slip-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.slip-field{border-bottom:1px solid #e5eaf0;padding:3px 0;min-width:0}.slip-field span{display:block;font-size:10px;color:#64748b}.slip-field b{display:block;font-size:12px;overflow-wrap:anywhere}.slip-field.full{grid-column:1/-1}.slip-foot{border-top:1px dashed #cbd5e1;margin-top:10px;padding-top:7px;font-size:9px;color:#64748b;display:flex;justify-content:space-between;gap:8px}.slip-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.slip-actions button{margin:0}.progress{height:8px;background:#ddd;border-radius:8px}.progress div{height:100%;width:0;background:var(--t)}@media(max-width:600px){.candidate-banner{grid-template-columns:56px 1fr 56px;gap:6px;padding:7px}.candidate-photo{width:54px;height:54px}.candidate-symbol{width:52px;height:52px}.candidate-info b{font-size:12px}.row{grid-template-columns:1fr}.slips{grid-template-columns:1fr}.slip-fields{gap:6px}} .bulk-print-pages{display:block}.bulk-print-page{width:100%;page-break-after:always;break-after:page;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:1.5mm;min-height:277mm;max-height:277mm;overflow:hidden}.bulk-print-page:last-child{page-break-after:auto;break-after:auto}.bulk-print-page .slip{height:100%;min-height:0;overflow:hidden;border-radius:4px;box-shadow:none}.bulk-print-page .candidate-banner{grid-template-columns:35px 1fr 35px;padding:3px;gap:3px}.bulk-print-page .candidate-photo{width:33px;height:33px;border-width:1px;border-radius:4px}.bulk-print-page .candidate-symbol{width:32px;height:32px;padding:1px;border-radius:4px}.bulk-print-page .candidate-info b{font-size:8px;line-height:1.2}.bulk-print-page .candidate-info small{font-size:6px}.bulk-print-page .slip-head{padding:4px 5px;gap:4px}.bulk-print-page .slip-mark{width:19px;height:19px;font-size:11px}.bulk-print-page .slip-head h4{font-size:9px}.bulk-print-page .slip-head small{font-size:6px}.bulk-print-page .slip-body{padding:4px 5px}.bulk-print-page .slip-panchayat{font-size:7px;padding:3px;margin-bottom:3px}.bulk-print-page .slip-name{font-size:10px;margin:2px 0 4px}.bulk-print-page .slip-fields{gap:2px}.bulk-print-page .slip-field{padding:1px 0}.bulk-print-page .slip-field span{font-size:6px}.bulk-print-page .slip-field b{font-size:7px;line-height:1.15}.bulk-print-page .slip-foot{font-size:6px;margin-top:3px;padding-top:2px;gap:2px}@media print{@page{size:A4 portrait;margin:6mm}body{background:#fff!important;font-family:Arial,'Tiro Devanagari Hindi',sans-serif!important}.wrap{max-width:none;margin:0;padding:0}.card,#printArea{box-shadow:none!important;border:0!important;padding:0!important;margin:0!important}header,.no-print,footer,#loginView,.grid,#adminTabs,#search{display:none!important}#app{display:block!important;margin:0!important;padding:0!important}#printArea{display:block!important;background:#fff!important}.slips{grid-template-columns:minmax(0,1fr);gap:7mm}.slip{height:auto;min-height:65mm;overflow:visible;border-radius:8px;box-shadow:none;break-inside:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}.candidate-banner{grid-template-columns:46px 1fr 46px;padding:5px;gap:5px}.candidate-photo{width:44px;height:44px}.candidate-symbol{width:42px;height:42px}.candidate-info b{font-size:10px}.candidate-info small{font-size:7px}.slip-head{padding:9px 10px}.slip-mark{width:34px;height:34px;font-size:19px}.slip-head h4{font-size:14px}.slip-body{padding:8px 10px}.slip-name{font-size:14px;margin:3px 0 6px}.slip-fields{gap:4px}.slip-field b{font-size:10px}.slip-field span{font-size:8px}.slip-panchayat{font-size:10px;padding:5px 7px;margin-bottom:6px}.slip-foot{font-size:8px;margin-top:6px;padding-top:5px}.bulk-print-page{width:100%;min-height:277mm;max-height:277mm;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));gap:1.5mm}.bulk-print-page .slip{height:100%;min-height:0;overflow:hidden;break-inside:avoid}.bulk-print-page .candidate-banner{grid-template-columns:35px 1fr 35px;padding:3px;gap:3px}.bulk-print-page .candidate-photo{width:33px;height:33px}.bulk-print-page .candidate-symbol{width:32px;height:32px}.bulk-print-page .candidate-info b{font-size:8px}.bulk-print-page .candidate-info small{font-size:6px}.bulk-print-page .slip-head{padding:4px 5px;gap:4px}.bulk-print-page .slip-mark{width:19px;height:19px;font-size:11px}.bulk-print-page .slip-head h4{font-size:9px}.bulk-print-page .slip-head small{font-size:6px}.bulk-print-page .slip-body{padding:4px 5px}.bulk-print-page .slip-panchayat{font-size:7px;padding:3px;margin-bottom:3px}.bulk-print-page .slip-name{font-size:10px;margin:2px 0 4px}.bulk-print-page .slip-field span{font-size:6px}.bulk-print-page .slip-field b{font-size:7px}.bulk-print-page .slip-foot{font-size:6px;margin-top:3px;padding-top:2px}}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>ITI COPA Exam - Sanjay Jajunda</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; }
+        #exam-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.15); max-width: 1150px; margin: auto; position: relative; }
+        .no-print { display: block; }
+        
+        /* Student Header Info */
+        .student-header { background: #2c3e50; color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .student-info-box { font-size: 16px; font-weight: 500; }
+        .student-info-box span { color: #f1c40f; margin-left: 10px; font-weight: bold; }
 
-/* Candidate header: portrait and position/name below; large borderless symbol */
-.candidate-banner{display:grid;grid-template-columns:40% 60%;align-items:stretch;gap:0;padding:10px 12px;background:#fff;border-bottom:2px solid #174ea6;min-height:210px}
-.candidate-left{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px 8px;min-width:0}
-.candidate-photo{width:min(100%,170px);height:150px;object-fit:cover;border:2px solid #174ea6;border-radius:10px;background:#fff}
-.candidate-position{margin-top:7px;background:#e5252a;color:#fff;font-size:14px;font-weight:700;padding:5px 8px;border-radius:7px;width:100%;overflow-wrap:anywhere}
-.candidate-name{font-size:21px;font-weight:700;color:#174ea6;line-height:1.2;margin-top:6px;overflow-wrap:anywhere}
-.candidate-right{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:0 5px}
-.candidate-symbol{width:100%;height:165px;max-width:100%;object-fit:contain;border:0!important;border-radius:0!important;background:transparent;padding:0!important}
-.symbol-name{font-size:17px;font-weight:700;color:#111;text-align:center;line-height:1.2;margin-top:4px;overflow-wrap:anywhere}
-.candidate-photo.placeholder,.candidate-symbol.placeholder{display:grid;place-items:center;background:#f8fafc;color:#64748b}
-@media(max-width:600px){.candidate-banner{grid-template-columns:40% 60%;min-height:175px;padding:7px}.candidate-photo{height:115px}.candidate-position{font-size:11px;padding:4px}.candidate-name{font-size:16px}.candidate-symbol{height:135px}.symbol-name{font-size:13px}}
-.bulk-print-page .candidate-banner{grid-template-columns:40% 60%;min-height:0;padding:3px;gap:0}
-.bulk-print-page .candidate-photo{width:100%;height:45px;max-width:54px;border-width:1px}
-.bulk-print-page .candidate-position{font-size:6px;padding:2px 1px;margin-top:2px;border-radius:2px}
-.bulk-print-page .candidate-name{font-size:8px;margin-top:2px}
-.bulk-print-page .candidate-symbol{width:100%;height:72px;padding:0!important;border:0!important}
-.bulk-print-page .symbol-name{font-size:7px;margin-top:1px}
-@media print{.candidate-banner{grid-template-columns:40% 60%;min-height:0;padding:6px}.candidate-photo{width:100%;height:105px;max-width:125px}.candidate-position{font-size:10px;padding:4px}.candidate-name{font-size:16px}.candidate-symbol{height:125px;border:0!important;padding:0!important}.symbol-name{font-size:13px}.bulk-print-page .candidate-banner{grid-template-columns:40% 60%;padding:3px}.bulk-print-page .candidate-photo{height:45px}.bulk-print-page .candidate-symbol{height:72px}.bulk-print-page .candidate-position{font-size:6px}.bulk-print-page .candidate-name{font-size:8px}.bulk-print-page .symbol-name{font-size:7px}}
+        /* Layout */
+        .quiz-layout { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+        .sidebar { background: #fff; border: 1px solid #dcdde1; padding: 15px; border-radius: 10px; height: fit-content; position: sticky; top: 10px; }
+        
+        /* Navigation Dots */
+        .grid-nav { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 15px; }
+        .dot { width: 42px; height: 42px; border-radius: 6px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; background: #fff; font-weight: bold; }
+        .dot.active { border: 3px solid #3498db; background: #ebf5fb; color: #2980b9; }
+        .dot.solved { background: #27ae60 !important; color: white; border-color: #219150; }
+        
+        /* Timer & Question Box */
+        .timer { font-size: 24px; color: #e67e22; font-weight: bold; background: #fff3e0; padding: 5px 15px; border-radius: 8px; border: 1px solid #ffe0b2; }
+        .question-box { border: 1px solid #dfe6e9; padding: 25px; border-radius: 10px; background: #fff; min-height: 280px; margin-bottom: 20px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .option-btn { padding: 15px; border: 1px solid #d1d8e0; border-radius: 8px; background: #f9f9f9; cursor: pointer; text-align: left; font-size: 16px; transition: 0.2s; }
+        .option-btn.selected { background: #3498db !important; color: white !important; font-weight: bold; }
+        .option-btn.locked { opacity: 0.7; pointer-events: none; }
+        
+        /* Result Table */
+        .result-table { width: 100%; border-collapse: collapse; margin-top: 2px; position: relative; z-index: 2; }
+        .result-table th, .result-table td { border: 1px solid #bdc3c7; padding: 6px; text-align: left; font-size: 12px; }
+        .pass { color: #27ae60; font-weight: bold; }
+        .fail { color: #e74c3c; font-weight: bold; }
 
-/* Larger, clearly readable voter details; use the available card height */
-.slip{min-height:560px;display:flex;flex-direction:column}
-.slip-body{padding:16px 18px 18px;display:flex;flex:1;flex-direction:column}
-.slip-panchayat{font-size:17px;padding:11px 13px;margin-bottom:14px;font-weight:600}
-.slip-body>div[style*="font-size:10px"]{font-size:15px!important;font-weight:600}
-.slip-name{font-size:27px;margin:6px 0 16px;line-height:1.3}
-.slip-fields{flex:1;align-content:space-between;gap:12px 16px;grid-auto-rows:minmax(48px,auto)}
-.slip-field{padding:7px 2px 8px;border-bottom:2px solid #dce4ed}
-.slip-field span{font-size:14px;font-weight:600;color:#53657b;line-height:1.35}
-.slip-field b{font-size:18px;line-height:1.4;font-weight:700;color:#101b2b}
-@media(max-width:600px){.slip{min-height:530px}.slip-body{padding:13px 14px 16px}.slip-panchayat{font-size:15px;padding:9px 10px}.slip-name{font-size:24px}.slip-fields{gap:10px 12px}.slip-field span{font-size:12px}.slip-field b{font-size:16px}}
-/* A4 single-slip print: readable type and fuller use of page space */
-@media print{
- .slip{min-height:105mm;display:flex;flex-direction:column}
- .slip-body{padding:11px 13px 13px;display:flex;flex:1;flex-direction:column}
- .slip-panchayat{font-size:13px;padding:7px 9px;margin-bottom:9px}
- .slip-body>div[style*="font-size:10px"]{font-size:11px!important}
- .slip-name{font-size:20px;margin:4px 0 10px}
- .slip-fields{flex:1;align-content:space-between;gap:7px 12px;grid-auto-rows:minmax(30px,auto)}
- .slip-field{padding:4px 1px 5px;border-bottom:1.5px solid #dce4ed}
- .slip-field span{font-size:10px;font-weight:600}
- .slip-field b{font-size:13px;line-height:1.3}
-}
-/* Keep the 9-per-A4 layout, but make its text as readable as the space allows */
-.bulk-print-page .slip-body{display:flex;flex-direction:column;padding:5px 6px}
-.bulk-print-page .slip-panchayat{font-size:8px;padding:4px;margin-bottom:4px}
-.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:7px!important}
-.bulk-print-page .slip-name{font-size:12px;line-height:1.2;margin:3px 0 5px}
-.bulk-print-page .slip-fields{gap:3px;align-content:start;grid-auto-rows:minmax(15px,auto)}
-.bulk-print-page .slip-field{padding:2px 0}
-.bulk-print-page .slip-field span{font-size:7px;font-weight:600;line-height:1.15}
-.bulk-print-page .slip-field b{font-size:8.5px;line-height:1.2}
-@media print{
- .bulk-print-page .slip-body{padding:4px 5px}
- .bulk-print-page .slip-panchayat{font-size:7.5px;padding:3px;margin-bottom:3px}
- .bulk-print-page .slip-name{font-size:10px;margin:2px 0 3px}
- .bulk-print-page .slip-field span{font-size:6.5px}
- .bulk-print-page .slip-field b{font-size:7.5px;line-height:1.1}
-}
-
-/* Candidate profile preview: desktop two-column layout; mobile stacked */
-.candidate-branding-display{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(180px,260px);align-items:center;gap:20px;padding:16px}
-.candidate-branding-identity{display:flex;align-items:center;gap:18px;min-width:0}
-#candidateLoginPhoto{display:block;flex:0 0 150px;width:150px;height:150px;max-width:150px;object-fit:cover;border:2px solid #174ea6;border-radius:10px}
-.candidate-branding-name{min-width:0;font-size:17px;overflow-wrap:anywhere}
-.candidate-branding-name .muted{font-size:14px}
-.candidate-branding-name b{display:block;font-size:20px;color:#123c80}
-.candidate-branding-symbol-wrap{display:flex;align-items:center;justify-content:center;min-width:0}
-#candidateLoginSymbol{display:block;flex:0 1 220px;width:220px;height:180px;max-width:100%;object-fit:contain;border:0!important;border-radius:0!important;background:transparent;padding:0!important}
-@media(max-width:600px){.candidate-branding-display{grid-template-columns:minmax(0,1fr);gap:10px}.candidate-branding-identity{gap:12px}#candidateLoginPhoto{flex-basis:112px;width:112px;height:112px;max-width:112px}.candidate-branding-name{font-size:14px}.candidate-branding-name b{font-size:16px}#candidateLoginSymbol{width:120px;height:120px;flex-basis:120px}}
-
-/* तैयार बैनर: हर पर्ची के ऊपर पूरी चौड़ाई */
-.banner-preview{display:block;width:100%;max-width:720px;max-height:220px;object-fit:contain;object-position:center;background:#fff;border:1px solid #d5dce5;border-radius:6px;margin:8px 0}
-.full-slip-banner-wrap{width:100%;height:29%;min-height:0;display:flex;align-items:stretch;justify-content:center;overflow:hidden;border-bottom:1px solid #333;background:#fff}
-.full-slip-banner{display:block;width:100%;height:100%;object-fit:fill;object-position:center}
-.banner-missing{width:100%;height:100%;display:grid;place-items:center;font-size:8px;color:#a11;background:#fff7f7}
-@media print{.full-slip-banner-wrap{height:29%;min-height:0}.full-slip-banner{width:100%;height:100%;object-fit:fill}}
-
-/* Public live counting */
-.live-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
-.live-card{border:1px solid #cfe2d5;border-top:4px solid #16834b}
-.live-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.live-badge{display:inline-flex;align-items:center;gap:5px;background:#e8f7ed;color:#13733d;padding:5px 10px;border-radius:30px;font-size:12px;font-weight:700}
-.live-dot{width:8px;height:8px;border-radius:50%;background:#16a34a;display:inline-block}
-.live-candidate{display:flex;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e5eaf0;border-radius:9px;margin:8px 0;align-items:center}
-.live-candidate strong{font-size:15px}
-.live-votes{font-size:22px;font-weight:800;color:#174ea6;white-space:nowrap}
-.live-winner{background:#eaf8ef;border-color:#16834b}
-.live-meta{font-size:12px;color:#64748b}.live-chart{margin:14px 0}.live-bar-row{margin:10px 0}.live-bar-label{display:flex;justify-content:space-between;gap:8px;font-size:13px;margin-bottom:4px}.live-bar-track{height:12px;background:#e9edf3;border-radius:20px;overflow:hidden}.live-bar-fill{height:100%;border-radius:20px;background:#2563eb}.live-total-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0}.live-total{padding:10px;border:1px solid #e2e8f0;border-radius:10px;text-align:center;background:#f8fafc}.live-total strong{display:block;font-size:20px;margin-top:3px}@media(max-width:520px){.live-total-grid{grid-template-columns:1fr 1fr}}
-.counting-candidate-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(110px,.7fr) auto;gap:8px;align-items:end;background:#f7f9fc;border:1px solid #e2e8f0;border-radius:9px;padding:8px;margin:7px 0}.counting-candidate-row label{margin-top:0}.counting-candidate-row input{margin-bottom:0}@media(max-width:600px){.counting-candidate-row{grid-template-columns:1fr 1fr}.counting-candidate-row .remove-count-candidate{grid-column:1/-1;width:100%}}.live-admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.live-admin-grid .full{grid-column:1/-1}
-@media(max-width:650px){.live-layout{grid-template-columns:1fr}.live-admin-grid{grid-template-columns:1fr}.live-admin-grid .full{grid-column:auto}}
-
-</style>
-<style>
-/* Readable, space-filling voter details in the 3x3 A4 ward print layout */
-.bulk-print-page .slip{display:flex;flex-direction:column}
-.bulk-print-page .slip-body{display:flex;flex:1;flex-direction:column;padding:6px 7px 7px}
-.bulk-print-page .slip-panchayat{font-size:10px;padding:5px 6px;margin-bottom:6px;line-height:1.3}
-.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;font-weight:700;line-height:1.25}
-.bulk-print-page .slip-name{font-size:15px;line-height:1.3;margin:3px 0 7px}
-.bulk-print-page .slip-fields{flex:1;align-content:space-between;gap:5px 7px;grid-auto-rows:minmax(22px,auto)}
-.bulk-print-page .slip-field{padding:3px 1px 4px;border-bottom:1.5px solid #cbd5e1}
-.bulk-print-page .slip-field span{font-size:8.5px;font-weight:700;line-height:1.25;color:#40536a}
-.bulk-print-page .slip-field b{font-size:10.5px;line-height:1.3;font-weight:700;color:#101827}
-@media print{
- .bulk-print-page .slip-body{padding:5px 6px 6px}
- .bulk-print-page .slip-panchayat{font-size:9.5px;padding:4px 5px;margin-bottom:5px}
- .bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:8.5px!important}
- .bulk-print-page .slip-name{font-size:13px;margin:2px 0 5px}
- .bulk-print-page .slip-fields{gap:4px 6px;grid-auto-rows:minmax(19px,auto)}
- .bulk-print-page .slip-field span{font-size:7.8px}
- .bulk-print-page .slip-field b{font-size:9.5px;line-height:1.25}
-}
-
-/* Final 3x3 A4 layout: distribute all voter details down to the bottom edge */
-.bulk-print-page .slip{display:flex!important;flex-direction:column!important;height:100%!important;min-height:0!important}
-.bulk-print-page .slip-body{display:flex!important;flex:1 1 auto!important;min-height:0!important;flex-direction:column!important;padding:5px 6px 6px!important}
-.bulk-print-page .slip-panchayat{flex:none!important;font-size:10px!important;padding:5px 6px!important;margin-bottom:5px!important}
-.bulk-print-page .slip-body>div[style*="font-size:10px"]{font-size:9px!important;line-height:1.3!important;font-weight:700!important;flex:none!important}
-.bulk-print-page .slip-name{font-size:15px!important;line-height:1.3!important;margin:3px 0 6px!important;flex:none!important}
-.bulk-print-page .slip-fields{display:grid!important;flex:1 1 auto!important;min-height:0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;align-content:stretch!important;gap:3px 7px!important}
-.bulk-print-page .slip-field{min-height:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;padding:2px 1px 3px!important;border-bottom:1.5px solid #cbd5e1!important;overflow-wrap:anywhere!important}
-.bulk-print-page .slip-field span{font-size:8.5px!important;line-height:1.2!important;font-weight:700!important}
-.bulk-print-page .slip-field b{font-size:10.5px!important;line-height:1.25!important;font-weight:700!important;overflow-wrap:anywhere!important}
-@media print{
- .bulk-print-page .slip-body{padding:5px 6px 6px!important}
- .bulk-print-page .slip-panchayat{font-size:9.5px!important}
- .bulk-print-page .slip-name{font-size:14px!important}
- .bulk-print-page .slip-field span{font-size:8px!important}
- .bulk-print-page .slip-field b{font-size:9.8px!important}
-}
-</style>
-
-<style>
-/* नमूना पर्ची डिजाइन — मतदाता की फोटो नहीं, केवल Excel का विवरण */
-.sample-slip{display:flex;flex-direction:column;overflow:hidden;border:2px solid #24a9bd!important;border-radius:0!important;background:#fff;box-shadow:none!important;color:#111}
-.sample-banner{display:grid!important;grid-template-columns:76px minmax(0,1fr) 82px!important;align-items:center;gap:5px!important;min-height:112px!important;padding:5px!important;background:#ffeb00!important;border-bottom:2px solid #24a9bd!important}
-.sample-symbol-box{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
-.sample-banner .candidate-symbol{width:62px!important;height:62px!important;max-width:100%;object-fit:contain;border:1px solid #333!important;background:#fff!important;padding:2px!important}
-.sample-banner .symbol-name{font-size:10px;font-weight:700;color:#a11;text-align:center;line-height:1.15;margin-top:2px}
-.sample-candidate-info{text-align:center;min-width:0;color:#111;line-height:1.15}
-.sample-topline{font-size:10px;font-weight:700}
-.sample-candidate-name{font-size:20px;font-weight:800;color:#d52a72;text-shadow:1px 1px #fff;margin:4px 0;overflow-wrap:anywhere}
-.sample-slogan{font-size:11px;font-weight:700;line-height:1.2}
-.sample-photo-box{display:flex;align-items:center;justify-content:center;min-width:0}
-.sample-banner .candidate-photo{display:block;width:76px!important;height:91px!important;max-width:100%;object-fit:cover;border:0!important;border-radius:0!important;background:#fff}
-.sample-cutline{font-size:9px;font-weight:700;text-align:center;line-height:1.25;padding:3px 4px;border-bottom:2px dashed #333;background:#fff}
-.sample-voter-area{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:5px;flex:1;min-height:0;padding:5px}
-.sample-voter-main{min-width:0}
-.sample-idline{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
-.sample-idline b{display:inline-block;min-width:52px;padding:2px 5px;border:1.5px solid #111;text-align:center;font-size:12px}
-.sample-idline strong{font-size:12px;overflow-wrap:anywhere}
-.sample-detail{font-size:12px;line-height:1.35;margin:2px 0;overflow-wrap:anywhere}
-.sample-detail b{font-weight:800}
-.sample-booth{border-left:2px solid #39a9bc;padding-left:5px;min-width:0;display:flex;flex-direction:column}
-.sample-booth-title{text-align:center;color:#1683a1;font-size:11px;font-weight:800}
-.sample-ward{text-align:center;color:#b22;font-size:12px;font-weight:800;border-bottom:1px solid #aaa;padding:3px 0}
-.sample-booth-content{font-size:10px;font-weight:700;line-height:1.25;padding-top:4px;overflow-wrap:anywhere}
-.sample-time{background:#e91e63;color:#fff;text-align:center;font-size:10px;font-weight:700;padding:3px}
-@media(max-width:600px){
- .sample-banner{grid-template-columns:58px minmax(0,1fr) 64px!important;min-height:96px!important}
- .sample-banner .candidate-symbol{width:49px!important;height:52px!important}
- .sample-banner .candidate-photo{width:60px!important;height:76px!important}
- .sample-topline{font-size:8px}.sample-candidate-name{font-size:16px}.sample-slogan{font-size:9px}
- .sample-voter-area{grid-template-columns:minmax(0,1fr) 72px}
- .sample-detail{font-size:11px}
-}
-.bulk-print-page .sample-slip{height:100%!important;min-height:0!important;max-height:100%;border-width:1.5px!important}
-.bulk-print-page .sample-banner{grid-template-columns:47px minmax(0,1fr) 48px!important;min-height:0!important;height:29%!important;padding:3px!important;gap:2px!important}
-.bulk-print-page .sample-banner .candidate-symbol{width:39px!important;height:42px!important}
-.bulk-print-page .sample-banner .symbol-name{font-size:6px}
-.bulk-print-page .sample-banner .candidate-photo{width:45px!important;height:58px!important}
-.bulk-print-page .sample-topline{font-size:6.5px}
-.bulk-print-page .sample-candidate-name{font-size:13px;margin:2px 0}
-.bulk-print-page .sample-slogan{font-size:7px}
-.bulk-print-page .sample-cutline{font-size:6.5px;padding:2px}
-.bulk-print-page .sample-voter-area{grid-template-columns:minmax(0,1fr) 52px;gap:3px;padding:3px;min-height:0}
-.bulk-print-page .sample-idline{gap:3px;margin-bottom:2px}
-.bulk-print-page .sample-idline b{min-width:27px;font-size:7px;padding:1px}
-.bulk-print-page .sample-idline strong{font-size:7px}
-.bulk-print-page .sample-detail{font-size:7.5px;line-height:1.22;margin:1px 0}
-.bulk-print-page .sample-booth{padding-left:3px;border-left-width:1px}
-.bulk-print-page .sample-booth-title{font-size:7px}
-.bulk-print-page .sample-ward{font-size:8px;padding:2px 0}
-.bulk-print-page .sample-booth-content{font-size:6.5px;line-height:1.2;padding-top:2px}
-.bulk-print-page .sample-time{font-size:7px;padding:2px}
-@media print{
- @page{size:A4 portrait;margin:6mm}
- .sample-slip{print-color-adjust:exact;-webkit-print-color-adjust:exact}
- .bulk-print-page .sample-banner{height:29%!important}
-}
-</style>
-
-<style>
-
-/* 18 voter slips per A4 page: 3 columns × 6 rows */
-.bulk-print-page{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(6,minmax(0,1fr))!important;gap:1.5mm!important}
-.bulk-print-page .sample-slip{min-height:0!important;height:100%!important}
-.bulk-print-page .sample-banner{height:25%!important;grid-template-columns:38px minmax(0,1fr) 40px!important;padding:2px!important}
-.bulk-print-page .sample-banner .candidate-symbol{width:32px!important;height:34px!important}
-.bulk-print-page .sample-banner .candidate-photo{width:37px!important;height:43px!important}
-.bulk-print-page .sample-banner .symbol-name{font-size:5px!important}
-.bulk-print-page .sample-topline{font-size:5.2px!important}
-.bulk-print-page .sample-candidate-name{font-size:10px!important;margin:1px 0!important}
-.bulk-print-page .sample-slogan{font-size:5.5px!important}
-.bulk-print-page .sample-cutline{font-size:5px!important;padding:1px!important}
-.bulk-print-page .sample-voter-area{grid-template-columns:minmax(0,1fr) 43px!important;gap:2px!important;padding:2px!important}
-.bulk-print-page .sample-idline{gap:2px!important;margin-bottom:1px!important}
-.bulk-print-page .sample-idline b{min-width:22px!important;font-size:5.5px!important;padding:0 2px!important}
-.bulk-print-page .sample-idline strong{font-size:5.5px!important}
-.bulk-print-page .sample-detail{font-size:6px!important;line-height:1.12!important;margin:0!important}
-.bulk-print-page .sample-booth{padding-left:2px!important}
-.bulk-print-page .sample-booth-title{font-size:5.5px!important}
-.bulk-print-page .sample-ward{font-size:6px!important;padding:1px 0!important}
-.bulk-print-page .sample-booth-content{font-size:5px!important;line-height:1.1!important;padding-top:1px!important}
-.bulk-print-page .sample-time{font-size:5.5px!important;padding:1px!important}
-@media print{
- .bulk-print-page{grid-template-rows:repeat(6,minmax(0,1fr))!important;gap:1.5mm!important;min-height:277mm!important;max-height:277mm!important}
-}
-
-</style>
-
-<style>
-/* Final voter slip print layout: 8 fuller, readable slips per A4 (2 × 4) */
-.bulk-print-page{
-  width:100%!important;
-  min-height:277mm!important;
-  max-height:277mm!important;
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(3,minmax(0,1fr))!important;
-  gap:2.5mm!important;
-  overflow:hidden!important;
-}
-.bulk-print-page .sample-slip{
-  height:100%!important;
-  min-height:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  overflow:hidden!important;
-  border:1.5px solid #20aabd!important;
-  border-radius:0!important;
-}
-.bulk-print-page .sample-banner{
-  height:42%!important;
-  min-height:0!important;
-  flex:0 0 42%!important;
-  grid-template-columns:62px minmax(0,1fr) 72px!important;
-  gap:4px!important;
-  padding:4px!important;
-}
-.bulk-print-page .sample-banner .candidate-symbol{
-  width:54px!important;height:61px!important;max-width:100%!important;
-  object-fit:contain!important;border:1px solid #333!important;
-  background:#fff!important;padding:2px!important;
-}
-.bulk-print-page .sample-banner .symbol-name{
-  font-size:8px!important;line-height:1.15!important;margin-top:2px!important;
-}
-.bulk-print-page .sample-banner .candidate-photo{
-  width:68px!important;height:82px!important;max-width:100%!important;
-  object-fit:cover!important;border:0!important;border-radius:0!important;
-}
-.bulk-print-page .sample-topline{font-size:8.5px!important;line-height:1.2!important}
-.bulk-print-page .sample-candidate-name{font-size:18px!important;line-height:1.15!important;margin:4px 0!important}
-.bulk-print-page .sample-slogan{font-size:9px!important;line-height:1.2!important}
-.bulk-print-page .sample-cutline{
-  flex:0 0 auto!important;font-size:8px!important;line-height:1.2!important;
-  padding:3px 4px!important;border-bottom:1.5px dashed #222!important;
-}
-.bulk-print-page .sample-voter-area{
-  display:grid!important;grid-template-columns:minmax(0,1fr) 68px!important;
-  gap:4px!important;flex:1 1 auto!important;min-height:0!important;padding:5px!important;
-}
-.bulk-print-page .sample-idline{gap:5px!important;margin-bottom:3px!important}
-.bulk-print-page .sample-idline b{min-width:38px!important;font-size:10px!important;padding:2px 4px!important}
-.bulk-print-page .sample-idline strong{font-size:10px!important;line-height:1.15!important}
-.bulk-print-page .sample-detail{font-size:10.5px!important;line-height:1.28!important;margin:2px 0!important}
-.bulk-print-page .sample-booth{padding-left:4px!important;border-left:1.5px solid #39a9bc!important}
-.bulk-print-page .sample-booth-title{font-size:9px!important;line-height:1.2!important}
-.bulk-print-page .sample-ward{font-size:10px!important;padding:3px 0!important}
-.bulk-print-page .sample-booth-content{font-size:8.5px!important;line-height:1.25!important;padding-top:3px!important}
-.bulk-print-page .sample-time{flex:0 0 auto!important;font-size:8.5px!important;padding:3px!important}
-@media print{
-  @page{size:A4 portrait;margin:6mm}
-  .bulk-print-page{
-    min-height:277mm!important;max-height:277mm!important;
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(3,minmax(0,1fr))!important;
-    gap:2.5mm!important;
-  }
-  .bulk-print-page .sample-slip{
-    print-color-adjust:exact!important;
-    -webkit-print-color-adjust:exact!important;
-  }
-}
-</style>
-
-
-<style>
-/* FINAL FIX: exactly 6 slips per A4 page (2 columns × 3 rows), no clipped text */
-.bulk-print-pages{display:block!important;width:100%!important}
-.bulk-print-page{
-  width:100%!important;
-  height:277mm!important;
-  min-height:277mm!important;
-  max-height:277mm!important;
-  box-sizing:border-box!important;
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(3,minmax(0,1fr))!important;
-  gap:2.2mm!important;
-  overflow:hidden!important;
-  page-break-after:always!important;
-  break-after:page!important;
-}
-.bulk-print-page:last-child{page-break-after:auto!important;break-after:auto!important}
-.bulk-print-page .sample-slip{
-  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
-  display:flex!important;flex-direction:column!important;overflow:hidden!important;
-  box-sizing:border-box!important;border:1.5px solid #20aabd!important;border-radius:0!important;
-}
-.bulk-print-page .sample-banner{
-  display:grid!important;flex:0 0 37%!important;height:37%!important;min-height:0!important;
-  grid-template-columns:58px minmax(0,1fr) 66px!important;
-  align-items:center!important;gap:4px!important;padding:4px!important;
-}
-.bulk-print-page .sample-banner .candidate-symbol{
-  width:50px!important;height:56px!important;max-width:100%!important;
-  object-fit:contain!important;padding:2px!important;background:#fff!important;
-}
-.bulk-print-page .sample-banner .symbol-name{font-size:7.5px!important;line-height:1.15!important}
-.bulk-print-page .sample-banner .candidate-photo{
-  display:block!important;width:62px!important;height:76px!important;max-width:100%!important;
-  object-fit:cover!important;border:0!important;border-radius:0!important;
-}
-.bulk-print-page .sample-topline{font-size:8px!important;line-height:1.2!important}
-.bulk-print-page .sample-candidate-name{font-size:17px!important;line-height:1.12!important;margin:3px 0!important}
-.bulk-print-page .sample-slogan{font-size:8.5px!important;line-height:1.2!important}
-.bulk-print-page .sample-cutline{
-  flex:0 0 auto!important;white-space:normal!important;
-  font-size:7.5px!important;line-height:1.2!important;padding:3px 4px!important;
-  border-bottom:1.5px dashed #222!important;
-}
-.bulk-print-page .sample-voter-area{
-  display:grid!important;grid-template-columns:minmax(0,1fr) 66px!important;
-  gap:4px!important;flex:1 1 auto!important;min-height:0!important;
-  padding:3px 4px 2px!important;align-items:stretch!important;
-}
-.bulk-print-page .sample-voter-main{
-  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
-  min-width:0!important;min-height:0!important;padding:0 0 1px!important;
-}
-.bulk-print-page .sample-idline{display:flex!important;align-items:center!important;gap:5px!important;margin:0 0 2px!important;min-width:0!important}
-.bulk-print-page .sample-idline b{min-width:34px!important;font-size:9.5px!important;padding:2px 4px!important}
-.bulk-print-page .sample-idline strong{font-size:9.5px!important;line-height:1.15!important;overflow-wrap:anywhere!important}
-.bulk-print-page .sample-detail{
-  font-size:10px!important;line-height:1.2!important;margin:1px 0!important;
-  padding:0!important;overflow-wrap:anywhere!important;word-break:normal!important;
-}
-.bulk-print-page .sample-booth{
-  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
-  min-width:0!important;padding-left:4px!important;border-left:1.5px solid #39a9bc!important;
-}
-.bulk-print-page .sample-booth-title{font-size:8.5px!important;line-height:1.2!important;text-align:center!important}
-.bulk-print-page .sample-ward{font-size:9.5px!important;line-height:1.2!important;padding:2px 0!important}
-.bulk-print-page .sample-booth-content{font-size:8px!important;line-height:1.2!important;padding:2px 0 1px!important;overflow-wrap:anywhere!important}
-.bulk-print-page .sample-time{
-  flex:0 0 auto!important;min-height:0!important;font-size:8px!important;
-  line-height:1.2!important;padding:3px 2px!important;
-}
-@media print{
-  @page{size:A4 portrait;margin:6mm}
-  html,body{margin:0!important;padding:0!important}
-  .bulk-print-pages{display:block!important}
-  .bulk-print-page{
-    height:277mm!important;min-height:277mm!important;max-height:277mm!important;
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(3,minmax(0,1fr))!important;
-    gap:2.2mm!important;overflow:hidden!important;
-  }
-  .bulk-print-page .sample-slip{
-    print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important;
-  }
-}
-</style>
-
-
-<style>
-/* अंतिम सुधार: बैनर थोड़ा ऊँचा और मतदाता विवरण अधिक स्पष्ट */
-.bulk-print-page .sample-banner{
-  flex:0 0 42%!important;
-  height:42%!important;
-  grid-template-columns:64px minmax(0,1fr) 72px!important;
-  gap:4px!important;
-  padding:5px!important;
-}
-.bulk-print-page .sample-banner .candidate-symbol{
-  width:58px!important;
-  height:64px!important;
-}
-.bulk-print-page .sample-banner .candidate-photo{
-  width:68px!important;
-  height:82px!important;
-}
-.bulk-print-page .sample-banner .symbol-name{
-  font-size:8.5px!important;
-}
-.bulk-print-page .sample-topline{font-size:8.8px!important}
-.bulk-print-page .sample-candidate-name{
-  font-size:18px!important;
-  line-height:1.15!important;
-  margin:4px 0!important;
-}
-.bulk-print-page .sample-slogan{font-size:9.2px!important}
-.bulk-print-page .sample-cutline{
-  font-size:8px!important;
-  line-height:1.25!important;
-  padding:3px 4px!important;
-}
-.bulk-print-page .sample-voter-area{
-  grid-template-columns:minmax(0,1fr) 68px!important;
-  gap:4px!important;
-  padding:4px 5px 3px!important;
-}
-.bulk-print-page .sample-idline b{font-size:10px!important}
-.bulk-print-page .sample-idline strong{font-size:10px!important}
-.bulk-print-page .sample-detail{
-  font-size:10.8px!important;
-  line-height:1.24!important;
-  margin:1.5px 0!important;
-}
-.bulk-print-page .sample-booth-title{font-size:9px!important}
-.bulk-print-page .sample-ward{font-size:10px!important}
-.bulk-print-page .sample-booth-content{
-  font-size:8.5px!important;
-  line-height:1.22!important;
-}
-.bulk-print-page .sample-time{font-size:8.8px!important}
-@media print{
-  .bulk-print-page .sample-banner{
-    flex:0 0 42%!important;
-    height:42%!important;
-  }
-  .bulk-print-page .sample-detail{
-    font-size:10.5px!important;
-  }
-}
-</style>
-
-
-<style>
-/* PDF नमूने के अनुसार: लगभग 100 × 50 mm की पर्ची, 8 पर्चियाँ प्रति A4 */
-.bulk-print-pages{display:block!important;width:100%!important}
-.bulk-print-page{
-  width:100%!important;height:277mm!important;min-height:277mm!important;max-height:277mm!important;
-  box-sizing:border-box!important;display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  grid-template-rows:repeat(4,50mm)!important;
-  column-gap:2mm!important;row-gap:15mm!important;
-  align-content:center!important;justify-content:stretch!important;
-  overflow:hidden!important;page-break-after:always!important;break-after:page!important;
-}
-.bulk-print-page:last-child{page-break-after:auto!important;break-after:auto!important}
-.bulk-print-page .sample-slip{
-  width:100%!important;height:50mm!important;min-height:50mm!important;max-height:50mm!important;
-  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
-  overflow:hidden!important;border:1px solid #20aabd!important;border-radius:0!important;
-}
-.bulk-print-page .full-slip-banner-wrap{
-  width:100%!important;height:38%!important;min-height:0!important;flex:0 0 38%!important;
-  display:flex!important;align-items:stretch!important;justify-content:center!important;
-  overflow:hidden!important;border-bottom:1px solid #333!important;
-}
-.bulk-print-page .full-slip-banner{
-  display:block!important;width:100%!important;height:100%!important;object-fit:fill!important;
-}
-.bulk-print-page .banner-missing{font-size:9px!important;text-align:center!important}
-.bulk-print-page .sample-cutline{
-  flex:0 0 auto!important;font-size:6.5px!important;line-height:1.1!important;
-  padding:1px 2px!important;border-bottom:1px dashed #333!important;
-}
-.bulk-print-page .sample-voter-area{
-  display:grid!important;grid-template-columns:minmax(0,1fr) 27mm!important;
-  gap:2px!important;flex:1 1 auto!important;min-height:0!important;padding:2px 3px 1px!important;
-}
-.bulk-print-page .sample-voter-main{
-  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
-  min-width:0!important;min-height:0!important;
-}
-.bulk-print-page .sample-idline{display:flex!important;align-items:center!important;gap:3px!important;margin:0 0 1px!important;min-width:0!important}
-.bulk-print-page .sample-idline b{min-width:23px!important;font-size:7px!important;padding:1px 2px!important}
-.bulk-print-page .sample-idline strong{font-size:7px!important;line-height:1.1!important;overflow-wrap:anywhere!important}
-.bulk-print-page .sample-detail{font-size:7.5px!important;line-height:1.15!important;margin:1px 0!important;padding:0!important;overflow-wrap:anywhere!important}
-.bulk-print-page .sample-booth{
-  display:flex!important;flex-direction:column!important;justify-content:space-between!important;
-  min-width:0!important;padding-left:3px!important;border-left:1px solid #39a9bc!important;
-}
-.bulk-print-page .sample-booth-title{font-size:7.5px!important;line-height:1.1!important;text-align:center!important}
-.bulk-print-page .sample-ward{font-size:8px!important;line-height:1.1!important;padding:1px 0!important}
-.bulk-print-page .sample-booth-content{font-size:6.8px!important;line-height:1.12!important;padding:1px 0!important;overflow-wrap:anywhere!important}
-.bulk-print-page .sample-time{flex:0 0 auto!important;font-size:7px!important;line-height:1.1!important;padding:2px!important}
-@media print{
-  @page{size:A4 portrait;margin:6mm}
-  html,body{margin:0!important;padding:0!important}
-  .bulk-print-pages{display:block!important}
-  .bulk-print-page{
-    height:277mm!important;min-height:277mm!important;max-height:277mm!important;
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    grid-template-rows:repeat(4,50mm)!important;
-    column-gap:2mm!important;row-gap:15mm!important;align-content:center!important;
-    overflow:hidden!important;
-  }
-  .bulk-print-page .sample-slip{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
-  #slips.slips .sample-slip{width:100mm!important;height:50mm!important;min-height:50mm!important}
-}
-</style>
-
-
-<style>
-/* FINAL PDF FIX: A4 पर 6 बड़ी पर्चियाँ, शून्य मार्जिन और नाम बोल्ड */
-@media print {
-  @page { size: A4 portrait; margin: 0 !important; }
-  html, body { margin: 0 !important; padding: 0 !important; width: 210mm !important; }
-  .bulk-print-pages { display:block !important; width:210mm !important; margin:0 !important; padding:0 !important; }
-  .bulk-print-page {
-    width:210mm !important; height:297mm !important;
-    min-height:297mm !important; max-height:297mm !important;
-    margin:0 !important; padding:0 !important; box-sizing:border-box !important;
-    display:grid !important;
-    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-    grid-template-rows:repeat(3,90mm) !important;
-    column-gap:2mm !important; row-gap:8mm !important;
-    align-content:center !important; justify-content:stretch !important;
-    overflow:hidden !important;
-    page-break-after:always !important; break-after:page !important;
-  }
-  .bulk-print-page:last-child { page-break-after:auto !important; break-after:auto !important; }
-  .bulk-print-page .sample-slip {
-    width:100% !important; height:90mm !important;
-    min-height:90mm !important; max-height:90mm !important;
-    box-sizing:border-box !important; overflow:hidden !important;
-    display:flex !important; flex-direction:column !important;
-    border:1px solid #20aabd !important; border-radius:0 !important;
-    print-color-adjust:exact !important; -webkit-print-color-adjust:exact !important;
-  }
-  .bulk-print-page .full-slip-banner-wrap {
-    width:100% !important; height:38% !important; min-height:0 !important;
-    flex:0 0 38% !important; overflow:hidden !important;
-  }
-  .bulk-print-page .full-slip-banner { width:100% !important; height:100% !important; object-fit:fill !important; }
-  .bulk-print-page .sample-cutline { font-size:9px !important; line-height:1.2 !important; padding:2px 3px !important; }
-  .bulk-print-page .sample-voter-area {
-    display:grid !important; grid-template-columns:minmax(0,1fr) 30mm !important;
-    gap:4px !important; flex:1 1 auto !important; min-height:0 !important; padding:4px 5px 3px !important;
-  }
-  .bulk-print-page .sample-voter-main { display:flex !important; flex-direction:column !important; justify-content:space-between !important; min-width:0 !important; min-height:0 !important; }
-  .bulk-print-page .sample-idline { display:flex !important; align-items:center !important; gap:4px !important; margin:1px 0 3px !important; }
-  .bulk-print-page .sample-idline b { min-width:29px !important; font-size:10px !important; padding:2px 3px !important; }
-  .bulk-print-page .sample-idline strong { font-size:10px !important; line-height:1.2 !important; overflow-wrap:anywhere !important; }
-  .bulk-print-page .sample-detail { font-size:11px !important; line-height:1.3 !important; margin:3px 0 !important; overflow-wrap:anywhere !important; }
-  .bulk-print-page .sample-detail .voter-value, .sample-detail .voter-value { font-weight:900 !important; color:#000 !important; }
-  .bulk-print-page .sample-booth { display:flex !important; flex-direction:column !important; justify-content:space-between !important; min-width:0 !important; padding-left:4px !important; border-left:1px solid #39a9bc !important; }
-  .bulk-print-page .sample-booth-title { font-size:10px !important; line-height:1.2 !important; text-align:center !important; }
-  .bulk-print-page .sample-ward { font-size:11px !important; line-height:1.2 !important; padding:2px 0 !important; }
-  .bulk-print-page .sample-booth-content { font-size:9px !important; line-height:1.25 !important; padding:2px 0 !important; overflow-wrap:anywhere !important; }
-  .bulk-print-page .sample-time { font-size:9px !important; line-height:1.2 !important; padding:3px !important; }
-}
-.sample-detail .voter-value { font-weight:900; color:#000; }
-</style>
-
-
-<style>
-/* नया विजुअल लाइव काउंटिंग डैशबोर्ड */
-.public-dashboard{display:block!important;max-width:1240px!important;padding:0 14px 24px!important}
-.public-hero{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:24px 26px;margin:16px 0 12px;border-radius:18px;color:#fff;background:linear-gradient(115deg,#092b62 0%,#075b91 55%,#079b91 100%);box-shadow:0 8px 24px #1233;position:relative;overflow:hidden}
-.public-hero:after{content:"";position:absolute;width:230px;height:230px;border:30px solid #ffffff12;border-radius:50%;right:12%;top:-150px}
-.public-hero h2{font-size:clamp(22px,4vw,34px);margin:5px 0;font-weight:800;position:relative;z-index:1}
-.public-hero p{margin:0;color:#d9f4ff;font-size:13px}.hero-kicker{font-size:14px;font-weight:700;color:#baf5e8}
-.public-hero .live-badge{background:#dcfce7;color:#087443;position:relative;z-index:1}
-.public-controls{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:12px 0!important;padding:14px 18px!important}
-.ward-entry-row{display:flex;gap:8px;align-items:center}.ward-entry-row input{flex:1;min-width:0}
-.ward-ok-btn{padding:10px 18px!important;border:0;border-radius:9px;background:#0878f9;color:#fff;font-weight:800;cursor:pointer;white-space:nowrap;min-height:42px}
-.ward-ok-btn:active{transform:scale(.97)}
-.control-field{flex:0 1 210px;min-width:160px}.control-field label{margin-top:0}.control-field select,.control-field input{margin-bottom:0}
-.control-context{display:flex;flex-direction:column;gap:4px;margin-left:auto;padding:4px 0;font-size:13px;color:#174ea6}
-.control-context span{color:#64748b;font-size:12px}
-.public-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0}
-.public-kpi{border-radius:14px;padding:15px 17px;color:#fff;box-shadow:0 5px 14px #1232;min-width:0}
-.public-kpi span{display:block;font-size:13px;font-weight:700;opacity:.95}
-.public-kpi strong{display:block;font-size:clamp(22px,3vw,30px);line-height:1.25;margin:5px 0}
-.public-kpi small{font-size:11px;opacity:.88}
-.kpi-blue{background:linear-gradient(135deg,#0878f9,#0753b8)}.kpi-green{background:linear-gradient(135deg,#0ab875,#08794e)}
-.kpi-orange{background:linear-gradient(135deg,#ffad32,#e56c00)}.kpi-pink{background:linear-gradient(135deg,#ed4b9b,#a51a73)}
-.public-main-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:14px;align-items:stretch}
-.public-panel{margin:0!important;padding:18px!important;border:1px solid #dbe6f2;box-shadow:0 5px 20px #1231}
-.panel-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e6edf5;padding-bottom:12px;margin-bottom:12px}
-.panel-heading h3{font-size:18px;color:#123c80;margin:0}.panel-subtitle{font-size:11px;color:#64748b}
-.dashboard-candidate{display:flex;gap:10px;align-items:center;padding:12px 10px;border:1px solid #e5ebf3;border-radius:12px;margin:9px 0;background:#fff}
-.dashboard-candidate.is-leading{background:linear-gradient(100deg,#edfff4,#fff);border-color:#86d7a6}
-.candidate-rank{width:30px;height:30px;display:grid;place-items:center;flex:none;border-radius:50%;background:#eaf1fb;color:#174ea6;font-weight:800}
-.is-leading .candidate-rank{background:#0aa66a;color:white}
-.candidate-result-main{flex:1;min-width:0}.candidate-result-top,.candidate-result-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.candidate-result-top strong{font-size:15px;overflow-wrap:anywhere}.candidate-result-top span{font-weight:800;color:#123c80;white-space:nowrap;font-size:14px}
-.candidate-progress{height:10px;background:#e8edf4;border-radius:20px;overflow:hidden;margin:8px 0 5px}
-.candidate-progress i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#0878f9,#10b981)}
-.is-leading .candidate-progress i{background:linear-gradient(90deg,#08a66a,#34d399)}
-.candidate-result-bottom{font-size:11px;color:#64748b}.winner-tag{color:#087443;background:#d9fbe8;border-radius:20px;padding:4px 9px;font-size:11px}
-.donut-wrap{display:flex;align-items:center;justify-content:center;gap:22px;padding:15px 0;min-height:280px}
-.donut-chart{width:min(230px,48vw);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;flex:none}
-.donut-hole{width:58%;height:58%;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px #e5eaf0}
-.donut-hole small{font-size:12px;color:#64748b}.donut-hole strong{font-size:23px;color:#123c80}
-.donut-legend{flex:1;min-width:130px}.donut-legend>div{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid #edf1f6;font-size:12px}
-.donut-legend i{width:10px;height:10px;border-radius:50%}.donut-legend span{overflow-wrap:anywhere}.donut-legend b{white-space:nowrap;color:#123c80}
-.public-status{padding:12px 14px;background:#eef5ff;border-left:4px solid #2675db;border-radius:9px;font-weight:700;color:#174ea6;font-size:13px;margin-top:8px}
-.public-status.is-completed{background:#e9fbf0;border-color:#0aa66a;color:#087443}
-.updated-line{font-size:11px;color:#64748b;margin-top:10px}
-.public-footnote{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:13px 4px;color:#64748b;font-size:11px}
-.public-login{max-width:480px!important;margin:10px auto 22px!important}
-@media(max-width:760px){.public-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.public-main-grid{grid-template-columns:1fr}.donut-wrap{gap:12px}.public-hero{padding:20px 16px}.control-context{margin-left:0;flex-basis:100%}}
-@media(max-width:430px){.public-dashboard{padding:0 8px 18px!important}.public-kpi{padding:12px}.public-kpi span{font-size:11px}.public-kpi strong{font-size:23px}.donut-wrap{flex-direction:column}.donut-chart{width:190px}.donut-legend{width:100%}.panel-heading h3{font-size:16px}}
-</style>
-
-</head><body>
-<header><div style="display:flex;flex-direction:column;gap:1px"><h1>🗳️ मतदाता पर्ची पोर्टल</h1><small style="font-family:inherit;font-size:9px;line-height:1;color:#dbeafe;margin-left:30px">संजय जाजुन्दा</small></div><button id="logout" class="hidden red">लॉगआउट</button></header>
-
-<main class="wrap public-dashboard" id="publicLiveArea">
-  <section class="public-hero">
-    <div>
-      <div class="hero-kicker">🗳️ ग्राम पंचायत सुवाणा</div>
-      <h2>लाइव काउंटिंग डैशबोर्ड</h2>
-      <p>पारदर्शी चुनाव परिणाम · ताज़ा अपडेट</p>
-    </div>
-    <span class="live-badge"><i class="live-dot"></i> LIVE</span>
-  </section>
-  <section class="public-controls card">
-    <div class="control-field"><label for="publicCountingType">किस पद का परिणाम देखें</label>
-      <select id="publicCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select>
-    </div>
-    <div class="control-field hidden" id="publicWardWrap"><label for="publicWardNumber">वार्ड नंबर</label><div class="ward-entry-row"><input id="publicWardNumber" inputmode="numeric" placeholder="वार्ड नंबर"><button type="button" id="publicWardOk" class="ward-ok-btn">OK</button></div></div>
-    <div class="control-context"><strong id="publicPanchayat">ग्राम पंचायत: सुवाणा</strong><span id="publicRound">पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ</span></div>
-  </section>
-  <section class="public-kpis" id="publicCountingTotals">
-    <div class="public-kpi kpi-blue"><span>कुल वैध प्रत्याशी वोट</span><strong>—</strong></div>
-    <div class="public-kpi kpi-green"><span>कुल वोट</span><strong>—</strong></div>
-    <div class="public-kpi kpi-orange"><span>निरस्त वोट</span><strong>—</strong></div>
-    <div class="public-kpi kpi-pink"><span>NOTA वोट</span><strong>—</strong></div>
-  </section>
-  <section class="public-main-grid">
-    <div class="card public-panel candidate-panel">
-      <div class="panel-heading"><h3>🏆 प्रत्याशीवार परिणाम</h3><span class="panel-subtitle">वोट और प्रतिशत</span></div>
-      <div id="publicCandidates"><div class="notice">लाइव काउंटिंग की जानकारी लोड हो रही है...</div></div>
-    </div>
-    <div class="card public-panel chart-panel">
-      <div class="panel-heading"><h3>📊 वोटों का विश्लेषण</h3><span class="panel-subtitle">कुल वोट में हिस्सेदारी</span></div>
-      <div id="publicCountingChart" class="live-chart"></div>
-      <div class="public-status" id="publicLead">अब तक की स्थिति: परिणाम प्रकाशित होने की प्रतीक्षा है।</div>
-      <div class="updated-line" id="publicUpdated">अपडेट समय: —</div>
-    </div>
-  </section>
-  <section class="card login public-login" id="publicLoginCard">
-    <div style="font-size:32px">🔐</div>
-    <h2>Admin एवं प्रत्याशी लॉगिन</h2>
-    <p class="muted">पोर्टल के प्रबंधन के लिए लॉगिन करें</p>
-    <form id="loginForm">
-      <label>ईमेल</label><input id="email" type="email" required>
-      <label>पासवर्ड</label><input id="password" type="password" required>
-      <button class="wide">लॉगिन करें</button>
-    </form>
-    <div id="loginMsg" class="notice hidden"></div>
-  </section>
-</main>
-<main id="loginView" class="wrap hidden"></main>
-<main id="app" class="wrap hidden">
-<div class="grid"><div class="stat">लॉगिन यूजर<strong id="who">-</strong></div><div class="stat">भूमिका<strong id="role">-</strong></div><div class="stat" id="countBox">पंचायतें<strong id="pCount">0</strong></div></div>
-<nav id="adminTabs" class="tabs no-print"><button class="tab active" data-id="panchayat">पंचायत</button><button class="tab" data-id="upload">Excel अपलोड</button><button class="tab" data-id="accounts">प्रत्याशी</button><button class="tab" data-id="search">मतदाता खोज</button><button class="tab" data-id="countingAdmin">लाइव काउंटिंग</button></nav>
-<section id="panchayat" class="card panel active no-print"><h3>नई ग्राम पंचायत</h3><div class="row"><div><label>पंचायत ID</label><input id="pid" placeholder="SUWANA01"></div><div><label>पंचायत नाम</label><input id="pname" placeholder="ग्राम पंचायत का नाम"></div></div><button id="addP" class="green">पंचायत जोड़ें</button><h3>पंचायत सूची</h3><div class="tablewrap"><table><thead><tr><th>ID</th><th>नाम</th><th>मतदाता</th><th>स्थिति</th><th>एक्शन</th></tr></thead><tbody id="pRows"></tbody></table></div></section>
-<section id="upload" class="card panel no-print"><h3>Excel वोटर सूची अपलोड</h3><label>पंचायत</label><select id="upP"></select><label>Excel फाइल</label><input id="excel" type="file" accept=".xlsx,.xls"><div class="notice">पहली शीट पढ़ी जाएगी। अधिकतम 20,000 पंक्तियाँ प्रति अपलोड। 300 रिकॉर्ड के बैच में सेव होंगे।</div><button id="uploadBtn" class="green">अपलोड शुरू करें</button><div id="upMsg" class="notice hidden"></div><div class="progress"><div id="bar"></div></div></section>
-<section id="accounts" class="card panel no-print"><h3>प्रत्याशी प्रोफाइल</h3><div class="notice">Spark Free में इस वेबसाइट से दूसरे Authentication खाते बनाना उपलब्ध नहीं है। प्रत्याशी खाते Firebase Console में बनाएँ और users/{UID} प्रोफाइल भी Console से जोड़ें।</div><div id="accountList"></div>
-<div class="result" style="margin-top:14px"><h4 style="margin:0 0 8px">पूरी पर्ची का बैनर सेट करें</h4><label>प्रत्याशी चुनें</label><select id="brandingCandidate"><option value="">प्रत्याशी चुनें</option></select><label>तैयार बैनर इमेज (JPG / PNG)</label><input id="brandingBannerFile" class="file-input" type="file" accept="image/*"><img id="brandingBannerPreview" class="banner-preview hidden" alt="बैनर Preview"><div class="image-tools"><button id="removeBrandingBanner" class="red" type="button">बैनर हटाएँ</button></div><div class="muted">एक ही तैयार बैनर अपलोड करें। उसमें प्रत्याशी की फोटो, नाम और चुनाव चिन्ह पहले से जोड़ लें। पोर्टल इसे हर पर्ची के ऊपर पूरी चौड़ाई में लगाएगा। इमेज compress होकर Firestore में सेव होगी।</div><button id="saveBranding" class="green" type="button">बैनर सेव करें</button><div id="brandingMsg" class="notice hidden"></div></div></section>
-
-<section id="countingAdmin" class="card panel no-print">
-  <h3>🗳️ लाइव काउंटिंग कंट्रोल</h3>
-  <div class="notice">सरपंच और सभी वार्ड पंचों के परिणाम एक ही सार्वजनिक शीट में सेव होंगे। हर वार्ड का डेटा अलग सुरक्षित रहेगा। जितने प्रत्याशी हों, उतने नाम जोड़ें। प्रकाशित आंकड़े बिना लॉगिन सभी दर्शकों को तुरंत दिखाई देंगे।</div>
-  <div class="result" style="margin:12px 0;border:1px solid #f0c36d;background:#fffaf0">
-    <h4 style="margin:0 0 8px">✏️ पहले से सेव काउंटिंग डेटा सुधारें</h4>
-    <div class="row">
-      <div><label>किसका डेटा सुधारना है?</label><select id="editCountingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
-      <div id="editCountingWardWrap" class="hidden"><label>वार्ड नंबर</label><input id="editCountingWardNumber" inputmode="numeric" placeholder="वार्ड नंबर"></div>
-    </div>
-    <button id="loadSavedCounting" type="button">पुराना सेव डेटा खोलें</button>
-    <div id="editCountingMsg" class="notice hidden"></div>
-    <div class="muted">डेटा खुलने के बाद नीचे फॉर्म में आवश्यक सुधार करें और “सुधार सेव करें” दबाएँ।</div>
-  </div>
-  <div class="live-admin-grid">
-    <div class="full"><label>ग्राम पंचायत</label><input id="countingPanchayatName" value="सुवाणा" readonly></div>
-    <div><label>पद चुनें</label><select id="countingType"><option value="sarpanch">सरपंच</option><option value="wardpanch">वार्ड पंच</option></select></div>
-    <div id="countingWardWrap" class="hidden"><label>वार्ड नंबर</label><input id="countingWardNumber" inputmode="numeric" placeholder="जैसे 9"></div>
-    <div><label>पोलिंग बूथ नंबर</label><input id="countingBoothNumber" type="text" inputmode="numeric" placeholder="पोलिंग बूथ नंबर / वार्ड नंबर"></div>
-    <div><label>काउंटिंग स्थिति</label><select id="countingStatus"><option value="running">काउंटिंग जारी है</option><option value="completed">काउंटिंग पूरी</option></select></div>
-    <div class="full">
-      <div class="row" style="align-items:center"><h4 style="margin:8px 0">प्रत्याशी और वोट</h4>
-        <button id="addCountingCandidate" type="button" class="green">＋ प्रत्याशी जोड़ें</button>
-      </div>
-      <div id="countingCandidateRows"></div>
-    </div>
-    <div class="full">
-      <h4 style="margin:8px 0">निरस्त वोट का अलग-अलग विवरण</h4>
-      <div class="notice">हर कारण के अनुसार वोटों की संख्या भरें। कुल निरस्त वोट अपने-आप जुड़ेंगे। NOTA इससे अलग रहेगा।</div>
-      <div class="live-admin-grid">
-        <div><label>एक से अधिक निशान वाले</label><input id="rejectedMultipleMarks" type="number" min="0" step="1" value="0"></div>
-        <div><label>गलत तरीके से मुहर लगे</label><input id="rejectedWrongMark" type="number" min="0" step="1" value="0"></div>
-        <div><label>बिना वैध निशान वाले</label><input id="rejectedNoValidMark" type="number" min="0" step="1" value="0"></div>
-        <div><label>अन्य कारणों से निरस्त</label><input id="rejectedOther" type="number" min="0" step="1" value="0"></div>
-      </div>
-      <div class="stat" style="margin-top:10px">कुल निरस्त वोट<strong id="countingRejectedTotal">0</strong></div>
-    </div>
-    <div><label>NOTA वोट</label><input id="countingNota" type="number" min="0" step="1" value="0"></div>
-    <div class="full"><label>अधिकृत अपडेट / टिप्पणी (वैकल्पिक)</label><input id="countingNote" placeholder="जैसे: राउंड 01 की आधिकारिक जानकारी"></div>
-  </div>
-  <button id="publishCounting" class="green wide" type="button">📢 लाइव अपडेट प्रकाशित करें / सुधार सेव करें</button>
-  <button id="exportCountingExcel" class="wide" type="button">📊 Firebase में सेव काउंटिंग डेटा की Excel डाउनलोड करें</button>
-  <div id="countingAdminMsg" class="notice hidden"></div>
-</section>
-
-<section id="search" class="card panel"><h3>मतदाता खोज</h3><div id="candidateBrandingDisplay" class="result hidden"><img id="candidateLoginBanner" class="banner-preview" alt="आपका प्रत्याशी बैनर"></div><div id="searchPWrap"><label>पंचायत</label><select id="searchP"></select></div><div class="row"><div><label>नाम / पिता-पति / मकान नंबर</label><input id="query" placeholder="खोजें"></div><div><label>वार्ड</label><select id="ward"><option value="">सभी अनुमत वार्ड</option></select></div></div><button id="searchBtn">खोजें</button><button id="bulkWardPrint" class="green">वार्ड की सभी पर्चियाँ प्रिंट करें (6 प्रति A4)</button><button id="clearBtn" class="gray">साफ करें</button><div id="searchMsg" class="notice hidden"></div><div id="results"></div></section>
-<section id="printArea" class="card hidden"><div class="no-print slip-actions"><button type="button" onclick="printCurrentSlip()">🖨️ पर्ची प्रिंट करें</button><button type="button" class="green" onclick="saveSlipPNG()">🖼️ Save PNG</button><button type="button" class="gray" onclick="closeSlip()">बंद करें</button></div><div id="slips" class="slips"></div><div class="no-print muted" style="margin-top:10px">पूरे चुने हुए वार्ड की पर्चियों के लिए मतदाता खोज में वार्ड चुनकर “वार्ड की सभी पर्चियाँ प्रिंट करें” दबाएँ।</div></section></main><footer class="muted" style="text-align:center;padding:20px">Voter Slip Portal · Sanjay Jajunda (9829970310)</footer>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script>
-const firebaseConfig={apiKey:"AIzaSyAcvUxuJIAlPodE65yRUQH_hAEvG9U4z_I",authDomain:"voter-11766.firebaseapp.com",projectId:"voter-11766",storageBucket:"voter-11766.firebasestorage.app",messagingSenderId:"1078819307357",appId:"1:1078819307357:web:c8752d49751e34c037b2b4",measurementId:"G-BHBYFENK2L"};
-firebase.initializeApp(firebaseConfig);const auth=firebase.auth(),db=firebase.firestore();let user=null,profile=null,places=[],cache=[],activeSearchPlace=null,candidateBranding={},accountsLoaded=false,brandingReadCache={};const $=x=>document.getElementById(x);
-const norm=x=>String(x??"").toLocaleLowerCase("hi").normalize("NFC").replace(/[\u200b-\u200d\ufeff]/g,"").replace(/[ईी]/g,"इ").replace(/[ऊू]/g,"उ").replace(/[ऐै]/g,"ए").replace(/[औौ]/g,"ओ").replace(/[.,;:|/_-]+/g," ").replace(/\s+/g," ").trim();
-function matchesSearch(v,term){
-  if(!term)return true;
-  const query=norm(term);
-  // केवल अंक लिखे हों तो मकान नंबर का सटीक मिलान करें।
-  // इससे 121 खोजने पर 12, 2121 या अन्य जगह मौजूद 1/2 वाले रिकॉर्ड नहीं आएँगे।
-  if(/^\d+$/.test(query)) return norm(v.house)===query;
-  const hay=norm([v.name,v.relative,v.relationType,v.house,v.ward,v.serial,v.epic,v.age,v.gender,v.locality,v.booth].join(" "));
-  const words=query.split(" ").filter(Boolean);
-  return words.every(word=>hay.includes(word));
-}
-const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function notice(el,s,kind="notice"){el.textContent=s;el.className="notice "+kind;el.classList.remove("hidden")}
-function field(o,keys){for(const k of keys)if(o[k]!=null&&String(o[k]).trim())return String(o[k]).trim();return ""}
-function fields(r){
- const normalized={};
- for(const [k,v] of Object.entries(r)){
-  const key=String(k).toLocaleLowerCase("hi").replace(/[\s_./()-]/g,"");
-  normalized[key]=v;
- }
- const pick=(keys)=>{
-  for(const k of keys){
-   const key=String(k).toLocaleLowerCase("hi").replace(/[\s_./()-]/g,"");
-   const v=normalized[key];
-   if(v!=null&&String(v).trim())return String(v).trim();
-  }
-  return "";
- };
- return {
-  ward:pick(["वार्ड नंबर","वार्ड संख्या","वार्ड","ward number","ward no","ward"]),
-  serial:pick(["क्रम संख्या","क्रमांक","serial number","serial no","serial"]),
-  epic:pick(["ईपीआईसी नंबर","epic number","epic no","epic","voter id"]),
-  name:pick(["नेम","नाम","मतदाता का नाम","मतदाता का पूरा नाम","निर्वाचक का नाम","name","voter name"]),
-  relationType:pick(["संबंध का प्रकार","संबंध प्रकार","relation type","relation"]),
-  relative:pick(["संबंधी का नाम","पिता/पति का नाम","पिता का नाम","पति का नाम","relative name","father name","husband name"]),
-  house:pick(["मकान संख्या","मकान नंबर","मकान नं","house number","house no"]),
-  age:pick(["आयु","उम्र","age"]),
-  gender:pick(["लिंग","gender","sex"]),
-  locality:pick(["मोहल्ला क्षेत्र/एरिया लोकलिटी","मोहल्ला","क्षेत्र","एरिया","लोकलिटी","locality","area"]),
-  booth:pick(["मतदान बूथ संख्या व पता","मतदान बूथ संख्या और पता","बूथ संख्या व पता","booth number and address","polling booth"])
- };
-}
-function isAdmin(){return profile?.role==="admin"}
-function renderCandidateBranding(){
- const box=$("candidateBrandingDisplay");if(!box)return;
- if(!profile||profile.role!=="client"){box.classList.add("hidden");return;}
- const banner=$("candidateLoginBanner");
- if(candidateBranding?.bannerBase64){banner.src=candidateBranding.bannerBase64;box.classList.remove("hidden");}
- else{banner.removeAttribute("src");box.classList.add("hidden");}
-}
-
-// सार्वजनिक लाइव काउंटिंग: नए एकल दस्तावेज़ और पुराने Firebase दस्तावेज़—दोनों पढ़ें।
-const LIVE_COUNTING_DOC = "SUWANA01";
-const countingTypeLabel = type => type === "wardpanch" ? "वार्ड पंच" : "सरपंच";
-const countingWardKey = value => String(value || "").trim().replace(/[^a-zA-Z0-9_-]/g,"");
-const countingDocId = () => LIVE_COUNTING_DOC;
-let liveCountingUnsubscribe = null;
-function renderPublicCounting(sheet){
-  const type = $("publicCountingType").value;
-  const ward = $("publicWardNumber").value.trim();
-  const legacyType = String(sheet.electionType || "").toLowerCase();
-  const data = type === "wardpanch"
-    ? ((sheet.wardPanchResults || {})[countingWardKey(ward)] || {})
-    : (sheet.sarpanchResult || ((legacyType !== "wardpanch" && Array.isArray(sheet.candidates)) ? sheet : {}));
-  const availableWards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
-  if(type === "wardpanch" && !ward && availableWards.length) $("publicWardNumber").placeholder = "उपलब्ध वार्ड: " + availableWards.join(", ");
-  $("publicPanchayat").textContent = "ग्राम पंचायत: " + (sheet.panchayatName || "सुवाणा") + " · " + countingTypeLabel(type) + (type === "wardpanch" && ward ? " · वार्ड " + ward : "");
-  $("publicRound").textContent = data.pollingBoothNumber ? "पोलिंग बूथ नंबर: " + String(data.pollingBoothNumber) : "पोलिंग बूथ नंबर: अभी दर्ज नहीं हुआ";
-  const candidates = Array.isArray(data.candidates) ? data.candidates : [];
-  const rejectedBreakdown = data.rejectedBreakdown || {};
-  const rejectedFromBreakdown = Object.values(rejectedBreakdown).reduce((n,v)=>n+(Math.max(0,Number(v)||0)),0);
-  const rejected = Math.max(0, Number(data.rejectedVotes)||rejectedFromBreakdown||0);
-  const rejectedItems = [
-    ["एक से अधिक निशान वाले", rejectedBreakdown.multipleMarks],
-    ["गलत तरीके से मुहर लगे", rejectedBreakdown.wrongMark],
-    ["बिना वैध निशान वाले", rejectedBreakdown.noValidMark],
-    ["अन्य कारणों से निरस्त", rejectedBreakdown.other]
-  ];
-  const nota = Math.max(0, Number(data.notaVotes)||0);
-  const candidateVotes = candidates.reduce((sum,c)=>sum+(Math.max(0,Number(c.votes)||0)),0);
-  const totalVotes = candidateVotes + rejected + nota;
-  const maxVotes = candidates.reduce((m,c)=>Math.max(m,Number(c.votes)||0),0);
-  const leaders = candidates.filter(c=>Number(c.votes)===maxVotes && maxVotes>0).map(c=>c.name).filter(Boolean);
-  const completed = data.status === "completed";
-  const sortedCandidates = candidates.map(c=>({...c, votes:Math.max(0,Number(c.votes)||0)})).sort((a,b)=>b.votes-a.votes);
-  $("publicCandidates").innerHTML = sortedCandidates.map((c,index)=>{
-    const isLead = maxVotes > 0 && c.votes === maxVotes;
-    const pct = totalVotes ? (c.votes/totalVotes*100) : 0;
-    return `<div class="dashboard-candidate ${isLead?"is-leading":""}">
-      <div class="candidate-rank">${index+1}</div>
-      <div class="candidate-result-main">
-        <div class="candidate-result-top"><strong>${esc(c.name || "प्रत्याशी")}</strong><span>${c.votes.toLocaleString("en-IN")} वोट</span></div>
-        <div class="candidate-progress"><i style="width:${Math.min(100,pct).toFixed(2)}%"></i></div>
-        <div class="candidate-result-bottom"><span>${pct.toFixed(2)}% कुल वोट</span>${isLead?`<b class="winner-tag">${completed?"🏆 विजेता":"▲ आगे चल रहे हैं"}</b>`:""}</div>
-      </div>
-    </div>`;
-  }).join("") || '<div class="notice">इस पद की काउंटिंग अपडेट अभी प्रकाशित नहीं हुई है।</div>';
-
-  const palette = ["#0878f9","#08a66a","#ff8a00","#9333ea","#e84393","#0ea5a4","#64748b"];
-  let offset = 0;
-  const segments = [];
-  const chartRows = sortedCandidates.map((c,i)=>{
-    const value = totalVotes ? c.votes/totalVotes*100 : 0;
-    const from = offset; offset += value;
-    segments.push(`${palette[i%palette.length]} ${from.toFixed(2)}% ${offset.toFixed(2)}%`);
-    return {name:c.name||"प्रत्याशी",votes:c.votes,pct:value,color:palette[i%palette.length]};
-  });
-  if(rejected){const from=offset;offset+=totalVotes?rejected/totalVotes*100:0;segments.push(`#ef4444 ${from.toFixed(2)}% ${offset.toFixed(2)}%`);}
-  if(nota){const from=offset;offset+=totalVotes?nota/totalVotes*100:0;segments.push(`#64748b ${from.toFixed(2)}% ${offset.toFixed(2)}%`);}
-  $("publicCountingChart").innerHTML = totalVotes ? `
-    <div class="donut-wrap"><div class="donut-chart" style="background:conic-gradient(${segments.join(",")})"><div class="donut-hole"><small>कुल वोट</small><strong>${totalVotes.toLocaleString("en-IN")}</strong></div></div>
-      <div class="donut-legend">${chartRows.map(r=>`<div><i style="background:${r.color}"></i><span>${esc(r.name)}</span><b>${r.pct.toFixed(1)}%</b></div>`).join("")}
-      ${rejected?`<div><i style="background:#ef4444"></i><span>निरस्त वोट</span><b>${(rejected/totalVotes*100).toFixed(1)}%</b></div>`:""}
-      ${nota?`<div><i style="background:#64748b"></i><span>NOTA</span><b>${(nota/totalVotes*100).toFixed(1)}%</b></div>`:""}</div>
-    </div>` : '<div class="notice">वोट दर्ज होने पर चार्ट यहाँ दिखाई देगा।</div>';
-
-  $("publicCountingTotals").innerHTML = `
-    <div class="public-kpi kpi-blue"><span>वैध प्रत्याशी वोट</span><strong>${candidateVotes.toLocaleString("en-IN")}</strong><small>प्रत्याशियों को मिले वोट</small></div>
-    <div class="public-kpi kpi-green"><span>कुल वोट</span><strong>${totalVotes.toLocaleString("en-IN")}</strong><small>सभी श्रेणियों सहित</small></div>
-    <div class="public-kpi kpi-orange"><span>निरस्त वोट</span><strong>${rejected.toLocaleString("en-IN")}</strong><small>अमान्य मत</small></div>
-    <div class="public-kpi kpi-pink"><span>NOTA वोट</span><strong>${nota.toLocaleString("en-IN")}</strong><small>नोटा मत</small></div>`;
-  $("publicLead").textContent = completed
-    ? "काउंटिंग पूरी" + (leaders.length ? " · विजेता: " + leaders.join(", ") : "")
-    : "काउंटिंग जारी" + (leaders.length ? " · आगे चल रहे प्रत्याशी: " + leaders.join(", ") : " · अभी बढ़त उपलब्ध नहीं है।");
-  $("publicLead").classList.toggle("is-completed",completed);
-  $("publicUpdated").textContent = "अंतिम अपडेट: " + (data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "—") + (data.note ? " · " + data.note : "");
-}
-function startPublicCountingListener(){
-  if(liveCountingUnsubscribe) liveCountingUnsubscribe();
-  const type = $("publicCountingType").value;
-  const ward = $("publicWardNumber").value.trim();
-  $("publicWardWrap").classList.toggle("hidden", type !== "wardpanch");
-  const rootRef = db.collection("liveCounting").doc(countingDocId());
-  if(type === "wardpanch" && !ward){
-    liveCountingUnsubscribe = rootRef.onSnapshot(snap=>{
-      const sheet = snap.exists ? snap.data() : {};
-      const wards = Object.keys(sheet.wardPanchResults || {}).sort((a,b)=>a.localeCompare(b,"en",{numeric:true}));
-      $("publicPanchayat").textContent = wards.length ? "उपलब्ध वार्ड नंबर: " + wards.join(", ") : "वार्ड पंच का परिणाम देखने के लिए वार्ड नंबर भरें";
-      $("publicRound").textContent = "पोलिंग बूथ नंबर: —";
-      $("publicCandidates").innerHTML = '<div class="notice">वार्ड नंबर भरें। पुराने और नए दोनों सेव किए गए वार्ड परिणाम यहाँ दिखेंगे।</div>';
-      $("publicCountingChart").innerHTML = ""; $("publicCountingTotals").innerHTML = "";
-      $("publicLead").textContent = "वार्ड चुनकर परिणाम देखें।";
-      $("publicUpdated").textContent = "अपडेट समय: " + (sheet.updatedAt && sheet.updatedAt.toDate ? sheet.updatedAt.toDate().toLocaleString("hi-IN") : "—");
-    }, err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका। Firebase Rules में liveCounting public read अनुमति जाँचें।</div>';});
-    return;
-  }
-  if(type === "wardpanch"){
-    // पहले नए एकल दस्तावेज़ में wardPanchResults देखें; यदि वहाँ नहीं है तो पुराना वार्ड डॉक्यूमेंट पढ़ें।
-    const legacyWardRef = db.collection("liveCounting").doc(LIVE_COUNTING_DOC + "_WARDPANCH_" + countingWardKey(ward));
-    let rootData = {};
-    let legacyUnsub = null;
-    const rootUnsub = rootRef.onSnapshot(snap=>{
-      rootData = snap.exists ? snap.data() : {};
-      const modern = (rootData.wardPanchResults || {})[countingWardKey(ward)];
-      if(modern){ if(legacyUnsub){legacyUnsub();legacyUnsub=null;} renderPublicCounting(rootData); }
-      else if(!legacyUnsub){
-        legacyUnsub = legacyWardRef.onSnapshot(oldSnap=>{
-          if(oldSnap.exists) renderPublicCounting({...rootData, wardPanchResults:{...(rootData.wardPanchResults||{}), [countingWardKey(ward)]:oldSnap.data()}});
-          else renderPublicCounting({...rootData, wardPanchResults:{}});
-        },err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">इस वार्ड का परिणाम नहीं पढ़ा जा सका। Firebase Rules जाँचें।</div>';});
-      }
-    },err=>{console.error(err); $("publicCandidates").innerHTML='<div class="notice error">परिणाम लोड नहीं हो सका। Firebase Rules में public read अनुमति जाँचें।</div>';});
-    liveCountingUnsubscribe = ()=>{rootUnsub(); if(legacyUnsub) legacyUnsub();};
-    return;
-  }
-  liveCountingUnsubscribe = rootRef.onSnapshot(
-    snap => renderPublicCounting(snap.exists ? snap.data() : {}),
-    err => { $("publicCandidates").innerHTML = '<div class="notice error">लाइव काउंटिंग लोड नहीं हो सकी। Firebase Rules में public read अनुमति जाँचें।</div>'; console.error("Live counting listener:",err); }
-  );
-}
-$("publicCountingType").addEventListener("change", startPublicCountingListener);
-$("publicWardNumber").addEventListener("change", startPublicCountingListener);
-$("publicWardNumber").addEventListener("keydown", e=>{if(e.key==="Enter")startPublicCountingListener()});
-$("countingType").addEventListener("change", ()=>{
-  $("countingWardWrap").classList.toggle("hidden", $("countingType").value !== "wardpanch");
-});
-startPublicCountingListener();
-
-let countingCandidateSerial = 0;
-function addCountingCandidateRow(name="", votes=0){
-  const row = document.createElement("div");
-  row.className = "counting-candidate-row";
-  row.innerHTML = `<div><label>प्रत्याशी का नाम</label><input class="counting-candidate-name" placeholder="प्रत्याशी का नाम" value="${esc(name)}"></div>
-    <div><label>प्राप्त वोट</label><input class="counting-candidate-votes" type="number" min="0" step="1" value="${Number(votes)||0}"></div>
-    <button type="button" class="red remove-count-candidate">हटाएँ</button>`;
-  row.querySelector(".remove-count-candidate").addEventListener("click", ()=>row.remove());
-  $("countingCandidateRows").appendChild(row);
-  countingCandidateSerial++;
-}
-$("addCountingCandidate").addEventListener("click", ()=>addCountingCandidateRow());
-for(let i=0;i<3;i++) addCountingCandidateRow();
-
-const rejectedInputIds = ["rejectedMultipleMarks","rejectedWrongMark","rejectedNoValidMark","rejectedOther"];
-function getRejectedBreakdown(){
-  const values = rejectedInputIds.map(id => Math.max(0, Math.floor(Number($(id).value)||0)));
-  return {multipleMarks:values[0], wrongMark:values[1], noValidMark:values[2], other:values[3]};
-}
-function updateRejectedTotal(){
-  const b = getRejectedBreakdown();
-  const total = b.multipleMarks + b.wrongMark + b.noValidMark + b.other;
-  $("countingRejectedTotal").textContent = total.toLocaleString("en-IN");
-  return total;
-}
-rejectedInputIds.forEach(id => $(id).addEventListener("input", updateRejectedTotal));
-updateRejectedTotal();
-
-$("editCountingType").addEventListener("change", ()=>{
-  $("editCountingWardWrap").classList.toggle("hidden", $("editCountingType").value !== "wardpanch");
-});
-
-function fillCountingForm(data, type, ward){
-  $("countingType").value=type;
-  $("countingWardWrap").classList.toggle("hidden", type !== "wardpanch");
-  $("countingWardNumber").value=type === "wardpanch" ? String(data.wardNumber || ward || "") : "";
-  $("countingBoothNumber").value=data.pollingBoothNumber || "";
-  $("countingStatus").value=data.status === "completed" ? "completed" : "running";
-  $("countingCandidateRows").innerHTML="";
-  (Array.isArray(data.candidates) && data.candidates.length ? data.candidates : [{name:"",votes:0}]).forEach(c=>addCountingCandidateRow(c.name || "",c.votes || 0));
-  const b=data.rejectedBreakdown || {};
-  $("rejectedMultipleMarks").value=Number(b.multipleMarks)||0;
-  $("rejectedWrongMark").value=Number(b.wrongMark)||0;
-  $("rejectedNoValidMark").value=Number(b.noValidMark)||0;
-  $("rejectedOther").value=Number(b.other)||0;
-  updateRejectedTotal();
-  $("countingNota").value=Number(data.notaVotes)||0;
-  $("countingNote").value=data.note || "";
-  notice($("editCountingMsg"),"पुराना डेटा फॉर्म में खुल गया है। सुधार करके नीचे ‘सुधार सेव करें’ दबाएँ।","success");
-  $("publishCounting").textContent="✏️ सुधार सेव करें और लाइव अपडेट करें";
-}
-
-$("loadSavedCounting").onclick=async()=>{
-  if(!isAdmin()) return notice($("editCountingMsg"),"केवल एडमिन सेव डेटा सुधार सकता है।","error");
-  const type=$("editCountingType").value;
-  const ward=$("editCountingWardNumber").value.trim();
-  if(type === "wardpanch" && !ward) return notice($("editCountingMsg"),"वार्ड नंबर भरें।","error");
-  const btn=$("loadSavedCounting"); btn.disabled=true;
-  try{
-    const ref=db.collection("liveCounting").doc(countingDocId());
-    const snap=await ref.get();
-    let data=null;
-    if(snap.exists){
-      const sheet=snap.data()||{};
-      data=type === "sarpanch" ? (sheet.sarpanchResult || ((Array.isArray(sheet.candidates) && sheet.electionType !== "wardpanch") ? sheet : null)) : ((sheet.wardPanchResults||{})[countingWardKey(ward)] || null);
-    }
-    // पुराने ward-wise दस्तावेज़ से भी डेटा पढ़ें; सेव करते समय नए साझा दस्तावेज़ में अपडेट होगा।
-    if(!data && type === "wardpanch"){
-      const oldSnap=await db.collection("liveCounting").doc(LIVE_COUNTING_DOC+"_WARDPANCH_"+countingWardKey(ward)).get();
-      if(oldSnap.exists) data=oldSnap.data();
-    }
-    if(!data) return notice($("editCountingMsg"),"इस चयन के लिए Firebase में सेव काउंटिंग डेटा नहीं मिला।","error");
-    fillCountingForm(data,type,ward);
-    $("countingAdminMsg").classList.add("hidden");
-  }catch(e){
-    console.error(e); notice($("editCountingMsg"),"सेव डेटा लोड नहीं हुआ: "+e.message,"error");
-  }finally{btn.disabled=false;}
-};
-
-$("publishCounting").onclick = async ()=>{
-  if(!isAdmin()) return notice($("countingAdminMsg"),"केवल एडमिन काउंटिंग अपडेट कर सकता है।","error");
-  const type = $("countingType").value;
-  const wardNumber = $("countingWardNumber").value.trim();
-  if(type === "wardpanch" && !wardNumber) return notice($("countingAdminMsg"),"वार्ड पंच की काउंटिंग के लिए वार्ड नंबर भरें।","error");
-  const candidates = [...$("countingCandidateRows").querySelectorAll(".counting-candidate-row")]
-    .map(row=>({
-      name:row.querySelector(".counting-candidate-name").value.trim(),
-      votes:Math.max(0,Math.floor(Number(row.querySelector(".counting-candidate-votes").value)||0))
-    })).filter(c=>c.name);
-  if(!candidates.length) return notice($("countingAdminMsg"),"कम से कम एक प्रत्याशी का नाम भरें।","error");
-  const pollingBoothNumber = $("countingBoothNumber").value.trim();
-  const status = $("countingStatus").value;
-  const btn=$("publishCounting"); btn.disabled=true;
-  try{
-    const resultData = {
-      wardNumber:type === "wardpanch" ? wardNumber : "",
-      electionType:type, electionTypeLabel:countingTypeLabel(type),
-      pollingBoothNumber,candidates,status,
-      rejectedBreakdown:getRejectedBreakdown(), rejectedVotes:updateRejectedTotal(),
-      notaVotes:Math.max(0,Math.floor(Number($("countingNota").value)||0)),
-      note:$("countingNote").value.trim(),
-      updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedBy:user.uid
-    };
-    const sheetRef = db.collection("liveCounting").doc(countingDocId());
-    const common = {panchayatId:LIVE_COUNTING_DOC, panchayatName:$("countingPanchayatName").value.trim() || "सुवाणा", updatedAt:firebase.firestore.FieldValue.serverTimestamp(), updatedBy:user.uid};
-    if(type === "wardpanch") await sheetRef.set({...common, wardPanchResults:{[countingWardKey(wardNumber)]:resultData}}, {merge:true});
-    else await sheetRef.set({...common, sarpanchResult:resultData}, {merge:true});
-    notice($("countingAdminMsg"),countingTypeLabel(type)+" की लाइव काउंटिंग सफलतापूर्वक प्रकाशित हो गई।","success");
-  }catch(e){
-    notice($("countingAdminMsg"),"अपडेट प्रकाशित नहीं हुआ: "+e.message+" · Firestore Rules में liveCounting पर Admin write और public read अनुमति जाँचें।","error");
-  }finally{btn.disabled=false;}
-};
-
-// Admin can export all saved counting results directly from Firestore to Excel.
-function countingExportRow(type, ward, data, sourceId){
-  const candidates = Array.isArray(data.candidates) ? data.candidates : [];
-  const rejected = data.rejectedBreakdown || {};
-  const candidateTotal = candidates.reduce((n,c)=>n+(Number(c.votes)||0),0);
-  const rejectedTotal = Number(data.rejectedVotes) || Object.values(rejected).reduce((n,v)=>n+(Number(v)||0),0);
-  const nota = Number(data.notaVotes)||0;
-  const total = candidateTotal + rejectedTotal + nota;
-  const updated = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toLocaleString("hi-IN") : "";
-  return {
-    "पद": countingTypeLabel(type), "वार्ड नंबर": ward || "—", "पोलिंग बूथ नंबर": data.pollingBoothNumber || "",
-    "प्रत्याशी": candidates.map(c=>c.name||"").join(" | "),
-    "प्रत्याशीवार वोट": candidates.map(c=>`${c.name||""}: ${Number(c.votes)||0}`).join(" | "),
-    "कुल प्रत्याशी वोट": candidateTotal, "NOTA": nota,
-    "एक से अधिक निशान": Number(rejected.multipleMarks)||0,
-    "गलत मुहर": Number(rejected.wrongMark)||0,
-    "बिना वैध निशान": Number(rejected.noValidMark)||0,
-    "अन्य निरस्त": Number(rejected.other)||0,
-    "कुल निरस्त वोट": rejectedTotal, "कुल वोट": total,
-    "स्थिति": data.status === "completed" ? "काउंटिंग पूरी" : "काउंटिंग जारी",
-    "टिप्पणी": data.note || "", "अपडेट समय": updated, "Firebase डॉक्यूमेंट": sourceId
-  };
-}
-$("exportCountingExcel").addEventListener("click", async ()=>{
-  if(!isAdmin()) return notice($("countingAdminMsg"),"Excel डाउनलोड केवल एडमिन कर सकता है।","error");
-  const btn=$("exportCountingExcel"); btn.disabled=true;
-  try{
-    notice($("countingAdminMsg"),"Firebase से सेव काउंटिंग डेटा पढ़ रहे हैं...");
-    const snap=await db.collection("liveCounting").get();
-    const rows=[]; const modernWardKeys=new Set();
-    const docs=snap.docs;
-    const root=docs.find(d=>d.id===LIVE_COUNTING_DOC);
-    if(root){
-      const sheet=root.data()||{};
-      if(sheet.sarpanchResult && Array.isArray(sheet.sarpanchResult.candidates)) rows.push(countingExportRow("sarpanch","",sheet.sarpanchResult,root.id));
-      else if(String(sheet.electionType||"").toLowerCase()!=="wardpanch" && Array.isArray(sheet.candidates)) rows.push(countingExportRow("sarpanch","",sheet,root.id));
-      Object.entries(sheet.wardPanchResults||{}).forEach(([ward,data])=>{
-        if(data && Array.isArray(data.candidates)){modernWardKeys.add(countingWardKey(ward));rows.push(countingExportRow("wardpanch",ward,data,root.id));}
-      });
-    }
-    docs.forEach(d=>{
-      const match=d.id.match(new RegExp("^"+LIVE_COUNTING_DOC+"_WARDPANCH_(.+)$"));
-      if(!match) return;
-      const ward=match[1], data=d.data()||{};
-      if(modernWardKeys.has(countingWardKey(ward)) || !Array.isArray(data.candidates)) return;
-      rows.push(countingExportRow("wardpanch",ward,data,d.id));
-    });
-    if(!rows.length) throw new Error("Firebase में कोई सेव काउंटिंग डेटा नहीं मिला।");
-    const wb=XLSX.utils.book_new();
-    const ws=XLSX.utils.json_to_sheet(rows);
-    ws["!cols"]=[{wch:14},{wch:12},{wch:16},{wch:30},{wch:45},{wch:16},{wch:10},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:14},{wch:16},{wch:30},{wch:22},{wch:32}];
-    XLSX.utils.book_append_sheet(wb,ws,"काउंटिंग रिजल्ट");
-    const summary=[
-      {"विवरण":"कुल सेव परिणाम","संख्या":rows.length},
-      {"विवरण":"सरपंच परिणाम","संख्या":rows.filter(r=>r["पद"]==="सरपंच").length},
-      {"विवरण":"वार्ड पंच परिणाम","संख्या":rows.filter(r=>r["पद"]==="वार्ड पंच").length},
-      {"विवरण":"कुल वोट (सभी परिणाम)","संख्या":rows.reduce((n,r)=>n+(Number(r["कुल वोट"])||0),0)}
-    ];
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),"सारांश");
-    XLSX.writeFile(wb,"Suwana_Live_Counting_Results.xlsx");
-    notice($("countingAdminMsg"),`Excel तैयार है। ${rows.length} सेव परिणाम डाउनलोड हो गए। Firebase का डेटा सुरक्षित है।`,"success");
-  }catch(e){notice($("countingAdminMsg"),"Excel नहीं बन सकी: "+e.message,"error");}
-  finally{btn.disabled=false;}
-});
-
-auth.onAuthStateChanged(async u=>{user=u;cache=[];activeSearchPlace=null;if(!u){profile=null;places=[];candidateBranding={};$("loginView").classList.add("hidden");$("publicLoginCard").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden");return}
-try{const d=await db.collection("users").doc(u.uid).get();if(!d.exists)throw Error("users प्रोफाइल नहीं मिली। Admin से संपर्क करें।");profile=d.data();if(!["admin","client"].includes(profile.role))throw Error("अमान्य भूमिका।");if(profile.role==="client"&&profile.active===false)throw Error("आपकी प्रत्याशी ID एडमिन द्वारा बंद की गई है। कृपया एडमिन से संपर्क करें।");$("loginView").classList.add("hidden");$("publicLoginCard").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");$("who").textContent=profile.name||u.email;$("role").textContent=isAdmin()?"Admin":profile.position||"प्रत्याशी";$("adminTabs").classList.toggle("hidden",!isAdmin());$("countBox").classList.toggle("hidden",!isAdmin());["panchayat","upload","accounts","countingAdmin"].forEach(id=>$(id).classList.toggle("hidden",!isAdmin()));if(isAdmin()){await loadPlaces();$("searchPWrap").classList.remove("hidden")}else{const p=await db.collection("panchayats").doc(profile.panchayatId).get();if(!p.exists)throw Error("प्रोफाइल की पंचायत नहीं मिली।");if(p.data().active===false)throw Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। पंचायत चालू होने पर आप फिर लॉगिन कर सकेंगे।");places=[{id:p.id,...p.data()}];try{const bs=await db.collection("panchayats").doc(profile.panchayatId).collection("candidateBranding").doc(u.uid).get();candidateBranding=bs.exists?bs.data():{};renderCandidateBranding();}catch(brandErr){candidateBranding={};renderCandidateBranding();console.warn("Candidate branding could not be loaded",brandErr);notice($("searchMsg"),"प्रत्याशी की फोटो/चिह्न लोड नहीं हुए: "+brandErr.message,"error");}$("searchPWrap").classList.add("hidden");$("ward").innerHTML=profile.ward==="ALL"?"<option value=''>सभी वार्ड</option>":`<option value="${esc(profile.ward)}">${esc(profile.ward)}</option>`;document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));$("search").classList.add("active");$("query").value="";$("results").innerHTML="";$("searchMsg").classList.add("hidden");cache=[]}}catch(e){alert(e.message);await auth.signOut()}});
-$("loginForm").onsubmit=async e=>{e.preventDefault();notice($("loginMsg"),"लॉगिन हो रहा है...");try{await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value)}catch(e){notice($("loginMsg"),e.message,"error")}};$("logout").onclick=()=>auth.signOut();
-document.querySelectorAll(".tab").forEach(b=>b.onclick=async()=>{
- document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
- document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
- b.classList.add("active");$(b.dataset.id).classList.add("active");
- if(b.dataset.id==="accounts"&&isAdmin()&&!accountsLoaded){
-  try{notice($("accountList"),"प्रत्याशी सूची लोड हो रही है...");await loadAccounts();}
-  catch(e){notice($("accountList"),"प्रत्याशी सूची नहीं खुली: "+e.message,"error");}
- }
-});
-async function loadPlaces(){
- const s=await db.collection("panchayats").orderBy("name").get();
- places=s.docs.map(d=>({id:d.id,...d.data()}));
- $("pCount").textContent=places.length;
- $("pRows").innerHTML=places.map(p=>{
-  const active=p.active!==false;
-  return `<tr><td>${esc(p.id)}</td><td>${esc(p.name)}</td><td>${p.activeVoterCount||0}</td><td><b style="color:${active?"#16834b":"#b42318"}">${active?"चालू":"बंद"}</b></td><td><button class="${active?"red":"green"}" onclick="togglePanchayat('${esc(p.id)}')">${active?"बंद करें":"चालू करें"}</button></td></tr>`;
- }).join("")||"<tr><td colspan='5'>कोई पंचायत नहीं</td></tr>";
- $("upP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.active===false?" (बंद)":""}</option>`).join("");
- $("searchP").innerHTML=places.map(p=>`<option value="${esc(p.id)}">${esc(p.name)}${p.active===false?" (बंद)":""}</option>`).join("");
-}
-window.togglePanchayat=async id=>{
- if(!isAdmin())return alert("केवल एडमिन पंचायत की स्थिति बदल सकता है।");
- const p=places.find(x=>x.id===id);if(!p)return alert("पंचायत नहीं मिली।");
- const next=p.active===false;
- const action=next?"चालू":"बंद";
- if(!confirm(`क्या आप "${p.name}" पंचायत को ${action} करना चाहते हैं?\n\nइससे कोई डेटा या प्रत्याशी अकाउंट डिलीट नहीं होगा।`))return;
- try{
-  await db.collection("panchayats").doc(id).update({active:next,activeUpdatedAt:firebase.firestore.FieldValue.serverTimestamp(),activeUpdatedBy:user.uid});
-  cache=[];$("results").innerHTML="";$("printArea").classList.add("hidden");
-  await loadPlaces();
-  alert(`पंचायत ${next?"चालू":"बंद"} कर दी गई। कोई डेटा डिलीट नहीं हुआ।`);
- }catch(e){alert("पंचायत की स्थिति नहीं बदली जा सकी: "+e.message)}
-};
-$("addP").onclick=async()=>{let id=$("pid").value.trim().toUpperCase(),name=$("pname").value.trim();if(!/^[A-Z0-9_-]{3,40}$/.test(id)||!name)return alert("सही ID और नाम भरें।");try{await db.collection("panchayats").doc(id).set({name,active:true,activeUploadId:null,activeVoterCount:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});await loadPlaces();alert("पंचायत जोड़ दी गई।")}catch(e){alert(e.message)}};
-$("uploadBtn").onclick=async()=>{let pid=$("upP").value,file=$("excel").files[0];if(!pid||!file)return alert("पंचायत और Excel चुनें।");$("uploadBtn").disabled=true;try{notice($("upMsg"),"Excel पढ़ रहे हैं...");let wb=XLSX.read(await file.arrayBuffer(),{type:"array"}),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:false});if(!rows.length||rows.length>20000)throw Error("1 से 20,000 रिकॉर्ड तक अपलोड करें।");let uid=db.collection("_ids").doc().id,ref=db.collection("panchayats").doc(pid).collection("uploads").doc(uid);await ref.set({status:"uploading",totalRecords:rows.length});let batch=db.batch(),count=0;for(let i=0;i<rows.length;i++){batch.set(ref.collection("voters").doc(String(i+2)),{...rows[i],...fields(rows[i]),_row:i+2});count++;if(count===300||i===rows.length-1){await batch.commit();batch=db.batch();count=0;$("bar").style.width=Math.round((i+1)/rows.length*100)+"%";notice($("upMsg"),`अपलोड ${i+1}/${rows.length}`)}}await ref.update({status:"active"});await db.collection("panchayats").doc(pid).update({activeUploadId:uid,activeVoterCount:rows.length});notice($("upMsg"),`${rows.length} रिकॉर्ड अपलोड हुए।`,"success");await loadPlaces()}catch(e){notice($("upMsg"),"त्रुटि: "+e.message,"error")}finally{$("uploadBtn").disabled=false}};
-let clientProfiles=[];
-async function loadAccounts(){
- let s=await db.collection("users").where("role","==","client").get();
- clientProfiles=s.docs.map(d=>({uid:d.id,...d.data()}));accountsLoaded=true;
- $("accountList").innerHTML=clientProfiles.map(x=>{const active=x.active!==false;return `<div class="result"><b>${esc(x.name||x.email||x.uid)}</b><br>${esc(x.email||"")} · ${esc(x.position||"")} · ${esc(x.panchayatId||"")} · वार्ड ${esc(x.ward||"")}<br><b style="color:${active?"#16834b":"#b42318"}">स्थिति: ${active?"चालू":"बंद"}</b><br><button type="button" class="${active?"red":"green"}" onclick="toggleCandidate('${esc(x.uid)}')">${active?"ID बंद करें":"ID चालू करें"}</button></div>`}).join("")||"कोई प्रत्याशी प्रोफाइल नहीं।";
- const select=$("brandingCandidate");
- select.innerHTML='<option value="">प्रत्याशी चुनें</option>'+clientProfiles.map(x=>`<option value="${esc(x.uid)}">${esc(x.name||x.email||x.uid)} — ${esc(x.panchayatId||"")} / वार्ड ${esc(x.ward||"")}</option>`).join("");
- let rememberedUid="";try{rememberedUid=localStorage.getItem("voterSlipBrandingCandidateUid")||""}catch(e){}
- if(rememberedUid&&clientProfiles.some(x=>x.uid===rememberedUid))select.value=rememberedUid;
- else if(clientProfiles.length)select.value=clientProfiles[0].uid;
- if(select.value)await loadBrandingEditor();
-}
-window.toggleCandidate=async uid=>{
- if(!isAdmin())return alert("केवल एडमिन प्रत्याशी ID की स्थिति बदल सकता है।");
- const c=clientProfiles.find(x=>x.uid===uid);if(!c)return alert("प्रत्याशी प्रोफाइल नहीं मिली।");
- const next=c.active===false;
- if(!confirm(`क्या आप "${c.name||c.email||uid}" की ID ${next?"चालू":"बंद"} करना चाहते हैं?`))return;
- try{
-  await db.collection("users").doc(uid).update({active:next,activeUpdatedAt:firebase.firestore.FieldValue.serverTimestamp(),activeUpdatedBy:user.uid});
-  await loadAccounts();
-  alert(`प्रत्याशी की ID ${next?"चालू":"बंद"} कर दी गई।`);
- }catch(e){alert("प्रत्याशी ID की स्थिति नहीं बदली जा सकी: "+e.message+"\\nFirestore Rules में users दस्तावेज़ का active field अपडेट करने की अनुमति जाँचें।")}
-};
-let brandingBannerData="";
-function setBannerPreview(data){const img=$("brandingBannerPreview");if(data){img.src=data;img.classList.remove("hidden");}else{img.removeAttribute("src");img.classList.add("hidden");}brandingBannerData=data||"";$("brandingBannerFile").value="";}
-async function compressBanner(file){
- if(!file||!file.type.startsWith("image/"))throw Error("कृपया JPG, PNG या WebP बैनर चुनें।");
- if(file.size>15*1024*1024)throw Error("मूल बैनर 15 MB से बड़ा है।");
- const url=URL.createObjectURL(file);
- try{const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=()=>j(Error("बैनर पढ़ा नहीं जा सका।"));img.src=url;});
- let max=1600,last="";
- for(let n=0;n<7;n++){const scale=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.naturalWidth*scale));c.height=Math.max(1,Math.round(img.naturalHeight*scale));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);for(const q of [.82,.72,.62,.52,.42,.32]){last=c.toDataURL("image/jpeg",q);if(last.length<=520*1024)return last;}max=Math.round(max*.78);}
- if(last.length<=650*1024)return last;throw Error("बैनर छोटा नहीं हो पा रहा। कम आकार की इमेज चुनें।");
- }finally{URL.revokeObjectURL(url);}
-}
-async function loadBrandingEditor(){
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);setBannerPreview("");$("brandingMsg").classList.add("hidden");if(!c)return;
- try{const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).get();if(d.exists)setBannerPreview(d.data().bannerBase64||"");}
- catch(e){notice($("brandingMsg"),"Firestore से बैनर लोड नहीं हुआ: "+e.message,"error");}
-}
-$("brandingCandidate").onchange=loadBrandingEditor;
-$("brandingBannerFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{notice($("brandingMsg"),"बैनर compress हो रहा है...");setBannerPreview(await compressBanner(f));notice($("brandingMsg"),"बैनर तैयार है। अब सेव करें।","success");}catch(err){notice($("brandingMsg"),err.message,"error");e.target.value="";}};
-$("removeBrandingBanner").onclick=()=>{setBannerPreview("");notice($("brandingMsg"),"बैनर हटाने के लिए अब सेव करें।");};
-$("saveBranding").onclick=async()=>{
- const uid=$("brandingCandidate").value,c=clientProfiles.find(x=>x.uid===uid);if(!c)return notice($("brandingMsg"),"पहले प्रत्याशी चुनें।","error");if(!c.panchayatId)return notice($("brandingMsg"),"प्रत्याशी प्रोफाइल में panchayatId नहीं है।","error");if(brandingBannerData.length>700*1024)return notice($("brandingMsg"),"बैनर बहुत बड़ा है। छोटी इमेज चुनें।","error");
- const btn=$("saveBranding");btn.disabled=true;try{await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(uid).set({bannerBase64:brandingBannerData,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});brandingReadCache={};notice($("brandingMsg"),"बैनर Firestore में सेव हो गया।","success");if(user&&user.uid===uid){candidateBranding={...candidateBranding,bannerBase64:brandingBannerData};renderCandidateBranding();}}
- catch(e){notice($("brandingMsg"),"सेव नहीं हुआ: "+e.message+" — Firestore Rules में candidateBranding की अनुमति जाँचें।","error");}finally{btn.disabled=false;}
-};
-
-// स्थानीय IndexedDB कैश: एक ही मतदाता सूची को पेज रीफ्रेश पर दोबारा डाउनलोड करने से बचाएँ।
-const VOTER_CACHE_DB = "voter-slip-local-cache-v2";
-// स्थायी कैश: कोई समय-सीमा नहीं। नया Excel अपलोड होने पर activeUploadId
-// बदलता है और नई सूची अपने आप डाउनलोड होकर अलग कैश में सेव होगी।
-
-function openVoterCacheDB() {
-  return new Promise((resolve, reject) => {
-    if (!("indexedDB" in window)) return reject(new Error("IndexedDB उपलब्ध नहीं है"));
-    const request = indexedDB.open(VOTER_CACHE_DB, 1);
-    request.onupgradeneeded = () => {
-      const database = request.result;
-      if (!database.objectStoreNames.contains("lists")) {
-        database.createObjectStore("lists", { keyPath: "key" });
-      }
-    };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error || new Error("कैश डेटाबेस नहीं खुला"));
-  });
-}
-
-async function readLocalVoterCache(key) {
-  let database;
-  try {
-    database = await openVoterCacheDB();
-    return await new Promise((resolve) => {
-      const request = database.transaction("lists", "readonly")
-        .objectStore("lists").get(key);
-      request.onsuccess = () => {
-        const item = request.result;
-        if (!item || !Array.isArray(item.data)) {
-          resolve(null);
-        } else {
-          resolve(item.data);
+        @media print { 
+            @page { size: A4 portrait; margin: 5mm; } 
+            .no-print, .sidebar, .student-header, #pin-area, #login-area { display: none !important; } 
+            body { background: white; padding: 0; } 
+            #exam-container { box-shadow: none; width: 100%; border: none; padding: 0; }
+            .result-table td { font-size: 9px !important; padding: 2px 4px !important; }
+            .result-table th { font-size: 10px !important; background: #eee !important; color: #000 !important; }
+            .watermark { display: block !important; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.05); white-space: nowrap; z-index: 1; pointer-events: none; }
         }
-      };
-      request.onerror = () => resolve(null);
-    });
-  } catch (_) {
-    return null;
-  } finally {
-    if (database) database.close();
-  }
-}
+        .watermark { display: none; }
+    </style>
+</head>
+<body>
 
-async function writeLocalVoterCache(key, data) {
-  let database;
-  try {
-    database = await openVoterCacheDB();
-    await new Promise((resolve) => {
-      const transaction = database.transaction("lists", "readwrite");
-      transaction.objectStore("lists").put({
-        key,
-        savedAt: Date.now(),
-        data
-      });
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = () => resolve();
-      transaction.onabort = () => resolve();
-    });
-  } catch (_) {
-    // स्थानीय कैश न चलने पर सामान्य Firestore खोज जारी रहेगी।
-  } finally {
-    if (database) database.close();
-  }
-}
+<div id="exam-container">
+    <div class="watermark">ITI KOTRI</div>
 
-
-// क्रम संख्या को वास्तविक संख्यात्मक क्रम में व्यवस्थित करें।
-// Firestore/IndexedDB से आए पुराने unsorted records पर भी यह लागू होगा।
-function sortVotersBySerial(list){
-  const toNumber = value => {
-    const s = String(value ?? "").trim()
-      .replace(/[०-९]/g, d => "०१२३४५६७८९".indexOf(d))
-      .replace(/,/g, "");
-    const m = s.match(/^\d+(?:\.\d+)?/);
-    return m ? Number(m[0]) : NaN;
-  };
-  return [...list].sort((a,b)=>{
-    const an=toNumber(a.serial), bn=toNumber(b.serial);
-    if(Number.isFinite(an) && Number.isFinite(bn) && an!==bn) return an-bn;
-    if(Number.isFinite(an)!==Number.isFinite(bn)) return Number.isFinite(an)?-1:1;
-    const rowA=Number(a._row), rowB=Number(b._row);
-    if(Number.isFinite(rowA)&&Number.isFinite(rowB)&&rowA!==rowB) return rowA-rowB;
-    return String(a.id||"").localeCompare(String(b.id||""),"en",{numeric:true});
-  });
-}
-
-async function getVoters() {
-  const p = isAdmin()
-    ? places.find(x => x.id === $("searchP").value)
-    : places.find(x => x.id === profile.panchayatId);
-
-  if (!p) {
-    throw new Error("प्रत्याशी की पंचायत नहीं मिली।");
-  }
-
-  // यूजर प्रोफाइल और पंचायत की सक्रिय स्थिति लॉगिन के समय जाँची जाती है।
-  // हर खोज पर दो अतिरिक्त Firestore reads करने की जरूरत नहीं है।
-  // activeUploadId लॉगिन पर मिली पंचायत जानकारी से कैश को version करता है।
-  if (!isAdmin() && p.active === false) {
-    cache=[];
-    throw new Error("यह ग्राम पंचायत एडमिन द्वारा अस्थायी रूप से बंद की गई है। कृपया दोबारा लॉगिन करें।");
-  }
-  activeSearchPlace = p;
-
-  if (!p.activeUploadId) {
-    throw new Error("सक्रिय वोटर सूची उपलब्ध नहीं है।");
-  }
-
-  // कैश की पहचान पंचायत + अपलोड + यूजर/वार्ड से होगी।
-  // नया Excel अपलोड होने पर activeUploadId बदलता है, इसलिए पुराना कैश इस्तेमाल नहीं होगा।
-  const cacheScope = isAdmin() ? "admin" : String(profile.ward || "ALL");
-  const localCacheKey = [
-    user?.uid || "unknown",
-    p.id,
-    p.activeUploadId,
-    cacheScope
-  ].join("|");
-
-  const savedVoters = await readLocalVoterCache(localCacheKey);
-  if (savedVoters !== null) {
-    activeSearchPlace = p;
-    return sortVotersBySerial(savedVoters);
-  }
-
-  let q = db
-    .collection("panchayats")
-    .doc(p.id)
-    .collection("uploads")
-    .doc(p.activeUploadId)
-    .collection("voters");
-
-  // वार्ड-विशिष्ट प्रत्याशी के लिए Firestore पर ही फ़िल्टर करें
-  if (!isAdmin() && profile.ward !== "ALL") {
-    q = q.where("ward", "==", profile.ward);
-  }
-
-  const snapshot = await q.limit(5000).get();
-
-  const voters = sortVotersBySerial(snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })));
-
-  // सूची इस ब्राउज़र में स्थायी रूप से रखें; कैश फेल हो तो Firestore से पढ़ें।
-  await writeLocalVoterCache(localCacheKey, voters);
-  return voters;
-}
-$("searchBtn").onclick=async()=>{try{notice($("searchMsg"),"खोज रहे हैं...");if(!cache.length)cache=await getVoters();if(isAdmin()||(profile?.role==="client"&&profile.ward==="ALL")){$("ward").innerHTML="<option value=''>सभी वार्ड</option>"+[...new Set(cache.map(v=>String(v.ward||"")).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"hi")).map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join("")}let term=norm($("query").value),ward=$("ward").value;let found=cache.filter(v=>matchesSearch(v,term)&&(!ward||norm(v.ward)===norm(ward))).slice(0,100);$("results").innerHTML=found.map(v=>`<div class="result"><b>${esc(v.name)}</b><br><small>पिता/पति: ${esc(v.relative)} · मकान: ${esc(v.house)} · वार्ड: ${esc(v.ward)} · क्रमांक: ${esc(v.serial)}</small><br><button onclick="makeSlip('${esc(v.id)}')">पर्ची देखें</button></div>`).join("")||"मतदाता नहीं मिला।";notice($("searchMsg"),`परिणाम: ${found.length}${cache.length===5000?" (पहले 5,000 रिकॉर्ड तक)":""}`)}catch(e){notice($("searchMsg"),e.message,"error")}};
-$("clearBtn").onclick=()=>{ $("query").value="";$("results").innerHTML="";cache=[];$("ward").value=""};$("searchP").onchange=()=>{cache=[];$("results").innerHTML="";$("ward").innerHTML="<option value=''>सभी वार्ड</option>"};
-async function getBrandingForCurrentSearch(){
- let brand=candidateBranding||{};
- if(isAdmin()){
-  // एडमिन की एक ही प्रत्याशी की फोटो/चिह्न हर पर्ची पर दोबारा Firestore से न पढ़ें।
-  const c=clientProfiles.find(x=>x.panchayatId===(activeSearchPlace?.id||""));
-  if(c){
-   const key=c.panchayatId+"|"+c.uid;
-   if(Object.prototype.hasOwnProperty.call(brandingReadCache,key)){
-    brand=brandingReadCache[key];
-   }else{
-    const d=await db.collection("panchayats").doc(c.panchayatId).collection("candidateBranding").doc(c.uid).get();
-    brand=d.exists?{...d.data(),position:c.position||"प्रत्याशी"}:{position:c.position||"प्रत्याशी"};
-    brandingReadCache[key]=brand;
-   }
-  }
- }
- return brand;
-}
-function slipHTML(v,panchayat,brand){
-  const banner=brand.bannerBase64?`<img class="full-slip-banner" src="${esc(brand.bannerBase64)}" alt="प्रत्याशी बैनर">`:`<div class="banner-missing">एडमिन से प्रत्याशी का बैनर सेट करवाएँ</div>`;
-  const boothText=v.booth||"—";
-  return `<article class="slip sample-slip">
-    <div class="full-slip-banner-wrap">${banner}</div>
-    <div class="sample-cutline">✂ मतदान तिथि से पूर्व बांटी गयी पर्ची, मतदान केन्द्र में जाने से पहले ऊपर का हिस्सा फाड़ दें। ✂</div>
-    <div class="sample-voter-area">
-      <div class="sample-voter-main">
-        <div class="sample-idline"><b>${esc(v.serial||"—")}</b><strong>${esc(v.epic||"")}</strong></div>
-        <div class="sample-detail"><b>नाम:</b> <strong class="voter-value">${esc(v.name||"—")}</strong></div>
-        <div class="sample-detail"><b>${esc(v.relationType||"पिता / पति")} का नाम:</b> <strong class="voter-value">${esc(v.relative||"—")}</strong></div>
-        <div class="sample-detail"><b>मकान संख्या:</b> ${esc(v.house||"—")}</div>
-        <div class="sample-detail"><b>आयु:</b> ${esc(v.age||"—")}　<b>लिंग:</b> ${esc(v.gender||"—")}</div>
-        ${v.locality?`<div class="sample-detail"><b>मोहल्ला:</b> ${esc(v.locality)}</div>`:""}
-      </div>
-      <aside class="sample-booth">
-        <div class="sample-booth-title">${esc(panchayat||"ग्राम पंचायत")}</div>
-        <div class="sample-ward">वार्ड : ${esc(v.ward||"—")}</div>
-        <div class="sample-booth-content"><b>मतदान बूथ</b><br>${esc(boothText)}</div>
-      </aside>
+    <div id="pin-area" style="text-align:center; padding: 100px 0;">
+        <h1 style="color:#2c3e50;">ITI KOTRI CBT PANEL</h1>
+        <p>परीक्षा अनलॉक करने के लिए PIN दर्ज करें</p>
+        <input type="password" id="access-pin" maxlength="4" style="font-size:30px; width:150px; text-align:center; letter-spacing: 10px; border: 2px solid #3498db; border-radius: 8px;"><br><br>
+        <button onclick="checkPin()" style="padding:10px 30px; background:#3498db; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">अनलॉक करें</button>
     </div>
-    <div class="sample-time">मतदान समय : प्रातः 7 से सायं 6 बजे तक</div>
-  </article>`;
-}
-window.makeSlip=async id=>{
- const v=cache.find(x=>x.id===id);if(!v)return;
- try{const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
-  $("printArea").classList.remove("hidden");$("slips").className="slips";$("slips").innerHTML=slipHTML(v,panchayat,brand);
-  await waitForSlipImages();window.scrollTo({top:$("printArea").offsetTop,behavior:"smooth"});
- }catch(e){notice($("searchMsg"),"पर्ची तैयार नहीं हुई: "+e.message,"error")}
-};
-function waitForSlipImages(){return Promise.all([...$("slips").querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,5000)})));}
-window.saveSlipPNG=async()=>{
- const slip=$("slips").querySelector(".slip");if(!slip)return alert("पहले एक मतदाता की पर्ची खोलें।");
- if(typeof html2canvas!=="function")return alert("PNG सुविधा लोड नहीं हुई। इंटरनेट कनेक्शन जाँचें और पेज रीफ्रेश करें।");
- try{await waitForSlipImages();const canvas=await html2canvas(slip,{scale:3,backgroundColor:"#ffffff",useCORS:true,logging:false});const a=document.createElement("a");a.download="voter-slip-"+Date.now()+".png";a.href=canvas.toDataURL("image/png");a.click();}
- catch(e){alert("PNG सेव नहीं हो सकी: "+e.message)}
-};
-window.printCurrentSlip=()=>{const pages=$("slips");if(!pages.querySelector(".slip"))return alert("पहले पर्ची खोलें।");document.body.classList.remove("bulk-print-mode");window.print()};
-$("bulkWardPrint").onclick=async()=>{
- try{
-  if(!cache.length)cache=await getVoters();
-  let ward=$("ward").value;
-  if(!isAdmin()&&profile.ward!=="ALL")ward=String(profile.ward);
-  if(!ward){return notice($("searchMsg"),"पहले वार्ड चुनें। Ward ALL प्रत्याशी को एक निश्चित वार्ड चुनना होगा।","error")}
-  // चुने हुए वार्ड की सभी पर्चियाँ क्रम संख्या 1, 2, 3... में ही छापें।
-  const voters=sortVotersBySerial(cache.filter(v=>norm(v.ward)===norm(ward)));
-  if(!voters.length)return notice($("searchMsg"),"इस वार्ड में मतदाता नहीं मिले। पहले खोजें बटन दबाकर सूची लोड करें।","error");
-  const brand=await getBrandingForCurrentSearch(),panchayat=activeSearchPlace?.name||places[0]?.name||"";
-  const pages=[];for(let i=0;i<voters.length;i+=6){pages.push(`<div class="bulk-print-page">${voters.slice(i,i+6).map(v=>slipHTML(v,panchayat,brand)).join("")}</div>`)}
-  $("printArea").classList.remove("hidden");$("slips").className="bulk-print-pages";$("slips").innerHTML=pages.join("");await waitForSlipImages();
-  notice($("searchMsg"),`वार्ड ${ward}: ${voters.length} पर्चियाँ तैयार हैं। प्रिंट संवाद में A4 और Scale 100% रखें।`,"success");window.print();
- }catch(e){notice($("searchMsg"),"वार्ड की पर्चियाँ तैयार नहीं हुईं: "+e.message,"error")}
-};
-window.closeSlip=()=>{$("printArea").classList.add("hidden");$("slips").innerHTML="";$ ("slips").className="slips"};
 
-</script></body></html>
+    <div id="login-area" style="display:none; text-align:center; padding: 50px 0;">
+        <h1 style="color:#2c3e50;">INDUSTRIAL TRAINING INSTITUTE, KOTRI</h1>
+        <h2>COPA TRADE - CBT EXAM</h2>
+        <p>अनुदेशक: <b>संजय जाजुन्दा</b></p>
+        <p><b>COPA ACHIVEMENT TEST 1</b></p>
+        <hr style="width:50%"><br>
+        <input type="text" id="student-name-input" placeholder="छात्र का नाम" style="width:300px; padding:12px; margin:5px;"><br>
+        <input type="text" id="roll-no-input" placeholder="रोल नंबर" style="width:300px; padding:12px; margin:5px;"><br><br>
+        <button onclick="startExam()" style="padding:15px 50px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer; font-weight:bold; width:325px;">परीक्षा प्रारंभ करें</button>
+    </div>
+
+    <div id="quiz-area" style="display:none;">
+        <div class="student-header">
+            <div class="student-info-box">छात्र: <span id="display-name">---</span></div>
+            <div class="student-info-box">रोल नंबर: <span id="display-roll">---</span></div>
+            <div class="timer" id="timer">समय: 30:00</div>
+        </div>
+
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 id="progress" style="color:#2c3e50; margin:0;">प्रश्न 1 / 25</h3>
+        </div>
+
+        <div class="quiz-layout">
+            <div class="main-content">
+                <div class="question-box">
+                    <p id="question-text" style="font-size: 20px; line-height: 1.5;"></p>
+                    <div class="options" id="options-container"></div>
+                </div>
+                <div style="display:flex; justify-content: space-between;">
+                    <button onclick="prevQuestion()" style="padding:10px 25px; background:#7f8c8d; color:white; border:none; border-radius:5px; cursor:pointer;">पिछला</button>
+                    <button id="next-btn" onclick="nextQuestion()" style="padding:10px 25px; background:#2ecc71; color:white; border:none; border-radius:5px; cursor:pointer;">अगला प्रश्न</button>
+                </div>
+            </div>
+            <div class="sidebar no-print">
+                <div style="display:flex; justify-content: space-between; margin-bottom:10px;">
+                    <span style="color:#27ae60; font-weight:bold;">हल: <span id="count-solved">0</span></span>
+                    <span style="color:#7f8c8d; font-weight:bold;">शेष: <span id="count-rem">25</span></span>
+                </div>
+                <div class="grid-nav" id="grid-nav"></div>
+                <button onclick="if(confirm('क्या आप सबमिट करना चाहते हैं?')) showScore()" style="background:#e74c3c; color:white; width:100%; margin-top:15px; padding:10px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">फाइनल सबमिट</button>
+            </div>
+        </div>
+   </div> 
+
+   <div id="score-screen" style="display:none;">
+        <div style="text-align:center;">
+            <h2 style="margin: 0;">INDUSTRIAL TRAINING INSTITUTE, KOTRI</h2>
+            <h3 style="color: gold; margin: 5px 0;">COPA TRADE - CBT RESULT CARD</h3>
+            <h4 style="color: red; margin: 0;">अनुदेशक: संजय जाजुन्दा</h4>
+        </div>
+        <hr>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px; margin-bottom: 10px;">
+            <div><strong>छात्र का नाम:</strong> <span id="res-name"></span></div>
+            <div><strong>रोल नंबर:</strong> <span id="res-roll"></span></div>
+            <div><strong>परीक्षा तिथि:</strong> <span id="res-date"></span></div>
+            <div><strong>सबमिट समय:</strong> <span id="res-time"></span></div>
+            <div><strong>प्राप्तांक:</strong> <span id="res-score"></span> / <span id="total-q-res"></span></div>
+            <div><strong>परिणाम:</strong> <span id="res-status"></span> (<span id="res-percent"></span>%)</div>
+        </div>
+        
+        <table class="result-table">
+            <thead><tr style="background:#2c3e50; color:white;"><th>#</th><th>प्रश्न</th><th>आपका उत्तर</th><th>सही उत्तर</th><th>परिणाम</th></tr></thead>
+            <tbody id="result-summary"></tbody>
+        </table>
+        <br><button class="no-print" onclick="window.print()" style="background:#3498db; color:white; width:100%; padding:15px; border:none; border-radius:5px; cursor:pointer; font-weight:bold;">रिजल्ट PDF सेव करें / प्रिंट करें</button>
+    </div>
+</div> 
+
+<script>
+    const MASTER_PIN = "0411";
+    const prefix = ["A", "B", "C", "D"];
+  const questions = [
+{
+q: "कोपा का कोर्स आप किस कक्षा के बाद कर सकते हैं?",
+a: ["(a) 10th", "(b) 12th", "(c) 8th", "(d) UG"],
+c: 0
+},
+{
+q: "कोपा का कोर्स कितने समयान्तराल का होता है?",
+a: ["(a) 1 वर्ष", "(b) 2 वर्ष", "(c) 6 माह", "(d) 3 वर्ष"],
+c: 0
+},
+{
+q: "कोपा का पूर्णरूप क्या है?",
+a: ["(a) कम्प्यूटर एण्ड प्रोग्रामिंग असिस्टेन्ट", "(b) कम्प्यूटर ऑपरेटर एण्ड प्रोग्राम असिस्टेन्ट", "(c) कम्प्यूटर ऑपरेटर एण्ड प्रोग्रामिंग असिस्टेन्ट", "(d) कम्प्यूटर ऑपरेटर एण्ड प्रोग्रामिंग एसोसिएट"],
+c: 2
+},
+{
+q: "जिसमें लकड़ी, प्लास्टिक, कागज या कार्बनिक पदार्थ शामिल होते हैं, किस प्रकार की आग श्रेणी में वर्गीकृत होते हैं?",
+a: ["(a) Class B", "(b) Class A", "(c) Class C", "(d) Class D"],
+c: 1
+},
+{
+q: "लिक्िवफाइड गैसों द्वारा लगी आग को बुझाने के लिए किस श्रेणी का आग बुझाने वाला यन्त्र उपयुक्त है?",
+a: ["(b) कार्बन टेट्राक्लोराइड (CTC) फायर एक्सटिंग्यूशर", "(a) फोम टाइप फायर एक्सटिंग्यूशर", "(c) ड्राई पाउडर फायर एक्सटिंग्यूशर", "(d) हैलोन टाइप फायर एक्सटिंग्यूशर"],
+c: 2
+},
+{
+q: "निम्न में से किसमें लगी आग के लिए शीतल जल की बौछार उपयुक्त रहती है?",
+a: ["(a) मिट्टी का तेल", "(b) कागज", "(c) LPG गैस", "(d) बिजली के तार"],
+c: 1
+},
+{
+q: "किस प्रकार का फायर एक्सटिंग्यूशर विद्युत आधारित अग्नि के लिए प्रयोग नहीं करना चाहिए?",
+a: ["(a) हैलोन एक्सटिंग्यूशर", "(b) कार्बन टेट्राक्लोराइड (CTC) एक्सटिंग्यूशर", "(c) फोम एक्सटिंग्यूशर", "(d) ड्राई पाउडर एक्सटिंग्यूशर"],
+c: 2
+},
+{
+q: "निम्न में से ऐसा कौन-सा महत्वपूर्ण तत्व है, जिसकी उपस्थिति से आग लगने की क्रिया जारी रहती है?",
+a: ["(a) ऊष्मा", "(b) ऑक्सीजन", "(c) ईंधन", "(d) ये सभी"],
+c: 3
+},
+{
+q: "विद्युत तारों में लगी आग को बुझाने के लिए प्रयोग किया जाने वाला अग्निशामक यन्त्र है",
+a: ["(a) जलयुक्त यन्त्र", "(b) झाग पैदा करने वाला यन्त्र", "(c) कार्बन टेट्राक्लोराइड युक्त यन्त्र", "(d) जल की बौछार"],
+c: 2
+},
+{
+q: "वैद्युतिक कार्यशालाओं में आग बुझाने हेतु",
+a: ["(a) आग बुझाने वाला यन्त्र उपलब्ध रहना चाहिए", "(b) रेत से भरी बाल्टियाँ उपलब्ध होनी चाहिए", "(c) जल की व्यवस्था हेतु जल से भरी ओवरहैड टंकी होनी चाहिए", "(d) उपरोक्त तीनों वस्तुएँ उपलब्ध होनी चाहिए"],
+c: 3
+},
+{
+q: "विद्युत उपकरणों और ऐसे आग वाले प्रतिष्ठानों में किस प्रकार के आग बुझाने वाले यन्त्र का प्रयोग करते हैं?",
+a: ["(a) फोम प्रकार का", "(b) हैलोन प्रकार का", "(c) गैस कार्ट्रीज जल भरा प्रकार का", "(d) दाब से भरे जल प्रकार का"],
+c: 1
+},
+{
+q: "CCl4 का पूरा नाम क्या है?",
+a: ["(a) कार्बन ट्राईक्लोराइड", "(b) कार्बन डाइक्लोराइड", "(c) कार्बन टेट्राक्लोराइड", "(d) इनमें से कोई नहीं"],
+c: 2
+},
+{
+q: "सभी श्रेणी-प्रकार की आग बुझाने के लिए निम्न में से किस आग बुझाने वाले यन्त्र का प्रयोग किया जा सकता है?",
+a: ["(a) CTC आग बुझाने वाले यन्त्र", "(b) CO2 आग बुझाने वाले यन्त्र", "(c) शुष्क पाउडर युक्त आग बुझाने वाले यन्त्र", "(d) उपरोक्त सभी"],
+c: 3
+},
+{
+q: "CTC आग बुझाने वाले यन्त्र में कौन-सा द्रव, वायुदाब के साथ भरा होता है?",
+a: ["(a) कार्बन टेट्राक्लोराइड (CCl4)", "(b) कार्बन डाइ-ऑक्साइड (CO2)", "(c) ब्रोमोक्लोरो-डाइ-फ्लोरो मीथेन (CBrClF2)", "(d) 'a' और 'c' दोनों"],
+c: 3
+},
+{
+q: "पेट्रोल से लगी आग को बुझाने के लिए ...... का प्रयोग किया जाता है।",
+a: ["(a) फोम प्ररुपी आग बुझाने वाला यन्त्र", "(b) रेत की बाल्टी", "(c) पानी की बाल्टी", "(d) शुष्क पाउडर युक्त बुझाने वाला यन्त्र"],
+c: 0
+},
+{
+q: "कम्प्यूटर के किस भाग द्वारा आँकड़ों की प्रोसेसिंग की जाती है?",
+a: ["(a) इनपुट यूनिट", "(b) मैमोरी", "(c) सी.पी.यू.", "(d) आउटपुट यूनिट"],
+c: 2
+},
+{
+q: "निम्नलिखित में से कौन-सा सी.पी.यू. का भाग नहीं है?",
+a: ["(a) ए.एल.यू.", "(b) मैमोरी", "(c) कन्ट्रोल इकाई", "(d) डिस्क ड्राइव"],
+c: 3
+},
+{
+q: "कम्प्यूटर को आँकड़े या आदेश देने के लिए किस प्रकार की यूनिट का प्रयोग किया जाता है?",
+a: ["(a) इनपुट यूनिट", "(b) आउटपुट यूनिट", "(c) स्टोरेज यूनिट", "(d) सी.पी.यू."],
+c: 0
+},
+{
+q: "प्रोसेस किये जाने वाला समस्त डेटा और उसको प्रोसेस करने के लिए आवश्यक निर्देश किससे प्राप्त किए जाते हैं?",
+a: ["(a) इनपुट यूनिट", "(b) आउटपुट यूनिट", "(c) स्टोरेज युक्ति", "(d) इनमें से कोई नहीं"],
+c: 0
+},
+{
+q: "कम्प्यूटर में डेटा किसे कहा जाता है?",
+a: ["(a) संख्या को", "(b) चिन्ह को", "(c) दी गई सूचनाओं को", "(d) चिन्ह व संख्यात्मक सूचना को"],
+c: 3
+},
+{
+q: "सूचना के नियन्त्रण के अन्तर्गत ऑपरेट करने वाली वह इलेक्ट्रॉनिक डिवाइस कौन-सी है जो डेटा को स्वीकार कर सकती है, डेटा को प्रोसेस कर सकती है, आउटपुट प्रोड्यूस करती है और भविष्य में प्रयोग के लिए परिणामों को स्टोर करती है?",
+a: ["(a) इनपुट", "(b) कम्प्यूटर", "(c) सॉफ्टवेयर", "(d) हार्डवेयर"],
+c: 1
+},
+{
+q: "डेटा प्रोसेसिंग का अर्थ क्या है?",
+a: ["(a) डेटा का संग्रहण", "(b) कम्प्यूटर की कार्यप्रणाली", "(c) वाणिज्यिक उपयोग के लिए जानकारी तैयार करना", "(d) गणना कार्य करना"],
+c: 2
+},
+{
+q: "कम्प्यूटर में सूचना किसे कहा जाता है?",
+a: ["(a) डेटा को", "(b) संख्याओं को", "(c) चिन्ह् को", "(d) प्रोससेड डेटा को"],
+c: 3
+},
+{
+q: "मनुष्य की स्मरण शक्ति कम्प्यूटर की तुलना में होती है",
+a: ["(a) सामान्य", "(b) उच्च", "(c) निम्न", "(d) औसत"],
+c: 0
+},
+{
+q: "कम्प्यूटर का प्राथमिक उद्देश्य ......... को प्रोसेस करना और सूचना में परिवर्तित करना है।",
+a: ["(a) इलेक्ट्रोसिटी", "(b) डेटा", "(c) कच्ची सामग्री", "(d) एक बिट"],
+c: 1
+},
+{
+q: "कम्प्यूटर के चार मुख्य कार्य हैं",
+a: ["(a) इनपुट, प्रोसेसिंग, आउटपुट और स्टोरेज", "(b) लर्निंग, थिंकिंग, इन्टेलिजेंस और वर्चुओसिटी", "(c) डेटा, इन्फॉर्मेशन, बिट्स और बाइट्स", "(d) हार्डवेयर, सॉफ्टवेयर, मॉडलिंग और ऑपरेशेंस"],
+c: 0
+},
+{
+q: "इन्सट्रक्शन का समूह, जो कम्प्यूटर को निर्देशित करता है, कहलाता है?",
+a: ["(a) हार्डवेयर", "(b) लॉजिक यूनिट", "(c) प्रोग्राम", "(d) CPU"],
+c: 2
+},
+{
+q: "CPU तथा पेरिफेरल के मध्य की कम्युनिकेशन लाइन को कहते हैं",
+a: ["(a) बस", "(b) लाइन", "(c) मीडिया", "(d) ये सभी"],
+c: 3
+},
+{
+q: "सेन्ट्रल प्रोसेसिंग यूनिट के सभी कार्य कौन करता है?",
+a: ["(a) माइक्रोप्रोसेसर", "(b) ALU", "(c) CU", "(d) मदरबोर्ड"],
+c: 1
+},
+{
+q: "कम्प्यूटर की शक्ति किससे मापी जाती है?",
+a: ["(a) गति एवं मैमोरी", "(b) कीमत एवं वजन", "(c) आकार एवं वजन", "(d) इनमें से कोई नहीं"],
+c: 0
+},
+{
+q: "यह पहली डिवाइस थी, जिसे मानव ने गणना करने के लिए बनाया",
+a: ["(a) लूम", "(b) अबेकस", "(c) बोन्स", "(d) इनमें से कोई नहीं"],
+c: 1
+},
+{
+q: "नेपियर्स बोन्स का आविष्कार कब हुआ?",
+a: ["(a) 1614 ई.", "(b) 1617 ई.", "(c) 1620 ई.", "(d) इनमें से कोई नहीं"],
+c: 0
+},
+{
+q: "जॉन नेपियर ने गणनाओं की लघुगणक विधि का आविष्कार कब किया?",
+a: ["(a) 1600 ई. में", "(b) 1642 ई. में", "(c) 1650 ई. में", "(d) 1617 ई. में"],
+c: 2
+},
+{
+q: "बुनाई मशीन में किसके द्वारा डिजाइन के पैटर्न को कन्ट्रोल करने के लिए पंच कार्ड्स का प्रयोग किया गया?",
+a: ["(a) ब्लेज़ पास्कल", "(b) हरमन होलेरिथ", "(c) जैकार्ड लूम", "(d) चार्ल्स बैबेज"],
+c: 2
+},
+{
+q: "निम्न में से कौन-सा बैबेज का आविष्कार है?",
+a: ["(a) पास्कलाइन", "(b) एनालिटिकल इंजन", "(c) 'a' और 'b' दोनों", "(d) इनमें से कोई नहीं"],
+c: 1
+},
+{
+q: "विश्व का सबसे पहला प्रोग्रामर किसे माना जाता है?",
+a: ["(a) पास्कल", "(b) बैबेज", "(c) एडा", "(d) होलेरिथ"],
+c: 2
+},
+{
+q: "............ विश्व का प्रथम स्वचालित विद्युत यांत्रिक (Electro Mechanical) गणना यन्त्र था।",
+a: ["(a) एनीएक", "(b) मार्क-1", "(c) यूनिवैक-1", "(d) इनमें से कोई नहीं"],
+c: 1
+},
+{
+q: "निम्न में से क्या कम्प्यूटर का/के गुण है/हैं?",
+a: ["(a) गति", "(b) विश्वसनीयता", "(c) शुद्धता", "(d) ये सभी"],
+c: 3
+},
+{
+q: "कम्प्यूटर की बुनियादी संरचना का विकास ........ ने किया था।",
+a: ["(a) जॉन वॉन न्यूमैन", "(b) चार्ल्स बैबेज", "(c) ब्लेज़ पास्कल", "(d) गार््डन मूर"],
+c: 0
+},
+{
+q: "प्रथम पीढ़ी के कम्प्यूटरों में ........ का उपयोग करके प्रोग्रामिंग की जाती थी।",
+a: ["(a) असेम्बली लैंग्वेज", "(b) मशीनी भाषा", "(c) सोर्स कोड", "(d) ऑब्जेक्ट कोड"],
+c: 1
+},
+{
+q: "अभी तक कम्प्यूटरों की कुल कितनी पीढ़ियाँ अस्तित्व में आ चुकी हैं?",
+a: ["(a) तीन", "(b) चार", "(c) पाँच", "(d) छ:"],
+c: 2
+},
+{
+q: "तीसरी पीढ़ी के कम्प्यूटर में निम्न में से किसका प्रयोग किया गया?",
+a: ["(a) एकीकृत परिपथ", "(b) ट्रांजिस्टर", "(c) सिलिकॉन चिप", "(d) वैक्यूम ट्यूब"],
+c: 0
+},
+{
+q: "माइक्रो चिप का प्रयोग ............... से शुरू हुआ।",
+a: ["(a) दूसरी पीढ़ी", "(b) तीसरी पीढ़ी", "(c) चौथी पीढ़ी", "(d) पाँचवीं पीढ़ी"],
+c: 1
+},
+{
+q: "पाँचवीं पीढ़ी के कम्प्यूटर में किसका उपयोग किया जाता है?",
+a: ["(a) डेटाबेस", "(b) आर्टिफिशियल इन्टेलिजेंस", "(c) ऑनलाइन सिस्टम", "(d) इंजीनियरिंग डिजाइन"],
+c: 1
+},
+{
+q: "वे कम्प्यूटर जिनमें इनपुट तथा आउटपुट गुणवाचक सूचना के रूप में होते हैं, कहलाते हैं",
+a: ["(a) डिजिटल कम्प्यूटर", "(b) हाइब्रिड कम्प्यूटर", "(c) एनालॉग कम्प्यूटर", "(d) ये सभी"],
+c: 2
+},
+{
+q: "एनालॉग तथा डिजिटल कम्प्यूटर की विशेषताओं के संयुक्त रूप को कहते हैं",
+a: ["(a) हाइब्रिड कम्प्यूटर", "(b) डिजिटल कम्प्यूटर", "(c) एनालॉग कम्प्यूटर", "(d) सुपर कम्प्यूटर"],
+c: 0
+},
+{
+q: "आकार के अनुसार सबसे छोटा कम्प्यूटर कौन-सा होता है?",
+a: ["(a) माइक्रो कम्प्यूटर", "(b) मिनी कम्प्यूटर", "(c) मेनफ्रेम कम्प्यूटर", "(d) सुपर कम्प्यूटर"],
+c: 0
+},
+{
+q: "इनमें से कौन-सा माइक्रो कम्प्यूटर नहीं है?",
+a: ["(a) HP 9000", "(b) होम कम्प्यूटर", "(c) पेन्टीयम", "(d) इनमें से कोई नहीं"],
+c: 0
+},
+{
+q: "निम्न में से किस कम्प्यूटर की गति सबसे तीव्र होती है?",
+a: ["(a) माइक्रो कम्प्यूटर", "(b) मिनी कम्प्यूटर", "(c) मेनफ्रेम कम्प्यूटर", "(d) सुपर कम्प्यूटर"],
+c: 3
+},
+{
+q: "भारत का पहला सुपर कम्प्यूटर है",
+a: ["(a) परम", "(b) क्रे-1", "(c) क्रे-2", "(d) लैपटॉप"],
+c: 0
+}
+];
+
+
+    let currentIdx = 0;
+    let timeLeft = 1800; // 30 Minute = 1800 Seconds
+    let totalQuestions = questions.length;
+    let userAnswers = new Array(totalQuestions).fill(null);
+    let questionOrder = [];
+
+    function checkPin() {
+        if(document.getElementById("access-pin").value === MASTER_PIN) {
+            document.getElementById("pin-area").style.display = "none";
+            document.getElementById("login-area").style.display = "block";
+        } else alert("गलत पिन!");
+    }
+
+    function startExam() {
+        const nameVal = document.getElementById("student-name-input").value;
+        const rollVal = document.getElementById("roll-no-input").value;
+        if(!nameVal || !rollVal) return alert("नाम और रोल नंबर भरें!");
+        
+        document.getElementById("display-name").innerText = nameVal;
+        document.getElementById("display-roll").innerText = rollVal;
+        document.getElementById("progress").innerText = `प्रश्न 1 / ${totalQuestions}`;
+        document.getElementById("count-rem").innerText = totalQuestions;
+
+        // Shuffle questions
+        questionOrder = Array.from({length: totalQuestions}, (_, i) => i).sort(() => Math.random() - 0.5);
+        
+        const nav = document.getElementById("grid-nav");
+        nav.innerHTML = "";
+        for(let i=0; i<totalQuestions; i++) {
+            const d = document.createElement("div");
+            d.className = "dot"; d.id = "dot-" + i; d.innerText = i + 1;
+            d.onclick = () => { currentIdx = i; loadQuestion(); };
+            nav.appendChild(d);
+        }
+
+        document.getElementById("login-area").style.display = "none";
+        document.getElementById("quiz-area").style.display = "block";
+        loadQuestion();
+        
+        const timerInt = setInterval(() => {
+            if(timeLeft <= 0) { 
+                clearInterval(timerInt); 
+                alert("समय समाप्त!");
+                showScore(); 
+                return; 
+            }
+            timeLeft--;
+            let m = Math.floor(timeLeft/60);
+            let s = timeLeft%60;
+            document.getElementById("timer").innerText = `समय: ${m}:${s<10?'0'+s:s}`;
+        }, 1000);
+    }
+
+    function loadQuestion() {
+        const qIdx = questionOrder[currentIdx];
+        const q = questions[qIdx];
+        const isLocked = userAnswers[currentIdx] !== null;
+
+        document.getElementById("progress").innerText = `प्रश्न ${currentIdx + 1} / ${totalQuestions}`;
+        document.getElementById("question-text").innerText = q.q;
+        
+        const container = document.getElementById("options-container");
+        container.innerHTML = "";
+        
+        q.a.forEach((opt, i) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn" + (userAnswers[currentIdx] === i ? " selected" : "") + (isLocked ? " locked" : "");
+            btn.innerHTML = `<strong>${prefix[i]}.</strong> ${opt}`;
+            btn.onclick = () => {
+                if(!isLocked) {
+                    userAnswers[currentIdx] = i;
+                    updateSidebar();
+                    loadQuestion();
+                }
+            };
+            container.appendChild(btn);
+        });
+
+        document.querySelectorAll(".dot").forEach(d => d.classList.remove("active"));
+        document.getElementById("dot-" + currentIdx).classList.add("active");
+        document.getElementById("next-btn").innerText = (currentIdx === totalQuestions - 1) ? "सबमिट" : "अगला प्रश्न";
+    }
+
+    function updateSidebar() {
+        let solved = userAnswers.filter(a => a !== null).length;
+        document.getElementById("count-solved").innerText = solved;
+        document.getElementById("count-rem").innerText = totalQuestions - solved;
+        document.getElementById("dot-"+currentIdx).classList.add("solved");
+    }
+
+    function nextQuestion() {
+        if(currentIdx < totalQuestions - 1) { 
+            currentIdx++; 
+            loadQuestion(); 
+        } else {
+            if(confirm("क्या आप फाइनल सबमिट करना चाहते हैं?")) showScore();
+        }
+    }
+
+    function prevQuestion() { 
+        if(currentIdx > 0) { 
+            currentIdx--; 
+            loadQuestion(); 
+        } 
+    }
+
+    function showScore() {
+        document.getElementById("quiz-area").style.display = "none";
+        document.getElementById("score-screen").style.display = "block";
+        let score = 0;
+        const resTable = document.getElementById("result-summary");
+        resTable.innerHTML = "";
+        
+        questionOrder.forEach((origIdx, i) => {
+            const q = questions[origIdx];
+            const isCorrect = userAnswers[i] === q.c;
+            if(isCorrect) score++;
+            
+            resTable.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td>${q.q}</td>
+                    <td class="${isCorrect?'pass':'fail'}">${userAnswers[i]!==null?prefix[userAnswers[i]]:'--'}</td>
+                    <td class="pass">${prefix[q.c]} ${q.a[q.c]}</td>
+                    <td>${isCorrect?'✓':'✗'}</td>
+                </tr>`;
+        });
+        
+        const now = new Date();
+        document.getElementById("res-name").innerText = document.getElementById("student-name-input").value;
+        document.getElementById("res-roll").innerText = document.getElementById("roll-no-input").value;
+        document.getElementById("res-date").innerText = now.toLocaleDateString('hi-IN');
+        document.getElementById("res-time").innerText = now.toLocaleTimeString('hi-IN');
+        document.getElementById("res-score").innerText = score;
+        document.getElementById("total-q-res").innerText = totalQuestions;
+        
+        const percent = ((score/totalQuestions)*100).toFixed(2);
+        document.getElementById("res-percent").innerText = percent;
+        
+        const status = document.getElementById("res-status");
+        status.innerText = percent >= 40 ? "PASS" : "FAIL";
+        status.className = percent >= 40 ? "pass" : "fail";
+    }
+</script>
+</body>
+</html>
